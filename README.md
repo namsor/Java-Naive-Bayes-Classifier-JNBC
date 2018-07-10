@@ -65,7 +65,7 @@ Here is an excerpt from the example (inspired by https://github.com/ptnplanet/Ja
 
 ```
 
-The GNU GPLv3 License
+The GNU LGPLv3 License
 ------------------
 Copyright (c) 2018 - Elian Carsenat, NamSor SAS
-https://www.gnu.org/licenses/gpl-3.0.en.html
+https://www.gnu.org/licenses/lgpl-3.0.en.html
