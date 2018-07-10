@@ -1,5 +1,5 @@
 # Java-Naive-Bayes-LevelDB
-A Java Naive Bayes Classifier that works on LevelDB or other key-value store. LevelDB is a fast key-value storage library written at Google that provides an ordered mapping from string keys to string values. The interface and sample are inspired by Philipp Nolte's https://github.com/ptnplanet/Java-Naive-Bayes-Classifier/, but the implementation is a full rewrite to store the key/values into a ConcurrentHashMap(), LevelDB, LMDB, Redis or other.
+A Java Naive Bayes Classifier that works on LevelDB or other key-value store. The interface and sample are inspired by Philipp Nolte's https://github.com/ptnplanet/Java-Naive-Bayes-Classifier/, but the implementation is a full rewrite to store the key/values into a ConcurrentHashMap(), LevelDB, LMDB, Redis or other. LevelDB is a fast key-value storage library written at Google that provides an ordered mapping from string keys to string values.
 
 Maven Quick-Start
 ------------------
