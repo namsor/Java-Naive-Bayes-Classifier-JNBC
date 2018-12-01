@@ -29,4 +29,9 @@ public class ClassificationImpl implements IClassification {
         return probability;
     }
 
+    @Override
+    public String toString() {
+        return "ClassificationImpl{" + "category=" + category + ", probability=" + probability + '}';
+    }
+
 }

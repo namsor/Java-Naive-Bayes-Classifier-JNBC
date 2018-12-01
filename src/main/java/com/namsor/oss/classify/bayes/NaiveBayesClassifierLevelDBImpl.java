@@ -29,7 +29,7 @@ public class NaiveBayesClassifierLevelDBImpl extends AbstractNaiveBayesClassifie
 
     public NaiveBayesClassifierLevelDBImpl(String classifierName, String[] categories, String rootPathWritable, int cacheSizeMb) throws IOException {
         super(classifierName, categories);
-        this.rootPathWritable = rootPathWritable;
+        this.rootPathWritable = rootPathWritable;        
         Options options = new Options();
         options.createIfMissing(true);
         options.cacheSize(cacheSizeMb * 1048576); // 100MB cache
