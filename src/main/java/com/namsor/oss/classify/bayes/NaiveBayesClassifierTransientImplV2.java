@@ -19,11 +19,11 @@ import java.util.logging.Logger;
  *
  * @author elian carsenat, NamSor SAS
  */
-public class NaiveBayesClassifierTransientImpl extends AbstractNaiveBayesClassifierImpl implements INaiveBayesClassifier {
+public class NaiveBayesClassifierTransientImplV2 extends AbstractNaiveBayesClassifierImpl implements INaiveBayesClassifier {
 
     private final Map<String, Long> db;
 
-    public NaiveBayesClassifierTransientImpl(String classifierName, String[] categories) throws IOException {
+    public NaiveBayesClassifierTransientImplV2(String classifierName, String[] categories) throws IOException {
         super(classifierName, categories);
         db = new ConcurrentHashMap();
     }
@@ -95,7 +95,7 @@ public class NaiveBayesClassifierTransientImpl extends AbstractNaiveBayesClassif
             try {
                 w.append(key + "|" + value + "\n");
             } catch (IOException ex) {
-                Logger.getLogger(NaiveBayesClassifierTransientImpl.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(NaiveBayesClassifierTransientImplV2.class.getName()).log(Level.SEVERE, null, ex);
                 throw new ClassifyException(ex);
             }
         }

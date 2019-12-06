@@ -29,13 +29,6 @@ public interface INaiveBayesClassifier {
     void learn(String category, Set<String> features, int weight) throws ClassifyException;
     
     /**
-     * Forget
-     * @param category
-     * @param features 
-     */
-    void forget(String category, Set<String> features) throws ClassifyException;
-    
-    /**
      * Predict most probable class
      * @param features 
      * @return 

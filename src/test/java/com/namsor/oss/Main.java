@@ -8,7 +8,9 @@ package com.namsor.oss;
 import com.namsor.oss.classify.bayes.ClassifyException;
 import com.namsor.oss.classify.bayes.INaiveBayesClassifier;
 import com.namsor.oss.classify.bayes.NaiveBayesClassifierLevelDBImpl;
+import com.namsor.oss.classify.bayes.NaiveBayesClassifierRocksDBImpl;
 import com.namsor.oss.classify.bayes.NaiveBayesClassifierTransientImpl;
+import com.namsor.oss.classify.bayes.PersistentClassifierException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Arrays;
@@ -23,15 +25,21 @@ import java.util.logging.Logger;
  * @author elian
  */
 public class Main {
+
     private static final String POSITIVE = "positive";
     private static final String NEGATIVE = "negative";
-    private static final boolean USE_LEVELDB = false;
+
     public static final void main(String[] args) {
         try {
             String[] cats = {POSITIVE, NEGATIVE};
             // Create a new bayes classifier with string categories and string features.
-            INaiveBayesClassifier bayes = (USE_LEVELDB ? new NaiveBayesClassifierLevelDBImpl("sentiment", cats, ".", 100) : new NaiveBayesClassifierTransientImpl("sentiment", cats));
-
+            // INaiveBayesClassifier bayes1 = new NaiveBayesClassifierLevelDBImpl("sentiment", cats, ".", 100);
+            //INaiveBayesClassifier bayes2 = new NaiveBayesClassifierTransientImpl("sentiment", cats);
+            NaiveBayesClassifierRocksDBImpl bayes = new NaiveBayesClassifierRocksDBImpl("sentiment", cats, ".", 100);
+            StringWriter sw = new StringWriter();
+            bayes.dumpDb(sw);
+            System.out.println("Bayes Stats 1 : \n"+sw);
+            
 // Two examples to learn from.
             String[] positiveText = "I love sunny days".split("\\s");
             String[] negativeText = "I hate rain".split("\\s");
@@ -46,14 +54,17 @@ public class Main {
 // Here are two unknown sentences to classify.
             String[] unknownText1 = "today is a sunny day".split("\\s");
             String[] unknownText2 = "there will be rain".split("\\s");
-            StringWriter sw = new StringWriter();
-            //bayes.dumpDb(sw);
+            sw = new StringWriter();
+            bayes.dumpDb(sw);
+            System.out.println("Bayes Stats 2 : \n"+sw);
             System.out.println(sw);
             System.out.println( // will output "positive"
                     bayes.classify(new HashSet(Arrays.asList(unknownText1)))[0].getCategory());
             System.out.println( // will output "negative"
                     bayes.classify(new HashSet(Arrays.asList(unknownText2)))[0].getCategory());
 
+        } catch (PersistentClassifierException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassifyException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {

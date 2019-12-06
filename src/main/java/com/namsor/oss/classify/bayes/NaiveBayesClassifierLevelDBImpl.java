@@ -14,6 +14,7 @@ import java.io.*;
 import static org.fusesource.leveldbjni.JniDBFactory.*;
 import java.util.Arrays;
 import java.util.Set;
+import java.util.logging.Level;
 
 /**
  * Implementation : choose one of 
@@ -37,18 +38,26 @@ public class NaiveBayesClassifierLevelDBImpl extends AbstractNaiveBayesClassifie
         db = factory.open(new File(rootPathWritable + "/" + classifierName), options);
     }
 
-    public String dbStatus() {
+    public String dbStatus() throws PersistentClassifierException {
         return db.getProperty("leveldb.stats");
     }
 
-    public void dbClose() throws IOException {
-        db.close();
+    public void dbClose() throws PersistentClassifierException {
+        try {
+            db.close();
+        } catch (IOException ex) {
+            throw new PersistentClassifierException(ex);
+        }
     }
 
-    public void dbCloseAndDestroy() throws IOException {
-        db.close();
-        Options options = new Options();
-        factory.destroy(new File(rootPathWritable + "/" + getClassifierName()), options);
+    public void dbCloseAndDestroy() throws PersistentClassifierException {
+        try {
+            db.close();
+            Options options = new Options();
+            factory.destroy(new File(rootPathWritable + "/" + getClassifierName()), options);
+        } catch (IOException ex) {
+            throw new PersistentClassifierException(ex);
+        }
     }
 
     @Override
@@ -69,7 +78,6 @@ public class NaiveBayesClassifierLevelDBImpl extends AbstractNaiveBayesClassifie
         ro.snapshot(db.getSnapshot());
         WriteBatch batch = db.createWriteBatch();
         try {
-
             //private Map<K, Map<T, Counter>> featureCountPerCategory;
             db.put(bytes(KEY_GLOBAL), Longs.toByteArray((db.get(bytes(KEY_GLOBAL), ro) == null ? weight : Longs.fromByteArray(db.get(bytes(KEY_GLOBAL), ro)) + weight)));
             db.put(bytes(KEY_GLOBAL + KEY_SEPARATOR + KEY_CATEGORY + KEY_SEPARATOR + category), Longs.toByteArray((db.get(bytes(KEY_GLOBAL + KEY_SEPARATOR + KEY_CATEGORY + KEY_SEPARATOR + category), ro) == null ? weight : Longs.fromByteArray(db.get(bytes(KEY_GLOBAL + KEY_SEPARATOR + KEY_CATEGORY + KEY_SEPARATOR + category), ro)) + weight)));
@@ -91,11 +99,6 @@ public class NaiveBayesClassifierLevelDBImpl extends AbstractNaiveBayesClassifie
                 throw new ClassifyException(ex);
             }
         }
-    }
-
-    @Override
-    public void forget(String category, Set<String> features) throws ClassifyException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
