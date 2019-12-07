@@ -1,15 +1,12 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.namsor.oss.classify.bayes;
 
 import java.util.Comparator;
-import java.util.Set;
+import java.util.Map;
 
 /**
- * A simple, scalable Naive Bayes Classifier, based on a key-value store (in memory, or disk-based)
+ * A simple, scalable Naive Bayes Classifier, based on a key-value store (in
+ * memory, or disk-based)
+ *
  * @author elian carsenat, NamSor SAS
  */
 public abstract class AbstractNaiveBayesClassifierImpl implements INaiveBayesClassifier {
@@ -32,13 +29,17 @@ public abstract class AbstractNaiveBayesClassifierImpl implements INaiveBayesCla
     /**
      * @return the categories
      */
+    @Override
     public String[] getCategories() {
         return categories;
     }
-    protected static final String KEY_GLOBAL = "~gL";
-    protected static final String KEY_CATEGORY = "~cA";
-    protected static final String KEY_FEATURE = "~fE";
-    protected static final String KEY_SEPARATOR = "//";
+    
+    private static final String KEY_GLOBAL = "~gL";
+    private static final String KEY_CATEGORY = "~cA";
+    private static final String KEY_FEATURE = "~fE";
+    private static final String KEY_FEATURE_EQVAL = "=";
+    private static final String KEY_SEPARATOR = "//";
+    
     protected final Comparator<IClassification> orderByProba = new Comparator() {
         @Override
         public int compare(Object o1, Object o2) {
@@ -49,7 +50,43 @@ public abstract class AbstractNaiveBayesClassifierImpl implements INaiveBayesCla
     };
 
     @Override
-    public synchronized void learn(String category, Set<String> features) throws ClassifyException {
+    public synchronized void learn(String category, Map<String, String> features) throws ClassifyException {
         learn(category, features, 1);
     }
+    
+
+    /**
+     * Path to the total number of observations
+     * @return 
+     */
+    protected static String pathGlobal() {
+        return KEY_GLOBAL;
+    }
+    
+    /**
+     * Path to the number of observations in a category
+     * @param category
+     * @return 
+     */
+    protected static String pathCategory(String category) {
+        return KEY_GLOBAL + KEY_SEPARATOR + KEY_CATEGORY + KEY_SEPARATOR + category;
+    }
+
+    /**
+     * Path to the number of observations in a category, with feature featureKey
+     * @param category
+     * @return 
+     */
+    protected static String pathCategoryFeatureKey(String category, String featureKey) {
+        return KEY_GLOBAL + KEY_SEPARATOR + KEY_CATEGORY + KEY_SEPARATOR + category + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + featureKey;
+    }    
+
+    /**
+     * Path to the number of observations in a category, with feature featureKey and value featureValue
+     * @param category
+     * @return 
+     */
+    protected static String pathCategoryFeatureKeyValue(String category, String featureKey, String featureValue) {
+        return KEY_GLOBAL + KEY_SEPARATOR + KEY_CATEGORY + KEY_SEPARATOR + category + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + featureKey+KEY_FEATURE_EQVAL+featureValue;
+    }    
 }

@@ -7,9 +7,9 @@ package com.namsor.oss.classify.bayes;
 
 import java.io.*;
 import java.util.Arrays;
-import java.util.Set;
 
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,57 +33,46 @@ public class NaiveBayesClassifierTransientImpl extends AbstractNaiveBayesClassif
     }
 
     public void dbClose() throws IOException {
-
     }
 
     public void dbCloseAndDestroy() throws IOException {
-
     }
 
     @Override
-    public synchronized void learn(String category, Set<String> features) throws ClassifyException {
-        learn(category, features, 1);
-    }
-
-    @Override
-    public synchronized void learn(String category, Set<String> features, int weight) throws ClassifyException {
+    public synchronized void learn(String category, Map<String, String> features, int weight) throws ClassifyException {
         //private Map<K, Map<T, Counter>> featureCountPerCategory;
-        db.put(bytes(KEY_GLOBAL), Longs.toByteArray((db.get(bytes(KEY_GLOBAL)) == null ? weight : Longs.fromByteArray(db.get(bytes(KEY_GLOBAL))) + weight)));
-        db.put(bytes(KEY_GLOBAL + KEY_SEPARATOR + KEY_CATEGORY + KEY_SEPARATOR + category), Longs.toByteArray((db.get(bytes(KEY_GLOBAL + KEY_SEPARATOR + KEY_CATEGORY + KEY_SEPARATOR + category)) == null ? weight : Longs.fromByteArray(db.get(bytes(KEY_GLOBAL + KEY_SEPARATOR + KEY_CATEGORY + KEY_SEPARATOR + category))) + weight)));
-        for (String feature : features) {
-            Logger.getLogger(getClass().getName()).info("learn category:"+category+" feature:"+feature+" weight:"+weight);
-            db.put(bytes(KEY_GLOBAL + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + feature), Longs.toByteArray((db.get(bytes(KEY_GLOBAL + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + feature)) == null ? weight : Longs.fromByteArray(db.get(bytes(KEY_GLOBAL + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + feature))) + weight)));
-            db.put(bytes(KEY_GLOBAL + KEY_SEPARATOR + KEY_CATEGORY + KEY_SEPARATOR + category + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + feature), Longs.toByteArray((db.get(bytes(KEY_GLOBAL + KEY_SEPARATOR + KEY_CATEGORY + KEY_SEPARATOR + category + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + feature)) == null ? weight : Longs.fromByteArray(db.get(bytes(KEY_GLOBAL + KEY_SEPARATOR + KEY_CATEGORY + KEY_SEPARATOR + category + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + feature))) + weight)));
+        db.put(bytes(pathGlobal()), Longs.toByteArray((db.get(bytes(pathGlobal())) == null ? weight : Longs.fromByteArray(db.get(bytes(pathGlobal()))) + weight)));
+        db.put(bytes(pathCategory(category)), Longs.toByteArray((db.get(bytes(pathCategory(category))) == null ? weight : Longs.fromByteArray(db.get(bytes(pathCategory(category)))) + weight)));
+        for (Entry<String, String> feature : features.entrySet()) {
+            db.put(bytes(pathCategoryFeatureKey(category, feature.getKey())), Longs.toByteArray((db.get(bytes(pathCategoryFeatureKey(category, feature.getKey()))) == null ? weight : Longs.fromByteArray(db.get(bytes(pathCategoryFeatureKey(category, feature.getKey())))) + weight)));
+            db.put(bytes(pathCategoryFeatureKeyValue(category, feature.getKey(), feature.getValue())), Longs.toByteArray((db.get(bytes(pathCategoryFeatureKeyValue(category, feature.getKey(), feature.getValue()))) == null ? weight : Longs.fromByteArray(db.get(bytes(pathCategoryFeatureKeyValue(category, feature.getKey(), feature.getValue())))) + weight)));
         }
     }
 
     @Override
-    public synchronized IClassification[] classify(Set<String> features) throws ClassifyException {
+    public synchronized IClassification[] classify(Map<String, String> features) throws ClassifyException {
         IClassification[] result = new ClassificationImpl[getCategories().length];
-        // return ((double) this.getCategoryCount(category) / (double) this.getCategoriesTotal()) * featuresProbabilityProduct(features, category);
-        long globalCount = (db.get(bytes(KEY_GLOBAL)) == null ? 0 : Longs.fromByteArray(db.get(bytes(KEY_GLOBAL))));
+        long globalCount = (db.get(bytes(pathGlobal())) == null ? 0 : Longs.fromByteArray(db.get(bytes(pathGlobal()))));
+        double[] likelyhood = new double[getCategories().length];
+        double likelyhoodTot = 0;
         for (int i = 0; i < getCategories().length; i++) {
             String category = getCategories()[i];
-            long categoryCount = (db.get(bytes(KEY_GLOBAL + KEY_SEPARATOR + KEY_CATEGORY + KEY_SEPARATOR + category)) == null ? 0 : Longs.fromByteArray(db.get(bytes(KEY_GLOBAL + KEY_SEPARATOR + KEY_CATEGORY + KEY_SEPARATOR + category))));
+            long categoryCount = (db.get(bytes(pathCategory(category))) == null ? 0 : Longs.fromByteArray(db.get(bytes(pathCategory(category)))));
             double product = 1.0d;
-            double weight = 1.0d;
-            double assumedProbability = 1d;
-            for (String feature : features) {
-                //product *= this.featureWeighedAverage(feature, category); //this.featureWeighedAverage(feature, category, null, 1.0d, 0.5d);
-                double featureCount = (db.get(bytes(KEY_GLOBAL + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + feature)) == null ? 0 : Longs.fromByteArray(db.get(bytes(KEY_GLOBAL + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + feature))));
-                double featureCategoryCount = (db.get(bytes(KEY_GLOBAL + KEY_SEPARATOR + KEY_CATEGORY + KEY_SEPARATOR + category + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + feature)) == null ? 0 : Longs.fromByteArray(db.get(bytes(KEY_GLOBAL + KEY_SEPARATOR + KEY_CATEGORY + KEY_SEPARATOR + category + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + feature))));
+            for (Entry<String, String> feature : features.entrySet()) {
+                double featureCount = (db.get(bytes(pathCategoryFeatureKey(category, feature.getKey()))) == null ? 0 : Longs.fromByteArray(db.get(bytes(pathCategoryFeatureKey(category, feature.getKey())))));
+                double featureCategoryCount = (db.get(bytes(pathCategoryFeatureKeyValue(category, feature.getKey(), feature.getValue()))) == null ? 0 : Longs.fromByteArray(db.get(bytes(pathCategoryFeatureKeyValue(category, feature.getKey(), feature.getValue())))));
                 double basicProbability = (featureCount == 0 ? 0 : 1d * featureCategoryCount / featureCount);
-
-                double featureWeighedAverage = (weight * assumedProbability + featureCount * basicProbability) / (weight + featureCount);
-                Logger.getLogger(getClass().getName()).info("\n\t\tcategory:"+ category+" feature:"+feature+" featureCount="+featureCount+" featureCategoryCount="+featureCategoryCount+" basicProbability="+basicProbability+" featureWeighedAverage="+featureWeighedAverage);
-                product *= featureWeighedAverage;
+                product *= basicProbability;
             }
-            double proba = 1d * categoryCount / globalCount * product;
-            Logger.getLogger(getClass().getName()).info("\n\tcategory:"+ category+" categoryCount="+categoryCount+" globalCount="+globalCount+" product="+product+" proba="+proba);
-            IClassification classif = new ClassificationImpl(category, proba); // return ((double) this.getCategoryCount(category) / (double) this.getCategoriesTotal()) * featuresProbabilityProduct(features, category);
+            likelyhood[i] = 1d * categoryCount / globalCount * product;
+            likelyhoodTot += likelyhood[i];
+        }
+        for (int i = 0; i < getCategories().length; i++) {
+            double proba = likelyhood[i] / likelyhoodTot;
+            ClassificationImpl classif = new ClassificationImpl(getCategories()[i], proba); 
             result[i] = classif;
         }
-
         Arrays.sort(result, orderByProba);
         return result;
     }
@@ -105,8 +94,10 @@ public class NaiveBayesClassifierTransientImpl extends AbstractNaiveBayesClassif
         return key;
     }
 
+    /**
+     * This class just to have a very similar interface when using Transient HashMap vs. a persistent KeyValue store
+     */
     private static class Longs {
-
         static long fromByteArray(Long get) {
             if (get == null) {
                 return 0;
@@ -114,11 +105,9 @@ public class NaiveBayesClassifierTransientImpl extends AbstractNaiveBayesClassif
                 return get;
             }
         }
-
         static Long toByteArray(long l) {
             return l;
         }
-
     }
 
 }

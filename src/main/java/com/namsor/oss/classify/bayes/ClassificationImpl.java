@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.namsor.oss.classify.bayes;
 
 /**
@@ -31,7 +26,7 @@ public class ClassificationImpl implements IClassification {
 
     @Override
     public String toString() {
-        return "ClassificationImpl{" + "category=" + category + ", probability=" + probability + '}';
+        return "P(" + category + ")=" + probability;
     }
 
 }
