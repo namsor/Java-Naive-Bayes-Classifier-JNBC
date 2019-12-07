@@ -12,7 +12,6 @@ import java.util.Map;
 public abstract class AbstractNaiveBayesClassifierImpl implements INaiveBayesClassifier {
     private static final String KEY_GLOBAL = "~gL";
     private static final String KEY_CATEGORY = "~cA";
-    private static final String KEY_SUM = ".sum";
     private static final String KEY_COUNT = ".count";
     private static final String KEY_FEATURE = "~fE";
     private static final String KEY_FEATURE_EQVAL = "=";
@@ -64,6 +63,13 @@ public abstract class AbstractNaiveBayesClassifierImpl implements INaiveBayesCla
     }
     
     /**
+     * Path to the total count of distinct categories 
+     * @return 
+     */
+    protected static String pathGlobalCountCategories() {
+        return KEY_GLOBAL+KEY_COUNT;
+    }    
+    /**
      * Path to the number of observations in a category
      * @param category
      * @return 
@@ -81,6 +87,24 @@ public abstract class AbstractNaiveBayesClassifierImpl implements INaiveBayesCla
         return KEY_GLOBAL + KEY_SEPARATOR + KEY_CATEGORY + KEY_SEPARATOR + category + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + featureKey;
     }    
 
+    /**
+     * Path to the number of observations in a category, with feature featureKey
+     * @param category
+     * @return 
+     */
+    protected static String pathFeatureKeyValue(String featureKey, String featureValue ) {
+        return KEY_GLOBAL + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + featureKey + KEY_FEATURE_EQVAL+featureValue;
+    }    
+    
+    /**
+     * Path to the number of observations in a category, with feature featureKey
+     * @param category
+     * @return 
+     */
+    protected static String pathFeatureKeyCountValueTypes(String featureKey) {
+        return KEY_GLOBAL + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + featureKey + KEY_COUNT;
+    }    
+    
     /**
      * Path to the number of observations in a category, with feature featureKey and value featureValue
      * @param category

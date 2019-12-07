@@ -17,7 +17,7 @@ import org.junit.runners.Suite;
  * @author elian
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({com.namsor.oss.classify.bayes.NaiveBayesClassifierTransientImplV2Test.class})
+@Suite.SuiteClasses({com.namsor.oss.classify.bayes.NaiveBayesClassifierTransientImplV2Test.class, com.namsor.oss.classify.bayes.NaiveBayesClassifierTransientLaplacedImplV2Test.class})
 public class JBNCTestSuite {
 
     @BeforeClass

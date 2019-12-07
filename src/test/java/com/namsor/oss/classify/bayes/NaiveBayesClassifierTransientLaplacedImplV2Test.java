@@ -27,9 +27,9 @@ import static org.junit.Assert.*;
  *
  * @author elian
  */
-public class NaiveBayesClassifierTransientImplV2Test {
+public class NaiveBayesClassifierTransientLaplacedImplV2Test {
 
-    public NaiveBayesClassifierTransientImplV2Test() {
+    public NaiveBayesClassifierTransientLaplacedImplV2Test() {
     }
 
     @BeforeClass
@@ -55,7 +55,7 @@ public class NaiveBayesClassifierTransientImplV2Test {
     @Test
     public void testTransientLearnClassifySample1() throws Exception {
         String[] cats = {YES, NO};
-        NaiveBayesClassifierTransientImpl bayes = new NaiveBayesClassifierTransientImpl("tennis", cats);
+        NaiveBayesClassifierTransientLaplacedImpl bayes = new NaiveBayesClassifierTransientLaplacedImpl("tennis", cats, 1, false);
         for (int i = 0; i < data.length; i++) {
             Map<String, String> features = new HashMap();
             for (int j = 0; j < colName.length - 1; j++) {
@@ -64,17 +64,17 @@ public class NaiveBayesClassifierTransientImplV2Test {
             bayes.learn(data[i][colName.length - 1], features);
         }
         Map<String, String> features = new HashMap();
-        features.put("outlook", "Sunny");
+        features.put("outlook", "Overcast");
         features.put("temp", "Cool");
         features.put("humidity", "High");
         features.put("wind", "Strong");
         IClassification[] predict = bayes.classify(features);
         assertNotNull(predict);
         assertEquals(predict.length, 2);
-        assertEquals(predict[0].getCategory(), "No");
-        assertEquals(predict[1].getCategory(), "Yes");
-        assertEquals(predict[0].getProbability(), 0.795417348608838, .0001);
-        assertEquals(predict[1].getProbability(), 0.204582651391162, .0001);
+        assertEquals(predict[0].getCategory(), "Yes");
+        assertEquals(predict[1].getCategory(), "No");
+        assertEquals(predict[0].getProbability(), 0.7215830648872527, .0001);
+        assertEquals(predict[1].getProbability(), 0.2784169351127473, .0001);
     }
 
     /**
@@ -86,7 +86,7 @@ public class NaiveBayesClassifierTransientImplV2Test {
         String[] cats = {ZERO, ONE};
         // Create a new bayes classifier with string categories and string features.
         // INaiveBayesClassifier bayes1 = new NaiveBayesClassifierLevelDBImpl("sentiment", cats, ".", 100);
-        NaiveBayesClassifierTransientImpl bayes = new NaiveBayesClassifierTransientImpl("sentiment", cats);
+        NaiveBayesClassifierTransientLaplacedImpl bayes = new NaiveBayesClassifierTransientLaplacedImpl("sentiment", cats, 1, true);
         //NaiveBayesClassifierRocksDBImpl bayes = new NaiveBayesClassifierRocksDBImpl("intro", cats, ".", 100);
 
 // Examples to learn from.
@@ -106,8 +106,8 @@ public class NaiveBayesClassifierTransientImplV2Test {
         assertEquals(predict.length, 2);
         assertEquals(predict[0].getCategory(), "0");
         assertEquals(predict[1].getCategory(), "1");
-        assertEquals(predict[0].getProbability(), 0.75, .0001);
-        assertEquals(predict[1].getProbability(), 0.25, .0001);
+        assertEquals(predict[0].getProbability(), 0.6511627906976744, .0001);
+        assertEquals(predict[1].getProbability(), 0.3488372093023256, .0001);
     }
 
 }
