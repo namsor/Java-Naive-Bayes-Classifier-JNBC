@@ -19,11 +19,11 @@ import java.util.logging.Logger;
  *
  * @author elian carsenat, NamSor SAS
  */
-public class NaiveBayesClassifierTransientImpl extends AbstractNaiveBayesClassifierImpl implements INaiveBayesClassifier {
+public class NaiveBayesClassifierTransientImplLaplaced extends AbstractNaiveBayesClassifierImpl implements INaiveBayesClassifier {
 
     private final Map<String, Long> db;
 
-    public NaiveBayesClassifierTransientImpl(String classifierName, String[] categories) throws IOException {
+    public NaiveBayesClassifierTransientImplLaplaced(String classifierName, String[] categories) throws IOException {
         super(classifierName, categories);
         db = new ConcurrentHashMap();
     }
@@ -49,7 +49,11 @@ public class NaiveBayesClassifierTransientImpl extends AbstractNaiveBayesClassif
             String pathCategoryFeatureKey = pathCategoryFeatureKey(category, feature.getKey());
             db.put(pathCategoryFeatureKey, (db.containsKey(pathCategoryFeatureKey) ? db.get(pathCategoryFeatureKey) + weight : weight ));
             String pathCategoryFeatureKeyValue = pathCategoryFeatureKeyValue(category, feature.getKey(), feature.getValue());
-            db.put(pathCategoryFeatureKeyValue, (db.containsKey(pathCategoryFeatureKeyValue) ? db.get(pathCategoryFeatureKeyValue) + weight : weight ));
+            if( db.containsKey(pathCategoryFeatureKeyValue) ) {
+                db.put(pathCategoryFeatureKeyValue, db.get(pathCategoryFeatureKeyValue) + weight);
+            } else {
+                db.put(pathCategoryFeatureKeyValue, weight);                                
+            }
         }
     }
 
@@ -92,7 +96,7 @@ public class NaiveBayesClassifierTransientImpl extends AbstractNaiveBayesClassif
             try {
                 w.append(key + "|" + value + "\n");
             } catch (IOException ex) {
-                Logger.getLogger(NaiveBayesClassifierTransientImpl.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(NaiveBayesClassifierTransientImplLaplaced.class.getName()).log(Level.SEVERE, null, ex);
                 throw new ClassifyException(ex);
             }
         }

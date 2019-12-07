@@ -10,7 +10,13 @@ import java.util.Map;
  * @author elian carsenat, NamSor SAS
  */
 public abstract class AbstractNaiveBayesClassifierImpl implements INaiveBayesClassifier {
-
+    private static final String KEY_GLOBAL = "~gL";
+    private static final String KEY_CATEGORY = "~cA";
+    private static final String KEY_SUM = ".sum";
+    private static final String KEY_COUNT = ".count";
+    private static final String KEY_FEATURE = "~fE";
+    private static final String KEY_FEATURE_EQVAL = "=";
+    private static final String KEY_SEPARATOR = "//";
     /**
      * @return the classifierName
      */
@@ -32,13 +38,7 @@ public abstract class AbstractNaiveBayesClassifierImpl implements INaiveBayesCla
     @Override
     public String[] getCategories() {
         return categories;
-    }
-    
-    private static final String KEY_GLOBAL = "~gL";
-    private static final String KEY_CATEGORY = "~cA";
-    private static final String KEY_FEATURE = "~fE";
-    private static final String KEY_FEATURE_EQVAL = "=";
-    private static final String KEY_SEPARATOR = "//";
+    }   
     
     protected final Comparator<IClassification> orderByProba = new Comparator() {
         @Override

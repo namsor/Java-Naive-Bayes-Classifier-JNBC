@@ -23,7 +23,7 @@ public interface INaiveBayesClassifier {
      * @param category
      * @param features
      */
-    void learn(String category, Map<String, String> features, int weight) throws ClassifyException;
+    void learn(String category, Map<String, String> features, long weight) throws ClassifyException;
 
     /**
      * Predict most probable class

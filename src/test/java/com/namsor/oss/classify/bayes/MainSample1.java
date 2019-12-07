@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.namsor.oss.classify.bayes;
 
 import java.io.IOException;
@@ -57,7 +52,6 @@ public class MainSample1 {
         try {
             String[] cats = {YES, NO};
             // Create a new bayes classifier with string categories and string features.
-            // INaiveBayesClassifier bayes1 = new NaiveBayesClassifierLevelDBImpl("sentiment", cats, ".", 100);
             NaiveBayesClassifierTransientImpl bayes = new NaiveBayesClassifierTransientImpl("tennis", cats);
             //NaiveBayesClassifierRocksDBImpl bayes = new NaiveBayesClassifierRocksDBImpl("intro", cats, ".", 100);
 
