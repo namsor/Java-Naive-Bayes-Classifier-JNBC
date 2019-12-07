@@ -52,7 +52,9 @@ public class NaiveBayesClassifierTransientImplLaplaced extends AbstractNaiveBaye
             if( db.containsKey(pathCategoryFeatureKeyValue) ) {
                 db.put(pathCategoryFeatureKeyValue, db.get(pathCategoryFeatureKeyValue) + weight);
             } else {
-                db.put(pathCategoryFeatureKeyValue, weight);                                
+                db.put(pathCategoryFeatureKeyValue, weight);
+                // increment the count
+                String pathCategoryFeatureKeyValueCount = pathCategoryFeatureKeyValue(category, feature.getKey(), feature.getValue())
             }
         }
     }
