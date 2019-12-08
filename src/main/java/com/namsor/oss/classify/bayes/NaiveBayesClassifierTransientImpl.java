@@ -28,13 +28,8 @@ public class NaiveBayesClassifierTransientImpl extends AbstractNaiveBayesClassif
         db = new ConcurrentHashMap();
     }
 
-    public String dbStatus() {
-        return "OK";
-    }
-
     @Override
     public synchronized void learn(String category, Map<String, String> features, long weight) throws ClassifyException {
-        //private Map<K, Map<T, Counter>> featureCountPerCategory;
         String pathGlobal = pathGlobal(); 
         db.put(pathGlobal, (db.containsKey(pathGlobal) ? db.get(pathGlobal) + weight : weight ));
         String pathCategory = pathCategory(category);
