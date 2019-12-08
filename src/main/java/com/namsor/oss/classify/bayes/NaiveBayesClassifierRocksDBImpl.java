@@ -15,8 +15,6 @@ import java.io.*;
 
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Set;
-import java.util.logging.Logger;
 import org.rocksdb.CompressionType;
 import org.rocksdb.ReadOptions;
 import org.rocksdb.RocksDBException;
