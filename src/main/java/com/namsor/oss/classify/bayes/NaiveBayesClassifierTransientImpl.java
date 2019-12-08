@@ -32,12 +32,6 @@ public class NaiveBayesClassifierTransientImpl extends AbstractNaiveBayesClassif
         return "OK";
     }
 
-    public void dbClose() throws IOException {
-    }
-
-    public void dbCloseAndDestroy() throws IOException {
-    }
-
     @Override
     public synchronized void learn(String category, Map<String, String> features, long weight) throws ClassifyException {
         //private Map<K, Map<T, Counter>> featureCountPerCategory;

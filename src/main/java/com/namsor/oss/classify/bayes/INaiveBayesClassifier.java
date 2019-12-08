@@ -39,4 +39,10 @@ public interface INaiveBayesClassifier {
      * @return
      */
     String[] getCategories();
+    
+    /**
+     * Close the classifier (if persistent)
+     * @throws PersistentClassifierException 
+     */
+    void dbClose() throws PersistentClassifierException;
 }
