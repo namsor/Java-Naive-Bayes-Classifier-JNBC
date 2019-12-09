@@ -1,5 +1,5 @@
 # Java-Naive-Bayes-Classifier-JNBC
-A Java Naive Bayes Classifier that works on RocksDB or other key-value store. The interface and sample are inspired by Philipp Nolte's https://github.com/ptnplanet/Java-Naive-Bayes-Classifier/, but the implementation is a full rewrite to store the key/values into a ConcurrentHashMap(), LevelDB, LMDB, Redis or other. LevelDB is a fast key-value storage library written at Google that provides an ordered mapping from string keys to string values.
+A Java Naive Bayes Classifier that works in-memory or on RocksDB fast key-value store. Naive Bayes Classification is fast and explainable. The objective of this ground-up implementations is to provide a self-contained, vertically scalable implementation.  
 
 Maven Quick-Start
 ------------------
@@ -130,7 +130,43 @@ public class MainSample1 {
     }
 }
 
+```
+Key-value store
+------------------
+When running the above example, the following key-values are stored in memory or in RocksDB, 
 
+```
+key	value
+~gL	14
+~gL//~cA//Yes	9
+~gL//~cA//Yes//~fE//wind=Weak	6
+~gL//~cA//Yes//~fE//wind=Strong	3
+~gL//~cA//Yes//~fE//wind	9
+~gL//~cA//Yes//~fE//temp=Mild	4
+~gL//~cA//Yes//~fE//temp=Hot	2
+~gL//~cA//Yes//~fE//temp=Cool	3
+~gL//~cA//Yes//~fE//temp	9
+~gL//~cA//Yes//~fE//outlook=Sunny	2
+~gL//~cA//Yes//~fE//outlook=Rain	3
+~gL//~cA//Yes//~fE//outlook=Overcast	4
+~gL//~cA//Yes//~fE//outlook	9
+~gL//~cA//Yes//~fE//humidity=Normal	6
+~gL//~cA//Yes//~fE//humidity=High	3
+~gL//~cA//Yes//~fE//humidity	9
+~gL//~cA//No	5
+~gL//~cA//No//~fE//wind=Weak	2
+~gL//~cA//No//~fE//wind=Strong	3
+~gL//~cA//No//~fE//wind	5
+~gL//~cA//No//~fE//temp=Mild	2
+~gL//~cA//No//~fE//temp=Hot	2
+~gL//~cA//No//~fE//temp=Cool	1
+~gL//~cA//No//~fE//temp	5
+~gL//~cA//No//~fE//outlook=Sunny	3
+~gL//~cA//No//~fE//outlook=Rain	2
+~gL//~cA//No//~fE//outlook	5
+~gL//~cA//No//~fE//humidity=Normal	1
+~gL//~cA//No//~fE//humidity=High	4
+~gL//~cA//No//~fE//humidity	5
 
 ```
 
