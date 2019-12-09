@@ -10,7 +10,7 @@ This Java Naive Bayes Classifier on RocksDB can be installed as any other depend
 <dependency>
     <groupId>com.namsor</groupId>
     <artifactId>Java-Naive-Bayes-Classifier-JNBC</artifactId>
-    <version>v2.0.1</version>
+    <version>v2.0.2</version>
 </dependency>
 ```
 
