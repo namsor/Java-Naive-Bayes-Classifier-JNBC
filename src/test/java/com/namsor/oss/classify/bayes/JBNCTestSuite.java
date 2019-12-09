@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.namsor.oss.classify.bayes;
 
 import org.junit.After;
@@ -17,7 +12,12 @@ import org.junit.runners.Suite;
  * @author elian
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({com.namsor.oss.classify.bayes.NaiveBayesClassifierTransientImplV2Test.class, com.namsor.oss.classify.bayes.NaiveBayesClassifierTransientLaplacedImplV2Test.class})
+@Suite.SuiteClasses({com.namsor.oss.classify.bayes.NaiveBayesClassifierTransientImplTest.class, 
+                     com.namsor.oss.classify.bayes.NaiveBayesClassifierTransientLaplacedImplTest.class,
+                     com.namsor.oss.classify.bayes.NaiveBayesClassifierRocksDBImplTest.class,
+                     com.namsor.oss.classify.bayes.NaiveBayesClassifierRocksDBLaplacedImplTest.class,
+
+})
 public class JBNCTestSuite {
 
     @BeforeClass

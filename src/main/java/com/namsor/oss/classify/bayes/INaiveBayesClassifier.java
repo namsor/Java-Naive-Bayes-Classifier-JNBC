@@ -45,4 +45,10 @@ public interface INaiveBayesClassifier {
      * @throws PersistentClassifierException 
      */
     void dbClose() throws PersistentClassifierException;
+    
+    /**
+     * Close the classifier (if persistent) and destroy the database.
+     * @throws com.namsor.oss.classify.bayes.PersistentClassifierException
+    */
+    void dbCloseAndDestroy()  throws PersistentClassifierException;
 }

@@ -1,7 +1,7 @@
 package com.namsor.oss.classify.bayes;
 
 /**
- * Classification and probability
+ * Classification output and probability estimate.
  * @author elian carsenat, NamSor SAS
  */
 public class ClassificationImpl implements IClassification {

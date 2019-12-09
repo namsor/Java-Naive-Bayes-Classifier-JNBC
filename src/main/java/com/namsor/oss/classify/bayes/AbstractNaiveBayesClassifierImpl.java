@@ -4,9 +4,8 @@ import java.util.Comparator;
 import java.util.Map;
 
 /**
- * A simple, scalable Naive Bayes Classifier, based on a key-value store (in
- * memory, or disk-based)
- *
+ * A simple, scalable Naive Bayes Classifier, based on a key-value store 
+ * (in memory, or disk-based)
  * @author elian carsenat, NamSor SAS
  */
 public abstract class AbstractNaiveBayesClassifierImpl implements INaiveBayesClassifier {

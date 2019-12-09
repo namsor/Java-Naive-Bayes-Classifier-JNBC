@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.namsor.oss.classify.bayes;
 
 import static com.namsor.oss.classify.bayes.MainSample1.NO;
@@ -27,9 +22,9 @@ import static org.junit.Assert.*;
  *
  * @author elian
  */
-public class NaiveBayesClassifierRocksDBImplV2Test {
+public class NaiveBayesClassifierTransientImplTest {
 
-    public NaiveBayesClassifierRocksDBImplV2Test() {
+    public NaiveBayesClassifierTransientImplTest() {
     }
 
     @BeforeClass
@@ -55,7 +50,7 @@ public class NaiveBayesClassifierRocksDBImplV2Test {
     @Test
     public void testTransientLearnClassifySample1() throws Exception {
         String[] cats = {YES, NO};
-        NaiveBayesClassifierRocksDBImpl bayes = new NaiveBayesClassifierRocksDBImpl("tennis", cats, ".");
+        NaiveBayesClassifierTransientImpl bayes = new NaiveBayesClassifierTransientImpl("tennis", cats);
         for (int i = 0; i < data.length; i++) {
             Map<String, String> features = new HashMap();
             for (int j = 0; j < colName.length - 1; j++) {
@@ -86,7 +81,7 @@ public class NaiveBayesClassifierRocksDBImplV2Test {
         String[] cats = {ZERO, ONE};
         // Create a new bayes classifier with string categories and string features.
         // INaiveBayesClassifier bayes1 = new NaiveBayesClassifierLevelDBImpl("sentiment", cats, ".", 100);
-        NaiveBayesClassifierRocksDBImpl bayes = new NaiveBayesClassifierRocksDBImpl("sentiment", cats, ".");
+        NaiveBayesClassifierTransientImpl bayes = new NaiveBayesClassifierTransientImpl("sentiment", cats);
         //NaiveBayesClassifierRocksDBImpl bayes = new NaiveBayesClassifierRocksDBImpl("intro", cats, ".", 100);
 
 // Examples to learn from.

@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.namsor.oss.classify.bayes;
 
 import java.io.*;
@@ -15,8 +10,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Implementation : in-memory, using a concurrent ConcurrentHashMap
- *
+ * Naive Bayes Classifier with Laplace smoothing and implementation with in-memory, concurrent ConcurrentHashMap.
+ * The Laplace smoothing has two variants as per Sample1 and Sample2. 
  * @author elian carsenat, NamSor SAS
  */
 public class NaiveBayesClassifierTransientLaplacedImpl extends AbstractNaiveBayesClassifierImpl implements INaiveBayesClassifier {
@@ -27,11 +22,9 @@ public class NaiveBayesClassifierTransientLaplacedImpl extends AbstractNaiveBaye
     private final Map<String, Long> db;
     
     public NaiveBayesClassifierTransientLaplacedImpl(String classifierName, String[] categories) throws IOException {
-        super(classifierName, categories);
-        db = new ConcurrentHashMap();
-        this.alpha = ALPHA;
-        this.variant = VARIANT;
+        this(classifierName, categories, ALPHA, VARIANT);
     }
+    
     /**
      * Create a classifier
      * @param classifierName
@@ -49,7 +42,6 @@ public class NaiveBayesClassifierTransientLaplacedImpl extends AbstractNaiveBaye
 
     @Override
     public synchronized void learn(String category, Map<String, String> features, long weight) throws ClassifyException {
-        //private Map<K, Map<T, Counter>> featureCountPerCategory;
         String pathGlobal = pathGlobal(); 
         String pathGlobalCountCategories = pathGlobalCountCategories();
         db.put(pathGlobal, (db.containsKey(pathGlobal) ? db.get(pathGlobal) + weight : weight ));
@@ -131,6 +123,10 @@ public class NaiveBayesClassifierTransientLaplacedImpl extends AbstractNaiveBaye
                 throw new ClassifyException(ex);
             }
         }
+    }
+
+    @Override
+    public void dbCloseAndDestroy() throws PersistentClassifierException {
     }
     
 }

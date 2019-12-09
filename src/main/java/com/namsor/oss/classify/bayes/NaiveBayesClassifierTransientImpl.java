@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.namsor.oss.classify.bayes;
 
 import java.io.*;
@@ -15,7 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Implementation : in-memory, using a concurrent ConcurrentHashMap
+ * Naive Bayes Classifier implementation with in-memory, concurrent ConcurrentHashMap.
  *
  * @author elian carsenat, NamSor SAS
  */
@@ -85,6 +80,10 @@ public class NaiveBayesClassifierTransientImpl extends AbstractNaiveBayesClassif
                 throw new ClassifyException(ex);
             }
         }
+    }
+
+    @Override
+    public void dbCloseAndDestroy() throws PersistentClassifierException {
     }
     
 }

@@ -1,7 +1,7 @@
 package com.namsor.oss.classify.bayes;
 
 /**
- * In case anything goes wrong.
+ * Classification exception (except persistence related).
  * @author elian carsenat, NamSor SAS
  */
 public class ClassifyException extends Exception {
