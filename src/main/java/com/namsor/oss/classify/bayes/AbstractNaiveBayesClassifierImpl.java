@@ -55,7 +55,7 @@ public abstract class AbstractNaiveBayesClassifierImpl implements INaiveBayesCla
 
     /**
      * Path to the total number of observations
-     * @return 
+     * @return Path to the total number of observations
      */
     protected static String pathGlobal() {
         return KEY_GLOBAL;
@@ -63,15 +63,15 @@ public abstract class AbstractNaiveBayesClassifierImpl implements INaiveBayesCla
     
     /**
      * Path to the total count of distinct categories 
-     * @return 
+     * @return Path to the total count of distinct categories 
      */
     protected static String pathGlobalCountCategories() {
         return KEY_GLOBAL+KEY_COUNT;
     }    
     /**
      * Path to the number of observations in a category
-     * @param category
-     * @return 
+     * @param category The category
+     * @return Path to the number of observations in a category
      */
     protected static String pathCategory(String category) {
         return KEY_GLOBAL + KEY_SEPARATOR + KEY_CATEGORY + KEY_SEPARATOR + category;
@@ -79,34 +79,39 @@ public abstract class AbstractNaiveBayesClassifierImpl implements INaiveBayesCla
 
     /**
      * Path to the number of observations in a category, with feature featureKey
-     * @param category
-     * @return 
+     * @param category The category
+     * @param featureKey The feature key
+     * @return Path to the number of observations in a category, with feature featureKey
      */
     protected static String pathCategoryFeatureKey(String category, String featureKey) {
         return KEY_GLOBAL + KEY_SEPARATOR + KEY_CATEGORY + KEY_SEPARATOR + category + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + featureKey;
     }    
 
     /**
-     * Path to the number of observations in a category, with feature featureKey
-     * @param category
-     * @return 
+     * Path to the number of observations with feature featureKey and feature value featureValue
+     * @param featureKey The feature key
+     * @param featureValue The feature value
+     * @return Path to the number of observations with feature featureKey and feature value featureValue
      */
     protected static String pathFeatureKeyValue(String featureKey, String featureValue ) {
         return KEY_GLOBAL + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + featureKey + KEY_FEATURE_EQVAL+featureValue;
     }    
     
     /**
-     * Path to the number of observations in a category, with feature featureKey
-     * @param category
-     * @return 
+     *  Path to the number of distinct value types for feature featureKey
+     * @param featureKey The featureKey
+     * @return Path to the number of distinct value types for feature featureKey
      */
     protected static String pathFeatureKeyCountValueTypes(String featureKey) {
         return KEY_GLOBAL + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + featureKey + KEY_COUNT;
     }    
     
+
     /**
      * Path to the number of observations in a category, with feature featureKey and value featureValue
-     * @param category
+     * @param category the Category
+     * @param featureKey the featureKey
+     * @param featureValue the featureValue
      * @return 
      */
     protected static String pathCategoryFeatureKeyValue(String category, String featureKey, String featureValue) {

@@ -10,18 +10,21 @@ import java.util.Map;
 public interface INaiveBayesClassifier {
 
     /**
-     * Learn
+     * Learn from features
      *
-     * @param category
-     * @param features
+     * @param category The category
+     * @param features The features
+     * @throws com.namsor.oss.classify.bayes.ClassifyException
      */
     void learn(String category, Map<String, String> features) throws ClassifyException;
 
     /**
-     * Learn
+     * Learn from features
      *
-     * @param category
-     * @param features
+     * @param category The category
+     * @param features The features
+     * @param weight The weight
+     * @throws com.namsor.oss.classify.bayes.ClassifyException
      */
     void learn(String category, Map<String, String> features, long weight) throws ClassifyException;
 

@@ -3,9 +3,232 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.namsor</groupId>
     <artifactId>Java-Naive-Bayes-Classifier-JNBC</artifactId>
-    <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <dependencies>        
+	<name>Java-Naive-Bayes-Classifier-JNBC</name>
+    <version>2.0.1</version>
+    <url>https://github.com/namsor/Java-Naive-Bayes-Classifier-JNBC/</url>
+    <description>A Java Naive Bayes Classifier that works either in memory or on RocksDB fast key-value store.</description>
+    <scm>
+        <connection>scm:git:git@github.com:namsor/Java-Naive-Bayes-Classifier-JNBC.git</connection>
+        <developerConnection>scm:git:git@github.com:namsor/Java-Naive-Bayes-Classifier-JNBC.git</developerConnection>
+        <url>https://github.com/namsor/Java-Naive-Bayes-Classifier-JNBC</url>
+    </scm>
+    <licenses>
+        <license>
+            <name>GNU LESSER GENERAL PUBLIC LICENSE</name>
+            <url>https://www.gnu.org/licenses/lgpl-3.0.en.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>	
+	<distributionManagement>
+	  <snapshotRepository>
+		<id>ossrh</id>
+		<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+	  </snapshotRepository>
+	</distributionManagement>	
+    <developers>
+        <!-- add NamSor -->
+	    <developer>
+            <name>NamSor</name>
+            <email>contact@namsor.com</email>
+            <organization>NamSor</organization>
+            <organizationUrl>https://www.namsor.com/</organizationUrl>
+        </developer>
+    </developers>	
+    <build>
+        <plugins>
+			
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.0.0-M1</version>
+                <executions>
+                    <execution>
+                        <id>enforce-maven</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion>
+                                    <version>2.2.0</version>
+                                </requireMavenVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.12</version>
+                <configuration>
+                    <systemProperties>
+                        <property>
+                            <name>loggerPath</name>
+                            <value>conf/log4j.properties</value>
+                        </property>
+                    </systemProperties>
+                    <argLine>-Xms512m -Xmx1500m</argLine>
+                    <parallel>methods</parallel>
+                    <forkMode>pertest</forkMode>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- attach test jar -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>jar</goal>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.10</version>
+                <executions>
+                    <execution>
+                        <id>add_sources</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>
+                                src/main/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>add_test_sources</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>
+                                src/test/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.10.4</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.2.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>					
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<version>1.5</version>
+				<!-- keyname as per https://www.previous.cloudbees.com/blog/continuous-deployment-maven-central-apache-maven -->
+				<configuration>
+					<keyname>C2DED53433BC8503EB737AF7CBCEA4F2104CD621</keyname>
+				</configuration>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- as per https://central.sonatype.org/pages/apache-maven.html -->
+			<plugin>
+			  <groupId>org.sonatype.plugins</groupId>
+			  <artifactId>nexus-staging-maven-plugin</artifactId>
+			  <version>1.6.7</version>
+			  <extensions>true</extensions>
+			  <configuration>
+				<serverId>ossrh</serverId>
+				<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+				<autoReleaseAfterClose>true</autoReleaseAfterClose>
+			  </configuration>
+			</plugin>	
+
+        </plugins>
+    </build>
+	
+    <profiles>
+        <profile>
+            <id>sign-artifacts-deploy</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.5</version>
+						<!-- keyname as per https://www.previous.cloudbees.com/blog/continuous-deployment-maven-central-apache-maven -->
+						<configuration>
+							<keyname>C2DED53433BC8503EB737AF7CBCEA4F2104CD621</keyname>
+						</configuration>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <dependencies>	
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

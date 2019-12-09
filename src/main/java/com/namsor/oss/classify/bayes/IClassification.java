@@ -7,12 +7,12 @@ package com.namsor.oss.classify.bayes;
 public interface IClassification {
     /**
      * Category
-     * @return 
+     * @return The classification category
      */
     String getCategory();
     /**
      * Probability
-     * @return 
+     * @return The classification probability estimate
      */
     double getProbability();
 }
