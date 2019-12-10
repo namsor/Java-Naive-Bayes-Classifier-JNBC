@@ -4,28 +4,15 @@ A Java Naive Bayes Classifier that works in-memory or on RocksDB fast key-value 
 Maven Quick-Start
 ------------------
 
-This Java Naive Bayes Classifier on RocksDB can be installed via the jitpack repository. Make sure to add it to your buildfile first.
-
-```xml
-<repositories>
-  <repository>
-    <id>jitpack.io</id>
-    <url>https://jitpack.io</url>
-  </repository>
-</repositories>
-```
-
-Then, treat it as any other dependency.
+This Java Naive Bayes Classifier on RocksDB can be installed as any other dependency.
 
 ```xml
 <dependency>
-    <groupId>com.github.namsor</groupId>
-    <artifactId>Java-Naive-Bayes-LevelDB</artifactId>
-    <version>v1.0.0</version>
+    <groupId>com.namsor</groupId>
+    <artifactId>Java-Naive-Bayes-Classifier-JNBC</artifactId>
+    <version>v2.0.2</version>
 </dependency>
 ```
-
-For other build-tools (e.g. gradle), visit https://jitpack.io for configuration snippets.
 
 Example
 ------------------
