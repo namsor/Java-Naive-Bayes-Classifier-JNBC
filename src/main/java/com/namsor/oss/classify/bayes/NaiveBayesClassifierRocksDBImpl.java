@@ -103,7 +103,6 @@ public class NaiveBayesClassifierRocksDBImpl extends AbstractNaiveBayesClassifie
 
     @Override
     public IClassification[] classify(Map<String, String> features) throws ClassifyException {
-        IClassification[] result = new ClassificationImpl[getCategories().length];
         ReadOptions ro = new ReadOptions();
         ro.setSnapshot(db.getSnapshot());
         try {
@@ -127,13 +126,7 @@ public class NaiveBayesClassifierRocksDBImpl extends AbstractNaiveBayesClassifie
                 likelyhood[i] = 1d * categoryCount / globalCount * product;
                 likelyhoodTot += likelyhood[i];
             }
-            for (int i = 0; i < getCategories().length; i++) {
-                double proba = likelyhood[i] / likelyhoodTot;
-                ClassificationImpl classif = new ClassificationImpl(getCategories()[i], proba);
-                result[i] = classif;
-            }
-            Arrays.sort(result, orderByProba);
-            return result;
+            return likelihoodsToProbas(likelyhood, likelyhoodTot);
         } catch (RocksDBException ex) {
             throw new PersistentClassifierException(ex);
         } finally {

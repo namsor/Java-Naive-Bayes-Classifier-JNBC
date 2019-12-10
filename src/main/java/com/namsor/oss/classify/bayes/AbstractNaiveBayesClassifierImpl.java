@@ -1,20 +1,24 @@
 package com.namsor.oss.classify.bayes;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Map;
 
 /**
- * A simple, scalable Naive Bayes Classifier, based on a key-value store 
- * (in memory, or disk-based)
+ * A simple, scalable Naive Bayes Classifier, based on a key-value store (in
+ * memory, or disk-based)
+ *
  * @author elian carsenat, NamSor SAS
  */
 public abstract class AbstractNaiveBayesClassifierImpl implements INaiveBayesClassifier {
+
     private static final String KEY_GLOBAL = "~gL";
     private static final String KEY_CATEGORY = "~cA";
     private static final String KEY_COUNT = ".count";
     private static final String KEY_FEATURE = "~fE";
     private static final String KEY_FEATURE_EQVAL = "=";
     private static final String KEY_SEPARATOR = "//";
+
     /**
      * @return the classifierName
      */
@@ -36,8 +40,8 @@ public abstract class AbstractNaiveBayesClassifierImpl implements INaiveBayesCla
     @Override
     public String[] getCategories() {
         return categories;
-    }   
-    
+    }
+
     protected final Comparator<IClassification> orderByProba = new Comparator() {
         @Override
         public int compare(Object o1, Object o2) {
@@ -51,27 +55,30 @@ public abstract class AbstractNaiveBayesClassifierImpl implements INaiveBayesCla
     public synchronized void learn(String category, Map<String, String> features) throws ClassifyException {
         learn(category, features, 1);
     }
-    
 
     /**
      * Path to the total number of observations
-     * @return 
+     *
+     * @return
      */
     protected static String pathGlobal() {
         return KEY_GLOBAL;
     }
-    
+
     /**
-     * Path to the total count of distinct categories 
-     * @return 
+     * Path to the total count of distinct categories
+     *
+     * @return
      */
     protected static String pathGlobalCountCategories() {
-        return KEY_GLOBAL+KEY_COUNT;
-    }    
+        return KEY_GLOBAL + KEY_COUNT;
+    }
+
     /**
      * Path to the number of observations in a category
+     *
      * @param category
-     * @return 
+     * @return
      */
     protected static String pathCategory(String category) {
         return KEY_GLOBAL + KEY_SEPARATOR + KEY_CATEGORY + KEY_SEPARATOR + category;
@@ -79,42 +86,64 @@ public abstract class AbstractNaiveBayesClassifierImpl implements INaiveBayesCla
 
     /**
      * Path to the number of observations in a category, with feature featureKey
+     *
      * @param category
-     * @return 
+     * @return
      */
     protected static String pathCategoryFeatureKey(String category, String featureKey) {
         return KEY_GLOBAL + KEY_SEPARATOR + KEY_CATEGORY + KEY_SEPARATOR + category + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + featureKey;
-    }    
+    }
 
     /**
      * Path to the number of observations in a category, with feature featureKey
+     *
      * @param category
-     * @return 
+     * @return
      */
-    protected static String pathFeatureKeyValue(String featureKey, String featureValue ) {
-        return KEY_GLOBAL + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + featureKey + KEY_FEATURE_EQVAL+featureValue;
-    }    
-    
+    protected static String pathFeatureKeyValue(String featureKey, String featureValue) {
+        return KEY_GLOBAL + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + featureKey + KEY_FEATURE_EQVAL + featureValue;
+    }
+
     /**
      * Path to the number of observations in a category, with feature featureKey
+     *
      * @param category
-     * @return 
+     * @return
      */
     protected static String pathFeatureKeyCountValueTypes(String featureKey) {
         return KEY_GLOBAL + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + featureKey + KEY_COUNT;
-    }    
-    
+    }
+
     /**
-     * Path to the number of observations in a category, with feature featureKey and value featureValue
+     * Path to the number of observations in a category, with feature featureKey
+     * and value featureValue
+     *
      * @param category
-     * @return 
+     * @return
      */
     protected static String pathCategoryFeatureKeyValue(String category, String featureKey, String featureValue) {
-        return KEY_GLOBAL + KEY_SEPARATOR + KEY_CATEGORY + KEY_SEPARATOR + category + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + featureKey+KEY_FEATURE_EQVAL+featureValue;
-    }    
+        return KEY_GLOBAL + KEY_SEPARATOR + KEY_CATEGORY + KEY_SEPARATOR + category + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + featureKey + KEY_FEATURE_EQVAL + featureValue;
+    }
 
     @Override
     public void dbClose() throws PersistentClassifierException {
-    }    
-    
+    }
+
+    protected IClassification[] likelihoodsToProbas(double[] likelyhood, double likelyhoodTot) {
+        IClassification[] result = new ClassificationImpl[getCategories().length];
+        for (int i = 0; i < getCategories().length; i++) {
+            double proba = likelyhood[i] / likelyhoodTot;
+            if (proba > 1d) {
+                // could equal 1.000000000002 due to double precision issue;
+                proba = 1d;
+            } else if (proba < 0) {
+                proba = 0d;
+            }
+            ClassificationImpl classif = new ClassificationImpl(getCategories()[i], proba);
+            result[i] = classif;
+        }
+        Arrays.sort(result, orderByProba);
+        return result;
+    }
+
 }

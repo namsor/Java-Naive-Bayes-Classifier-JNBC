@@ -163,6 +163,12 @@ public class NaiveBayesClassifierRocksDBLaplacedImpl extends AbstractNaiveBayesC
             }
             for (int i = 0; i < getCategories().length; i++) {
                 double proba = likelyhood[i] / likelyhoodTot;
+                if( proba > 1d) {
+                    // could equal 1.000000000002 due to double precision issue;
+                    proba = 1d;
+                } else if( proba < 0 ) {
+                    proba = 0;
+                }
                 ClassificationImpl classif = new ClassificationImpl(getCategories()[i], proba);
                 result[i] = classif;
             }

@@ -10,7 +10,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Naive Bayes Classifier implementation with in-memory, concurrent ConcurrentHashMap.
+ * Naive Bayes Classifier implementation with in-memory, concurrent
+ * ConcurrentHashMap.
  *
  * @author elian carsenat, NamSor SAS
  */
@@ -25,22 +26,21 @@ public class NaiveBayesClassifierTransientImpl extends AbstractNaiveBayesClassif
 
     @Override
     public synchronized void learn(String category, Map<String, String> features, long weight) throws ClassifyException {
-        String pathGlobal = pathGlobal(); 
-        db.put(pathGlobal, (db.containsKey(pathGlobal) ? db.get(pathGlobal) + weight : weight ));
+        String pathGlobal = pathGlobal();
+        db.put(pathGlobal, (db.containsKey(pathGlobal) ? db.get(pathGlobal) + weight : weight));
         String pathCategory = pathCategory(category);
-        db.put(pathCategory, (db.containsKey(pathCategory) ? db.get(pathCategory) + weight : weight ));
+        db.put(pathCategory, (db.containsKey(pathCategory) ? db.get(pathCategory) + weight : weight));
         for (Entry<String, String> feature : features.entrySet()) {
             String pathCategoryFeatureKey = pathCategoryFeatureKey(category, feature.getKey());
-            db.put(pathCategoryFeatureKey, (db.containsKey(pathCategoryFeatureKey) ? db.get(pathCategoryFeatureKey) + weight : weight ));
+            db.put(pathCategoryFeatureKey, (db.containsKey(pathCategoryFeatureKey) ? db.get(pathCategoryFeatureKey) + weight : weight));
             String pathCategoryFeatureKeyValue = pathCategoryFeatureKeyValue(category, feature.getKey(), feature.getValue());
-            db.put(pathCategoryFeatureKeyValue, (db.containsKey(pathCategoryFeatureKeyValue) ? db.get(pathCategoryFeatureKeyValue) + weight : weight ));
+            db.put(pathCategoryFeatureKeyValue, (db.containsKey(pathCategoryFeatureKeyValue) ? db.get(pathCategoryFeatureKeyValue) + weight : weight));
         }
     }
 
     @Override
     public synchronized IClassification[] classify(Map<String, String> features) throws ClassifyException {
-        IClassification[] result = new ClassificationImpl[getCategories().length];
-        String pathGlobal = pathGlobal(); 
+        String pathGlobal = pathGlobal();
         long globalCount = (db.containsKey(pathGlobal) ? db.get(pathGlobal) : 0);
         double[] likelyhood = new double[getCategories().length];
         double likelyhoodTot = 0;
@@ -60,13 +60,8 @@ public class NaiveBayesClassifierTransientImpl extends AbstractNaiveBayesClassif
             likelyhood[i] = 1d * categoryCount / globalCount * product;
             likelyhoodTot += likelyhood[i];
         }
-        for (int i = 0; i < getCategories().length; i++) {
-            double proba = likelyhood[i] / likelyhoodTot;
-            ClassificationImpl classif = new ClassificationImpl(getCategories()[i], proba); 
-            result[i] = classif;
-        }
-        Arrays.sort(result, orderByProba);
-        return result;
+        return likelihoodsToProbas(likelyhood, likelyhoodTot);
+
     }
 
     public synchronized void dumpDb(Writer w) throws ClassifyException {
@@ -85,5 +80,5 @@ public class NaiveBayesClassifierTransientImpl extends AbstractNaiveBayesClassif
     @Override
     public void dbCloseAndDestroy() throws PersistentClassifierException {
     }
-    
+
 }
