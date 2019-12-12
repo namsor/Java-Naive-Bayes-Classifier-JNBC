@@ -53,7 +53,7 @@ public class MainSample2 {
             }
         } catch (ClassifyException ex) {
             Logger.getLogger(MainSample2.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
+        } catch (Throwable ex) {
             Logger.getLogger(MainSample2.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

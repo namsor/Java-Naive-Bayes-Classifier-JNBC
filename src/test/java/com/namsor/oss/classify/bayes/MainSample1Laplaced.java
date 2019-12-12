@@ -87,7 +87,7 @@ public class MainSample1Laplaced {
             Logger.getLogger(MainSample1Laplaced.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassifyException ex) {
             Logger.getLogger(MainSample1Laplaced.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
+        } catch (Throwable ex) {
             Logger.getLogger(MainSample1Laplaced.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

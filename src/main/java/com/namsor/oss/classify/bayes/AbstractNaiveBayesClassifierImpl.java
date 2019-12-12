@@ -123,9 +123,7 @@ public abstract class AbstractNaiveBayesClassifierImpl implements INaiveBayesCla
         return KEY_GLOBAL + KEY_SEPARATOR + KEY_CATEGORY + KEY_SEPARATOR + category + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + featureKey + KEY_FEATURE_EQVAL + featureValue;
     }
 
-    @Override
-    public void dbClose() throws PersistentClassifierException {
-    }
+
 
     protected IClassification[] likelihoodsToProbas(double[] likelyhood, double likelyhoodTot) {
         IClassification[] result = new ClassificationImpl[getCategories().length];

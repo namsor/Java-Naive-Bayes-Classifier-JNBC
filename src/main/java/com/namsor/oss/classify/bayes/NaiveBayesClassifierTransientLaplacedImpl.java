@@ -16,13 +16,12 @@ import java.util.logging.Logger;
  *
  * @author elian carsenat, NamSor SAS
  */
-public class NaiveBayesClassifierTransientLaplacedImpl extends AbstractNaiveBayesClassifierImpl implements INaiveBayesClassifier {
+public class NaiveBayesClassifierTransientLaplacedImpl extends AbstractNaiveBayesClassifierTransientImpl implements INaiveBayesClassifier {
 
     private static final boolean VARIANT = false;
     private static final double ALPHA = 1d;
     private final boolean variant;
     private final double alpha;
-    private final Map<String, Long> db;
 
     public NaiveBayesClassifierTransientLaplacedImpl(String classifierName, String[] categories) throws IOException {
         this(classifierName, categories, ALPHA, VARIANT);
@@ -39,7 +38,6 @@ public class NaiveBayesClassifierTransientLaplacedImpl extends AbstractNaiveBaye
      */
     public NaiveBayesClassifierTransientLaplacedImpl(String classifierName, String[] categories, double alpha, boolean variant) throws IOException {
         super(classifierName, categories);
-        db = new ConcurrentHashMap();
         this.alpha = alpha;
         this.variant = variant;
     }
@@ -48,29 +46,29 @@ public class NaiveBayesClassifierTransientLaplacedImpl extends AbstractNaiveBaye
     public synchronized void learn(String category, Map<String, String> features, long weight) throws ClassifyException {
         String pathGlobal = pathGlobal();
         String pathGlobalCountCategories = pathGlobalCountCategories();
-        db.put(pathGlobal, (db.containsKey(pathGlobal) ? db.get(pathGlobal) + weight : weight));
+        getDb().put(pathGlobal, (getDb().containsKey(pathGlobal) ? getDb().get(pathGlobal) + weight : weight));
         String pathCategory = pathCategory(category);
-        if (db.containsKey(pathCategory)) {
-            db.put(pathCategory, db.get(pathCategory) + weight);
+        if (getDb().containsKey(pathCategory)) {
+            getDb().put(pathCategory, getDb().get(pathCategory) + weight);
         } else {
-            db.put(pathCategory, weight);
+            getDb().put(pathCategory, weight);
             // increment the count
-            db.put(pathGlobalCountCategories, (db.containsKey(pathGlobalCountCategories) ? db.get(pathGlobalCountCategories) + 1 : 1));
+            getDb().put(pathGlobalCountCategories, (getDb().containsKey(pathGlobalCountCategories) ? getDb().get(pathGlobalCountCategories) + 1 : 1));
         }
         for (Entry<String, String> feature : features.entrySet()) {
             String pathCategoryFeatureKey = pathCategoryFeatureKey(category, feature.getKey());
-            db.put(pathCategoryFeatureKey, (db.containsKey(pathCategoryFeatureKey) ? db.get(pathCategoryFeatureKey) + weight : weight));
+            getDb().put(pathCategoryFeatureKey, (getDb().containsKey(pathCategoryFeatureKey) ? getDb().get(pathCategoryFeatureKey) + weight : weight));
             String pathCategoryFeatureKeyValue = pathCategoryFeatureKeyValue(category, feature.getKey(), feature.getValue());
             String pathFeatureKeyValue = pathFeatureKeyValue(feature.getKey(), feature.getValue());
-            if (db.containsKey(pathFeatureKeyValue)) {
-                db.put(pathFeatureKeyValue, db.get(pathFeatureKeyValue) + weight);
+            if (getDb().containsKey(pathFeatureKeyValue)) {
+                getDb().put(pathFeatureKeyValue, getDb().get(pathFeatureKeyValue) + weight);
             } else {
-                db.put(pathFeatureKeyValue, weight);
+                getDb().put(pathFeatureKeyValue, weight);
                 // increment the count
                 String pathFeatureKeyCountValueTypes = pathFeatureKeyCountValueTypes(feature.getKey());
-                db.put(pathFeatureKeyCountValueTypes, (db.containsKey(pathFeatureKeyCountValueTypes) ? db.get(pathFeatureKeyCountValueTypes) + 1 : 1));
+                getDb().put(pathFeatureKeyCountValueTypes, (getDb().containsKey(pathFeatureKeyCountValueTypes) ? getDb().get(pathFeatureKeyCountValueTypes) + 1 : 1));
             }
-            db.put(pathCategoryFeatureKeyValue, (db.containsKey(pathCategoryFeatureKeyValue) ? db.get(pathCategoryFeatureKeyValue) + weight : weight));
+            getDb().put(pathCategoryFeatureKeyValue, (getDb().containsKey(pathCategoryFeatureKeyValue) ? getDb().get(pathCategoryFeatureKeyValue) + weight : weight));
         }
     }
 
@@ -78,24 +76,24 @@ public class NaiveBayesClassifierTransientLaplacedImpl extends AbstractNaiveBaye
     public synchronized IClassification[] classify(Map<String, String> features) throws ClassifyException {
         String pathGlobal = pathGlobal();
         String pathGlobalCountCategories = pathGlobalCountCategories();
-        long globalCount = (db.containsKey(pathGlobal) ? db.get(pathGlobal) : 0);
-        long globalCountCategories = (db.containsKey(pathGlobalCountCategories) ? db.get(pathGlobalCountCategories) : 0);
+        long globalCount = (getDb().containsKey(pathGlobal) ? getDb().get(pathGlobal) : 0);
+        long globalCountCategories = (getDb().containsKey(pathGlobalCountCategories) ? getDb().get(pathGlobalCountCategories) : 0);
         double[] likelyhood = new double[getCategories().length];
         double likelyhoodTot = 0;
         for (int i = 0; i < getCategories().length; i++) {
             String category = getCategories()[i];
             String pathCategory = pathCategory(category);
-            long categoryCount = (db.containsKey(pathCategory) ? db.get(pathCategory) : 0);
+            long categoryCount = (getDb().containsKey(pathCategory) ? getDb().get(pathCategory) : 0);
             double product = 1.0d;
             for (Entry<String, String> feature : features.entrySet()) {
                 String pathCategoryFeatureKey = pathCategoryFeatureKey(category, feature.getKey());
-                double featureCount = (db.containsKey(pathCategoryFeatureKey) ? db.get(pathCategoryFeatureKey) : 0);
+                double featureCount = (getDb().containsKey(pathCategoryFeatureKey) ? getDb().get(pathCategoryFeatureKey) : 0);
 
                 String pathFeatureKeyCountValueTypes = pathFeatureKeyCountValueTypes(feature.getKey());
-                double featureCountValueTypes = (db.containsKey(pathFeatureKeyCountValueTypes) ? db.get(pathFeatureKeyCountValueTypes) : 0);
+                double featureCountValueTypes = (getDb().containsKey(pathFeatureKeyCountValueTypes) ? getDb().get(pathFeatureKeyCountValueTypes) : 0);
 
                 String pathCategoryFeatureKeyValue = pathCategoryFeatureKeyValue(category, feature.getKey(), feature.getValue());
-                double featureCategoryCount = (db.containsKey(pathCategoryFeatureKeyValue) ? db.get(pathCategoryFeatureKeyValue) : 0);
+                double featureCategoryCount = (getDb().containsKey(pathCategoryFeatureKeyValue) ? getDb().get(pathCategoryFeatureKeyValue) : 0);
                 double basicProbability = (featureCount == 0 ? 0 : 1d * (featureCategoryCount + alpha) / (featureCount + featureCountValueTypes * alpha));
                 product *= basicProbability;
             }
@@ -107,23 +105,6 @@ public class NaiveBayesClassifierTransientLaplacedImpl extends AbstractNaiveBaye
             likelyhoodTot += likelyhood[i];
         }
         return likelihoodsToProbas(likelyhood, likelyhoodTot);
-    }
-
-    public synchronized void dumpDb(Writer w) throws ClassifyException {
-        for (Map.Entry<String, Long> entry : db.entrySet()) {
-            String key = entry.getKey();
-            long value = entry.getValue();
-            try {
-                w.append(key + "|" + value + "\n");
-            } catch (IOException ex) {
-                Logger.getLogger(NaiveBayesClassifierTransientLaplacedImpl.class.getName()).log(Level.SEVERE, null, ex);
-                throw new ClassifyException(ex);
-            }
-        }
-    }
-
-    @Override
-    public void dbCloseAndDestroy() throws PersistentClassifierException {
     }
 
 }

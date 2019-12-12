@@ -22,76 +22,30 @@ import org.rocksdb.WriteOptions;
  * Learning is Synchronized by classification is not.
  * @author elian carsenat, NamSor SAS
  */
-public class NaiveBayesClassifierRocksDBImpl extends AbstractNaiveBayesClassifierImpl implements INaiveBayesClassifier {
-
-    private final String rootPathWritable;
-    private final RocksDB db;
+public class NaiveBayesClassifierRocksDBImpl extends AbstractNaiveBayesClassifierRocksDBImpl implements INaiveBayesClassifier {
 
     public NaiveBayesClassifierRocksDBImpl(String classifierName, String[] categories, String rootPathWritable) throws IOException, PersistentClassifierException {
-        super(classifierName, categories);
-        this.rootPathWritable = rootPathWritable;
-        Options options = new Options();
-        options.setCreateIfMissing(true);
-        options.setCompressionType(CompressionType.NO_COMPRESSION);
-        try {
-            db = RocksDB.open(options, rootPathWritable + "/" + classifierName);
-        } catch (RocksDBException ex) {
-            throw new PersistentClassifierException(ex);
-        }
-    }
-
-    public String dbStatus() throws PersistentClassifierException {
-        try {
-            return db.getProperty("leveldb.stats");
-        } catch (RocksDBException ex) {
-            throw new PersistentClassifierException(ex);
-        }
-    }
-
-    @Override
-    public void dbClose() throws PersistentClassifierException {
-        db.close();
-    }
-
-    @Override
-    public void dbCloseAndDestroy() throws PersistentClassifierException {
-        try {
-            db.close();
-            Options options = new Options();
-            RocksDB.destroyDB(rootPathWritable + "/" + getClassifierName(), options);
-        } catch (RocksDBException ex) {
-            throw new PersistentClassifierException(ex);
-        }
-    }
-
-    @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
-        try {
-            dbClose();
-        } catch (Throwable t) {
-            // ignore
-        }
+        super(classifierName, categories, rootPathWritable);
     }
 
     @Override
     public synchronized void learn(String category, Map<String, String> features, long weight) throws ClassifyException {
         ReadOptions ro = new ReadOptions();
-        ro.setSnapshot(db.getSnapshot());
+        ro.setSnapshot(getDb().getSnapshot());
         WriteOptions wo = new WriteOptions();
         WriteBatch batch = new WriteBatch();
         try {
             String pathGlobal = pathGlobal();
-            batch.put(bytes(pathGlobal), Longs.toByteArray((db.get(ro, bytes(pathGlobal)) == null ? weight : Longs.fromByteArray(db.get(ro, bytes(pathGlobal))) + weight)));
+            batch.put(bytes(pathGlobal), Longs.toByteArray((getDb().get(ro, bytes(pathGlobal)) == null ? weight : Longs.fromByteArray(getDb().get(ro, bytes(pathGlobal))) + weight)));
             String pathCategory = pathCategory(category);
-            batch.put(bytes(pathCategory), Longs.toByteArray((db.get(ro, bytes(pathCategory)) == null ? weight : Longs.fromByteArray(db.get(ro, bytes(pathCategory))) + weight)));
+            batch.put(bytes(pathCategory), Longs.toByteArray((getDb().get(ro, bytes(pathCategory)) == null ? weight : Longs.fromByteArray(getDb().get(ro, bytes(pathCategory))) + weight)));
             for (Map.Entry<String, String> feature : features.entrySet()) {
                 String pathCategoryFeatureKey = pathCategoryFeatureKey(category, feature.getKey());
-                batch.put(bytes(pathCategoryFeatureKey), Longs.toByteArray((db.get(ro, bytes(pathCategoryFeatureKey)) == null ? weight : Longs.fromByteArray(db.get(ro, bytes(pathCategoryFeatureKey))) + weight)));
+                batch.put(bytes(pathCategoryFeatureKey), Longs.toByteArray((getDb().get(ro, bytes(pathCategoryFeatureKey)) == null ? weight : Longs.fromByteArray(getDb().get(ro, bytes(pathCategoryFeatureKey))) + weight)));
                 String pathCategoryFeatureKeyValue = pathCategoryFeatureKeyValue(category, feature.getKey(), feature.getValue());
-                batch.put(bytes(pathCategoryFeatureKeyValue), Longs.toByteArray((db.get(ro, bytes(pathCategoryFeatureKeyValue)) == null ? weight : Longs.fromByteArray(db.get(ro, bytes(pathCategoryFeatureKeyValue))) + weight)));
+                batch.put(bytes(pathCategoryFeatureKeyValue), Longs.toByteArray((getDb().get(ro, bytes(pathCategoryFeatureKeyValue)) == null ? weight : Longs.fromByteArray(getDb().get(ro, bytes(pathCategoryFeatureKeyValue))) + weight)));
             }
-            db.write(wo, batch);
+            getDb().write(wo, batch);
         } catch (RocksDBException ex) {
             throw new PersistentClassifierException(ex);
         } finally {
@@ -104,22 +58,22 @@ public class NaiveBayesClassifierRocksDBImpl extends AbstractNaiveBayesClassifie
     @Override
     public IClassification[] classify(Map<String, String> features) throws ClassifyException {
         ReadOptions ro = new ReadOptions();
-        ro.setSnapshot(db.getSnapshot());
+        ro.setSnapshot(getDb().getSnapshot());
         try {
             String pathGlobal = pathGlobal();
-            long globalCount = (db.get(ro, bytes(pathGlobal)) == null ? 0 : Longs.fromByteArray(db.get(ro, bytes(pathGlobal))));
+            long globalCount = (getDb().get(ro, bytes(pathGlobal)) == null ? 0 : Longs.fromByteArray(getDb().get(ro, bytes(pathGlobal))));
             double[] likelyhood = new double[getCategories().length];
             double likelyhoodTot = 0;
             for (int i = 0; i < getCategories().length; i++) {
                 String category = getCategories()[i];
                 String pathCategory = pathCategory(category);
-                long categoryCount = (db.get(ro, bytes(pathCategory)) == null ? 0 : Longs.fromByteArray(db.get(ro, bytes(pathCategory))));
+                long categoryCount = (getDb().get(ro, bytes(pathCategory)) == null ? 0 : Longs.fromByteArray(getDb().get(ro, bytes(pathCategory))));
                 double product = 1.0d;
                 for (Map.Entry<String, String> feature : features.entrySet()) {
                     String pathCategoryFeatureKey = pathCategoryFeatureKey(category, feature.getKey());
-                    double featureCount = (db.get(ro, bytes(pathCategoryFeatureKey)) == null ? 0 : Longs.fromByteArray(db.get(ro, bytes(pathCategoryFeatureKey))));
+                    double featureCount = (getDb().get(ro, bytes(pathCategoryFeatureKey)) == null ? 0 : Longs.fromByteArray(getDb().get(ro, bytes(pathCategoryFeatureKey))));
                     String pathCategoryFeatureKeyValue = pathCategoryFeatureKeyValue(category, feature.getKey(), feature.getValue());
-                    double featureCategoryCount = (db.get(ro, bytes(pathCategoryFeatureKeyValue)) == null ? 0 : Longs.fromByteArray(db.get(ro, bytes(pathCategoryFeatureKeyValue))));
+                    double featureCategoryCount = (getDb().get(ro, bytes(pathCategoryFeatureKeyValue)) == null ? 0 : Longs.fromByteArray(getDb().get(ro, bytes(pathCategoryFeatureKeyValue))));
                     double basicProbability = (featureCount == 0 ? 0 : 1d * featureCategoryCount / featureCount);
                     product *= basicProbability;
                 }
@@ -138,9 +92,9 @@ public class NaiveBayesClassifierRocksDBImpl extends AbstractNaiveBayesClassifie
 
     public void dumpDb(Writer w) throws ClassifyException {
         ReadOptions ro = new ReadOptions();
-        ro.setSnapshot(db.getSnapshot());
+        ro.setSnapshot(getDb().getSnapshot());
 
-        RocksIterator iterator = db.newIterator(ro);
+        RocksIterator iterator = getDb().newIterator(ro);
         try {
             for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
                 String key = new String(iterator.key());
@@ -155,7 +109,4 @@ public class NaiveBayesClassifierRocksDBImpl extends AbstractNaiveBayesClassifie
         }
     }
 
-    private byte[] bytes(String key) {
-        return key.getBytes();
-    }
 }

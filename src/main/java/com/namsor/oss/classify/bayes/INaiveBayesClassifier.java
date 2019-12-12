@@ -54,4 +54,11 @@ public interface INaiveBayesClassifier {
      * @throws com.namsor.oss.classify.bayes.PersistentClassifierException
     */
     void dbCloseAndDestroy()  throws PersistentClassifierException;
+    
+    /**
+     * Estimate the number of key-values in DB
+     * @return The estimate number of key values
+     * @throws PersistentClassifierException 
+     */
+    long dbSize() throws PersistentClassifierException;
 }
