@@ -58,6 +58,7 @@ public abstract class AbstractNaiveBayesClassifierImpl implements INaiveBayesCla
 
     /**
      * Path to the total number of observations
+     *
      * @return Path to the total number of observations
      */
     protected static String pathGlobal() {
@@ -65,8 +66,9 @@ public abstract class AbstractNaiveBayesClassifierImpl implements INaiveBayesCla
     }
 
     /**
-     * Path to the total count of distinct categories 
-     * @return Path to the total count of distinct categories 
+     * Path to the total count of distinct categories
+     *
+     * @return Path to the total count of distinct categories
      */
     protected static String pathGlobalCountCategories() {
         return KEY_GLOBAL + KEY_COUNT;
@@ -74,6 +76,7 @@ public abstract class AbstractNaiveBayesClassifierImpl implements INaiveBayesCla
 
     /**
      * Path to the number of observations in a category
+     *
      * @param category The category
      * @return Path to the number of observations in a category
      */
@@ -83,47 +86,61 @@ public abstract class AbstractNaiveBayesClassifierImpl implements INaiveBayesCla
 
     /**
      * Path to the number of observations in a category, with feature featureKey
+     *
      * @param category The category
      * @param featureKey The feature key
-     * @return Path to the number of observations in a category, with feature featureKey
+     * @return Path to the number of observations in a category, with feature
+     * featureKey
      */
     protected static String pathCategoryFeatureKey(String category, String featureKey) {
         return KEY_GLOBAL + KEY_SEPARATOR + KEY_CATEGORY + KEY_SEPARATOR + category + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + featureKey;
     }
 
     /**
-     * Path to the number of observations with feature featureKey and feature value featureValue
+     * Path to the number of observations with feature featureKey and feature
+     * value featureValue
+     *
      * @param featureKey The feature key
      * @param featureValue The feature value
-     * @return Path to the number of observations with feature featureKey and feature value featureValue
+     * @return Path to the number of observations with feature featureKey and
+     * feature value featureValue
      */
     protected static String pathFeatureKeyValue(String featureKey, String featureValue) {
         return KEY_GLOBAL + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + featureKey + KEY_FEATURE_EQVAL + featureValue;
     }
 
+    /**
+     * Path to the counter for featureKey
+     *
+     * @param featureKey The featureKey
+     * @return Path to the counter for feature featureKey
+     */
+    protected static String pathFeatureKey(String featureKey) {
+        return KEY_GLOBAL + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + featureKey;
+    }
 
     /**
-     *  Path to the number of distinct value types for feature featureKey
+     * Path to the number of distinct value types for feature featureKey
+     *
      * @param featureKey The featureKey
      * @return Path to the number of distinct value types for feature featureKey
      */
     protected static String pathFeatureKeyCountValueTypes(String featureKey) {
         return KEY_GLOBAL + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + featureKey + KEY_COUNT;
-    }    
-    
+    }
 
     /**
-     * Path to the number of observations in a category, with feature featureKey and value featureValue
+     * Path to the number of observations in a category, with feature featureKey
+     * and value featureValue
+     *
      * @param category the Category
      * @param featureKey the featureKey
      * @param featureValue the featureValue
-     * @return 
+     * @return
      */
     protected static String pathCategoryFeatureKeyValue(String category, String featureKey, String featureValue) {
         return KEY_GLOBAL + KEY_SEPARATOR + KEY_CATEGORY + KEY_SEPARATOR + category + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + featureKey + KEY_FEATURE_EQVAL + featureValue;
     }
-
-
 
     protected IClassification[] likelihoodsToProbas(double[] likelyhood, double likelyhoodTot) {
         IClassification[] result = new ClassificationImpl[getCategories().length];

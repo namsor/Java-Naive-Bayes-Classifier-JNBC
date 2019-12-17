@@ -48,7 +48,7 @@ public class NaiveBayesClassifierTransientLaplacedImplTest {
      * http://ai.fon.bg.ac.rs/wp-content/uploads/2015/04/ML-Classification-NaiveBayes-2014.pdf
      */
     @Test
-    public void testTransientLearnClassifySample1() throws Exception {
+    public void testLearnClassifySample1() throws Exception {
         String[] cats = {YES, NO};
         NaiveBayesClassifierTransientLaplacedImpl bayes = new NaiveBayesClassifierTransientLaplacedImpl("tennis", cats, 1, false);
         for (int i = 0; i < data.length; i++) {
@@ -77,7 +77,7 @@ public class NaiveBayesClassifierTransientLaplacedImplTest {
      * https://towardsdatascience.com/introduction-to-na%C3%AFve-bayes-classifier-fa59e3e24aaf
      */
     @Test
-    public void testTransientLearnClassifySample2() throws Exception {
+    public void testLearnClassifySample2() throws Exception {
         String[] cats = {ZERO, ONE};
         // Create a new bayes classifier with string categories and string features.
         // INaiveBayesClassifier bayes1 = new NaiveBayesClassifierLevelDBImpl("sentiment", cats, ".", 100);
@@ -104,5 +104,7 @@ public class NaiveBayesClassifierTransientLaplacedImplTest {
         assertEquals(predict[0].getProbability(), 0.6511627906976744, .0001);
         assertEquals(predict[1].getProbability(), 0.3488372093023256, .0001);
     }
+    
+    
 
 }

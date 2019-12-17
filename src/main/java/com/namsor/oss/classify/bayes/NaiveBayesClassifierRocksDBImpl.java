@@ -18,8 +18,9 @@ import org.rocksdb.WriteBatch;
 import org.rocksdb.WriteOptions;
 
 /**
- * Naive Bayes Classifier implementation with RocksDB as key/value store. 
+ * Naive Bayes Classifier implementation with RocksDB as key/value store.
  * Learning is Synchronized by classification is not.
+ *
  * @author elian carsenat, NamSor SAS
  */
 public class NaiveBayesClassifierRocksDBImpl extends AbstractNaiveBayesClassifierRocksDBImpl implements INaiveBayesClassifier {
@@ -40,6 +41,8 @@ public class NaiveBayesClassifierRocksDBImpl extends AbstractNaiveBayesClassifie
             String pathCategory = pathCategory(category);
             batch.put(bytes(pathCategory), Longs.toByteArray((getDb().get(ro, bytes(pathCategory)) == null ? weight : Longs.fromByteArray(getDb().get(ro, bytes(pathCategory))) + weight)));
             for (Map.Entry<String, String> feature : features.entrySet()) {
+                String pathFeatureKey = pathFeatureKey(feature.getKey());
+                batch.put(bytes(pathFeatureKey), Longs.toByteArray((getDb().get(ro, bytes(pathFeatureKey)) == null ? weight : Longs.fromByteArray(getDb().get(ro, bytes(pathFeatureKey))) + weight)));
                 String pathCategoryFeatureKey = pathCategoryFeatureKey(category, feature.getKey());
                 batch.put(bytes(pathCategoryFeatureKey), Longs.toByteArray((getDb().get(ro, bytes(pathCategoryFeatureKey)) == null ? weight : Longs.fromByteArray(getDb().get(ro, bytes(pathCategoryFeatureKey))) + weight)));
                 String pathCategoryFeatureKeyValue = pathCategoryFeatureKeyValue(category, feature.getKey(), feature.getValue());
@@ -70,12 +73,16 @@ public class NaiveBayesClassifierRocksDBImpl extends AbstractNaiveBayesClassifie
                 long categoryCount = (getDb().get(ro, bytes(pathCategory)) == null ? 0 : Longs.fromByteArray(getDb().get(ro, bytes(pathCategory))));
                 double product = 1.0d;
                 for (Map.Entry<String, String> feature : features.entrySet()) {
-                    String pathCategoryFeatureKey = pathCategoryFeatureKey(category, feature.getKey());
-                    double featureCount = (getDb().get(ro, bytes(pathCategoryFeatureKey)) == null ? 0 : Longs.fromByteArray(getDb().get(ro, bytes(pathCategoryFeatureKey))));
-                    String pathCategoryFeatureKeyValue = pathCategoryFeatureKeyValue(category, feature.getKey(), feature.getValue());
-                    double featureCategoryCount = (getDb().get(ro, bytes(pathCategoryFeatureKeyValue)) == null ? 0 : Longs.fromByteArray(getDb().get(ro, bytes(pathCategoryFeatureKeyValue))));
-                    double basicProbability = (featureCount == 0 ? 0 : 1d * featureCategoryCount / featureCount);
-                    product *= basicProbability;
+                    String pathFeatureKey = pathFeatureKey(feature.getKey());
+                    double featureCount = (getDb().get(ro, bytes(pathFeatureKey)) == null ? 0 : Longs.fromByteArray(getDb().get(ro, bytes(pathFeatureKey))));
+                    if (featureCount > 0) {
+                        String pathCategoryFeatureKey = pathCategoryFeatureKey(category, feature.getKey());
+                        double categoryFeatureCount = (getDb().get(ro, bytes(pathCategoryFeatureKey)) == null ? 0 : Longs.fromByteArray(getDb().get(ro, bytes(pathCategoryFeatureKey))));
+                        String pathCategoryFeatureKeyValue = pathCategoryFeatureKeyValue(category, feature.getKey(), feature.getValue());
+                        double categoryFeatureValueCount = (getDb().get(ro, bytes(pathCategoryFeatureKeyValue)) == null ? 0 : Longs.fromByteArray(getDb().get(ro, bytes(pathCategoryFeatureKeyValue))));
+                        double basicProbability = (categoryFeatureCount == 0 ? 0 : 1d * categoryFeatureValueCount / categoryFeatureCount);
+                        product *= basicProbability;
+                    }
                 }
                 likelyhood[i] = 1d * categoryCount / globalCount * product;
                 likelyhoodTot += likelyhood[i];

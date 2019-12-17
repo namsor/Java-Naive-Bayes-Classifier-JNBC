@@ -28,6 +28,8 @@ public class NaiveBayesClassifierTransientImpl extends AbstractNaiveBayesClassif
         String pathCategory = pathCategory(category);
         getDb().put(pathCategory, (getDb().containsKey(pathCategory) ? getDb().get(pathCategory) + weight : weight));
         for (Entry<String, String> feature : features.entrySet()) {
+            String pathFeatureKey = pathFeatureKey(feature.getKey());
+            getDb().put(pathFeatureKey, (getDb().containsKey(pathFeatureKey) ? getDb().get(pathFeatureKey) + weight : weight));
             String pathCategoryFeatureKey = pathCategoryFeatureKey(category, feature.getKey());
             getDb().put(pathCategoryFeatureKey, (getDb().containsKey(pathCategoryFeatureKey) ? getDb().get(pathCategoryFeatureKey) + weight : weight));
             String pathCategoryFeatureKeyValue = pathCategoryFeatureKeyValue(category, feature.getKey(), feature.getValue());
@@ -47,12 +49,16 @@ public class NaiveBayesClassifierTransientImpl extends AbstractNaiveBayesClassif
             long categoryCount = (getDb().containsKey(pathCategory) ? getDb().get(pathCategory) : 0);
             double product = 1.0d;
             for (Entry<String, String> feature : features.entrySet()) {
-                String pathCategoryFeatureKey = pathCategoryFeatureKey(category, feature.getKey());
-                double featureCount = (getDb().containsKey(pathCategoryFeatureKey) ? getDb().get(pathCategoryFeatureKey) : 0);
-                String pathCategoryFeatureKeyValue = pathCategoryFeatureKeyValue(category, feature.getKey(), feature.getValue());
-                double featureCategoryCount = (getDb().containsKey(pathCategoryFeatureKeyValue) ? getDb().get(pathCategoryFeatureKeyValue) : 0);
-                double basicProbability = (featureCount == 0 ? 0 : 1d * featureCategoryCount / featureCount);
-                product *= basicProbability;
+                String pathFeatureKey = pathFeatureKey(feature.getKey());
+                double featureCount = (getDb().containsKey(pathFeatureKey) ? getDb().get(pathFeatureKey) : 0);
+                if (featureCount > 0) {
+                    String pathCategoryFeatureKey = pathCategoryFeatureKey(category, feature.getKey());
+                    double categoryFeatureCount = (getDb().containsKey(pathCategoryFeatureKey) ? getDb().get(pathCategoryFeatureKey) : 0);
+                    String pathCategoryFeatureKeyValue = pathCategoryFeatureKeyValue(category, feature.getKey(), feature.getValue());
+                    double categoryFeatureValueCount = (getDb().containsKey(pathCategoryFeatureKeyValue) ? getDb().get(pathCategoryFeatureKeyValue) : 0);
+                    double basicProbability = (categoryFeatureCount == 0 ? 0 : 1d * categoryFeatureValueCount / categoryFeatureCount);
+                    product *= basicProbability;
+                }
             }
             likelyhood[i] = 1d * categoryCount / globalCount * product;
             likelyhoodTot += likelyhood[i];
@@ -60,6 +66,5 @@ public class NaiveBayesClassifierTransientImpl extends AbstractNaiveBayesClassif
         return likelihoodsToProbas(likelyhood, likelyhoodTot);
 
     }
-
 
 }

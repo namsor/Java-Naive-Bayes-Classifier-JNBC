@@ -69,6 +69,7 @@ public class MainSample3 {
             features.put("Long", "Yes");
             features.put("Sweet", "Yes");
             features.put("Yellow", "Yes");
+            features.put("Dummy", "Yes");
             IClassification[] predict = bayes.classify(features);
             StringWriter sw = new StringWriter();
             bayes.dumpDb(sw);

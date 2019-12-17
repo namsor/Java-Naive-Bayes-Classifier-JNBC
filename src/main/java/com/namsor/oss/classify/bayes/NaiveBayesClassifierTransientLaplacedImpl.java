@@ -56,6 +56,8 @@ public class NaiveBayesClassifierTransientLaplacedImpl extends AbstractNaiveBaye
             getDb().put(pathGlobalCountCategories, (getDb().containsKey(pathGlobalCountCategories) ? getDb().get(pathGlobalCountCategories) + 1 : 1));
         }
         for (Entry<String, String> feature : features.entrySet()) {
+            String pathFeatureKey = pathFeatureKey(feature.getKey());
+            getDb().put(pathFeatureKey, (getDb().containsKey(pathFeatureKey) ? getDb().get(pathFeatureKey) + weight : weight));
             String pathCategoryFeatureKey = pathCategoryFeatureKey(category, feature.getKey());
             getDb().put(pathCategoryFeatureKey, (getDb().containsKey(pathCategoryFeatureKey) ? getDb().get(pathCategoryFeatureKey) + weight : weight));
             String pathCategoryFeatureKeyValue = pathCategoryFeatureKeyValue(category, feature.getKey(), feature.getValue());
@@ -86,16 +88,20 @@ public class NaiveBayesClassifierTransientLaplacedImpl extends AbstractNaiveBaye
             long categoryCount = (getDb().containsKey(pathCategory) ? getDb().get(pathCategory) : 0);
             double product = 1.0d;
             for (Entry<String, String> feature : features.entrySet()) {
-                String pathCategoryFeatureKey = pathCategoryFeatureKey(category, feature.getKey());
-                double featureCount = (getDb().containsKey(pathCategoryFeatureKey) ? getDb().get(pathCategoryFeatureKey) : 0);
+                String pathFeatureKey = pathFeatureKey(feature.getKey());
+                double featureCount = (getDb().containsKey(pathFeatureKey) ? getDb().get(pathFeatureKey) : 0);
+                if (featureCount > 0) {
+                    String pathCategoryFeatureKey = pathCategoryFeatureKey(category, feature.getKey());
+                    double categoryFeatureCount = (getDb().containsKey(pathCategoryFeatureKey) ? getDb().get(pathCategoryFeatureKey) : 0);
 
-                String pathFeatureKeyCountValueTypes = pathFeatureKeyCountValueTypes(feature.getKey());
-                double featureCountValueTypes = (getDb().containsKey(pathFeatureKeyCountValueTypes) ? getDb().get(pathFeatureKeyCountValueTypes) : 0);
+                    String pathFeatureKeyCountValueTypes = pathFeatureKeyCountValueTypes(feature.getKey());
+                    double featureCountValueTypes = (getDb().containsKey(pathFeatureKeyCountValueTypes) ? getDb().get(pathFeatureKeyCountValueTypes) : 0);
 
-                String pathCategoryFeatureKeyValue = pathCategoryFeatureKeyValue(category, feature.getKey(), feature.getValue());
-                double featureCategoryCount = (getDb().containsKey(pathCategoryFeatureKeyValue) ? getDb().get(pathCategoryFeatureKeyValue) : 0);
-                double basicProbability = (featureCount == 0 ? 0 : 1d * (featureCategoryCount + alpha) / (featureCount + featureCountValueTypes * alpha));
-                product *= basicProbability;
+                    String pathCategoryFeatureKeyValue = pathCategoryFeatureKeyValue(category, feature.getKey(), feature.getValue());
+                    double categoryFeatureValueCount = (getDb().containsKey(pathCategoryFeatureKeyValue) ? getDb().get(pathCategoryFeatureKeyValue) : 0);
+                    double basicProbability = (categoryFeatureCount == 0 ? 0 : 1d * (categoryFeatureValueCount + alpha) / (categoryFeatureCount + featureCountValueTypes * alpha));
+                    product *= basicProbability;
+                }
             }
             if (variant) {
                 likelyhood[i] = 1d * ((categoryCount + alpha) / (globalCount + globalCountCategories * alpha)) * product;
