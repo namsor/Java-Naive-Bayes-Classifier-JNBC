@@ -26,10 +26,26 @@ public abstract class AbstractNaiveBayesClassifierImpl implements INaiveBayesCla
         return classifierName;
     }
     private final String classifierName;
+    private final int topN;
 
     public AbstractNaiveBayesClassifierImpl(String classifierName, String[] categories) {
         this.classifierName = classifierName;
         this.categories = categories;
+        this.topN = -1;
+    }
+
+    /**
+     * Create a Naive Bayes Classifier that can return only the topN most
+     * probable classifications, and a special 'Other'
+     *
+     * @param classifierName
+     * @param categories
+     * @param topN
+     */
+    public AbstractNaiveBayesClassifierImpl(String classifierName, String[] categories, int topN) {
+        this.classifierName = classifierName;
+        this.categories = categories;
+        this.topN = topN;
     }
 
     private final String[] categories;
@@ -143,6 +159,36 @@ public abstract class AbstractNaiveBayesClassifierImpl implements INaiveBayesCla
     }
 
     protected IClassification[] likelihoodsToProbas(double[] likelyhood, double likelyhoodTot) {
+        if (topN > 0 && likelyhood.length > topN) {
+            double[] likelyhoodSorted = likelyhood.clone(); // Arrays.copyOf(likelyhood, topN);
+            Arrays.sort(likelyhoodSorted);
+            double likelyhoodN = likelyhoodSorted[likelyhood.length - 1 - topN];
+            IClassification[] result = new ClassificationImpl[topN + 1];
+            double probaTopN = 0;
+            for (int i = 0; i < getCategories().length; i++) {
+                double proba = likelyhood[i] / likelyhoodTot;
+                if (proba > 1d) {
+                    // could equal 1.000000000002 due to double precision issue;
+                    proba = 1d;
+                } else if (proba < 0) {
+                    proba = 0d;
+                }
+                if (likelyhood[i] >= likelyhoodN) {
+                    ClassificationImpl classif = new ClassificationImpl(getCategories()[i], proba);
+                    result[i] = classif;
+                    probaTopN+=proba;
+                }
+            }
+            Arrays.sort(result, 0, topN - 1, orderByProba);
+            ClassificationImpl classifOther = new ClassificationImpl(IClassification.SPECIAL_CATEGORY_OTHER, (1d-probaTopN));
+            result[topN] = classifOther;
+            return result;
+        } else {
+            return likelihoodsToProbas_(likelyhood, likelyhoodTot);
+        }
+    }
+
+    protected IClassification[] likelihoodsToProbas_(double[] likelyhood, double likelyhoodTot) {
         IClassification[] result = new ClassificationImpl[getCategories().length];
         for (int i = 0; i < getCategories().length; i++) {
             double proba = likelyhood[i] / likelyhoodTot;

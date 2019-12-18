@@ -75,7 +75,7 @@ public class NaiveBayesClassifierTransientLaplacedImpl extends AbstractNaiveBaye
     }
 
     @Override
-    public synchronized IClassification[] classify(Map<String, String> features) throws ClassifyException {
+    public IClassification[] classify(Map<String, String> features) throws ClassifyException {
         String pathGlobal = pathGlobal();
         String pathGlobalCountCategories = pathGlobalCountCategories();
         long globalCount = (getDb().containsKey(pathGlobal) ? getDb().get(pathGlobal) : 0);
