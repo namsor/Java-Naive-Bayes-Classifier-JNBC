@@ -20,11 +20,15 @@ public abstract class AbstractNaiveBayesClassifierTransientImpl extends Abstract
 
     private final Map<String, Long> db;
 
-    public AbstractNaiveBayesClassifierTransientImpl(String classifierName, String[] categories) {
-        super(classifierName, categories);
+    public AbstractNaiveBayesClassifierTransientImpl(String classifierName, String[] categories, int topN) {
+        super(classifierName, categories, topN);
         db = new ConcurrentHashMap();
     }
-
+    
+    public AbstractNaiveBayesClassifierTransientImpl(String classifierName, String[] categories) {
+        this(classifierName, categories, -1);
+    }
+    
     @Override
     public void dbClose() throws PersistentClassifierException {
     }

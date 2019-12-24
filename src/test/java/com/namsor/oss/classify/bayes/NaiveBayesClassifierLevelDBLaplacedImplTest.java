@@ -9,6 +9,7 @@ import static com.namsor.oss.samples.MainSample2.X1;
 import static com.namsor.oss.samples.MainSample2.X2;
 import static com.namsor.oss.samples.MainSample2.Y;
 import static com.namsor.oss.samples.MainSample2.ZERO;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.After;
@@ -22,9 +23,9 @@ import static org.junit.Assert.*;
  *
  * @author elian
  */
-public class NaiveBayesClassifierTransientLaplacedImplTest {
-
-    public NaiveBayesClassifierTransientLaplacedImplTest() {
+public class NaiveBayesClassifierLevelDBLaplacedImplTest {
+    private static final String LEVELDB_DIR = "/tmp/leveldb";
+    public NaiveBayesClassifierLevelDBLaplacedImplTest() {
     }
 
     @BeforeClass
@@ -37,6 +38,12 @@ public class NaiveBayesClassifierTransientLaplacedImplTest {
 
     @Before
     public void setUp() {
+        File leveldb = new File(LEVELDB_DIR);
+        if( leveldb.exists() && leveldb.isDirectory() ) {
+            // ok
+        } else {
+            leveldb.mkdirs();
+        }
     }
 
     @After
@@ -50,7 +57,7 @@ public class NaiveBayesClassifierTransientLaplacedImplTest {
     @Test
     public void testLearnClassifySample1() throws Exception {
         String[] cats = {YES, NO};
-        NaiveBayesClassifierTransientLaplacedImpl bayes = new NaiveBayesClassifierTransientLaplacedImpl("tennis", cats, 1, false);
+        NaiveBayesClassifierLevelDBLaplacedImpl bayes = new NaiveBayesClassifierLevelDBLaplacedImpl("tennis", cats, LEVELDB_DIR, 1d, false);
         for (int i = 0; i < data.length; i++) {
             Map<String, String> features = new HashMap();
             for (int j = 0; j < colName.length - 1; j++) {
@@ -70,6 +77,8 @@ public class NaiveBayesClassifierTransientLaplacedImplTest {
         assertEquals(predict[1].getCategory(), "No");
         assertEquals(predict[0].getProbability(), 0.7215830648872527, .0001);
         assertEquals(predict[1].getProbability(), 0.2784169351127473, .0001);
+        bayes.dbCloseAndDestroy();
+        
     }
 
     /**
@@ -81,8 +90,8 @@ public class NaiveBayesClassifierTransientLaplacedImplTest {
         String[] cats = {ZERO, ONE};
         // Create a new bayes classifier with string categories and string features.
         // INaiveBayesClassifier bayes1 = new NaiveBayesClassifierLevelDBImpl("sentiment", cats, ".", 100);
-        NaiveBayesClassifierTransientLaplacedImpl bayes = new NaiveBayesClassifierTransientLaplacedImpl("sentiment", cats, 1, true);
-        //NaiveBayesClassifierRocksDBImpl bayes = new NaiveBayesClassifierRocksDBImpl("intro", cats, ".", 100);
+        NaiveBayesClassifierLevelDBLaplacedImpl bayes = new NaiveBayesClassifierLevelDBLaplacedImpl("sentiment", cats, LEVELDB_DIR, 1, true);
+        //NaiveBayesClassifierLevelDBImpl bayes = new NaiveBayesClassifierLevelDBImpl("intro", cats, ".", 100);
 
 // Examples to learn from.
         for (int i = 0; i < Y.length; i++) {
@@ -103,8 +112,8 @@ public class NaiveBayesClassifierTransientLaplacedImplTest {
         assertEquals(predict[1].getCategory(), "1");
         assertEquals(predict[0].getProbability(), 0.6511627906976744, .0001);
         assertEquals(predict[1].getProbability(), 0.3488372093023256, .0001);
+        bayes.dbCloseAndDestroy();
+        
     }
-    
-    
 
 }

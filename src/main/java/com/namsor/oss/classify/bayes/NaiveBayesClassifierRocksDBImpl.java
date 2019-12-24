@@ -3,14 +3,10 @@ package com.namsor.oss.classify.bayes;
 import com.google.common.primitives.Longs;
 import static com.namsor.oss.classify.bayes.AbstractNaiveBayesClassifierImpl.pathCategory;
 import static com.namsor.oss.classify.bayes.AbstractNaiveBayesClassifierImpl.pathGlobal;
-import org.rocksdb.RocksDB;
-import org.rocksdb.Options;
 
 import java.io.*;
 
-import java.util.Arrays;
 import java.util.Map;
-import org.rocksdb.CompressionType;
 import org.rocksdb.ReadOptions;
 import org.rocksdb.RocksDBException;
 import org.rocksdb.RocksIterator;
@@ -19,11 +15,15 @@ import org.rocksdb.WriteOptions;
 
 /**
  * Naive Bayes Classifier implementation with RocksDB as key/value store.
- * Learning is Synchronized by classification is not.
+ * Learning is Synchronized but classification is not.
  *
  * @author elian carsenat, NamSor SAS
  */
 public class NaiveBayesClassifierRocksDBImpl extends AbstractNaiveBayesClassifierRocksDBImpl implements INaiveBayesClassifier {
+
+    public NaiveBayesClassifierRocksDBImpl(String classifierName, String[] categories, String rootPathWritable, int topN) throws IOException, PersistentClassifierException {
+        super(classifierName, categories, rootPathWritable, topN);
+    }
 
     public NaiveBayesClassifierRocksDBImpl(String classifierName, String[] categories, String rootPathWritable) throws IOException, PersistentClassifierException {
         super(classifierName, categories, rootPathWritable);
@@ -95,25 +95,6 @@ public class NaiveBayesClassifierRocksDBImpl extends AbstractNaiveBayesClassifie
             ro.snapshot().close();
         }
 
-    }
-
-    public void dumpDb(Writer w) throws ClassifyException {
-        ReadOptions ro = new ReadOptions();
-        ro.setSnapshot(getDb().getSnapshot());
-
-        RocksIterator iterator = getDb().newIterator(ro);
-        try {
-            for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
-                String key = new String(iterator.key());
-                long value = Longs.fromByteArray(iterator.value());
-                w.append(key + "|" + value + "\n");
-            }
-        } catch (IOException ex) {
-            throw new ClassifyException(ex);
-        } finally {
-            // Make sure you close the snapshot to avoid resource leaks.
-            ro.snapshot().close();
-        }
     }
 
 }

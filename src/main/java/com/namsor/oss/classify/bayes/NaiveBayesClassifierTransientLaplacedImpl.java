@@ -1,13 +1,9 @@
 package com.namsor.oss.classify.bayes;
 
 import java.io.*;
-import java.util.Arrays;
 
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Naive Bayes Classifier with Laplace smoothing and implementation with
@@ -23,7 +19,12 @@ public class NaiveBayesClassifierTransientLaplacedImpl extends AbstractNaiveBaye
     private final boolean variant;
     private final double alpha;
 
-    public NaiveBayesClassifierTransientLaplacedImpl(String classifierName, String[] categories) throws IOException {
+
+    public NaiveBayesClassifierTransientLaplacedImpl(String classifierName, String[] categories, int topN) {
+        this(classifierName, categories, ALPHA, VARIANT, topN);
+    }
+
+    public NaiveBayesClassifierTransientLaplacedImpl(String classifierName, String[] categories) {
         this(classifierName, categories, ALPHA, VARIANT);
     }
 
@@ -36,12 +37,28 @@ public class NaiveBayesClassifierTransientLaplacedImpl extends AbstractNaiveBaye
      * @param variant
      * @throws IOException
      */
-    public NaiveBayesClassifierTransientLaplacedImpl(String classifierName, String[] categories, double alpha, boolean variant) throws IOException {
+    public NaiveBayesClassifierTransientLaplacedImpl(String classifierName, String[] categories, double alpha, boolean variant) {
         super(classifierName, categories);
         this.alpha = alpha;
         this.variant = variant;
     }
 
+    /**
+     * Create a classifier, that will only return topN classifs
+     *
+     * @param classifierName
+     * @param categories
+     * @param alpha Typically 1
+     * @param variant
+     * @throws IOException
+     */
+    public NaiveBayesClassifierTransientLaplacedImpl(String classifierName, String[] categories, double alpha, boolean variant, int topN) {
+        super(classifierName, categories, topN);
+        this.alpha = alpha;
+        this.variant = variant;
+    }
+
+    
     @Override
     public synchronized void learn(String category, Map<String, String> features, long weight) throws ClassifyException {
         String pathGlobal = pathGlobal();

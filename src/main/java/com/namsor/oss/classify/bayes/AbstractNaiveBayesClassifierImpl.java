@@ -1,7 +1,10 @@
 package com.namsor.oss.classify.bayes;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -162,8 +165,8 @@ public abstract class AbstractNaiveBayesClassifierImpl implements INaiveBayesCla
         if (topN > 0 && likelyhood.length > topN) {
             double[] likelyhoodSorted = likelyhood.clone(); // Arrays.copyOf(likelyhood, topN);
             Arrays.sort(likelyhoodSorted);
-            double likelyhoodN = likelyhoodSorted[likelyhood.length - 1 - topN];
-            IClassification[] result = new ClassificationImpl[topN + 1];
+            double likelyhoodN = likelyhoodSorted[likelyhood.length - topN];
+            List<IClassification> result = new ArrayList(topN + 1);
             double probaTopN = 0;
             for (int i = 0; i < getCategories().length; i++) {
                 double proba = likelyhood[i] / likelyhoodTot;
@@ -175,14 +178,16 @@ public abstract class AbstractNaiveBayesClassifierImpl implements INaiveBayesCla
                 }
                 if (likelyhood[i] >= likelyhoodN) {
                     ClassificationImpl classif = new ClassificationImpl(getCategories()[i], proba);
-                    result[i] = classif;
+                    result.add(classif);
                     probaTopN+=proba;
                 }
             }
-            Arrays.sort(result, 0, topN - 1, orderByProba);
+            Collections.sort(result, orderByProba);
             ClassificationImpl classifOther = new ClassificationImpl(IClassification.SPECIAL_CATEGORY_OTHER, (1d-probaTopN));
-            result[topN] = classifOther;
-            return result;
+            result.add(classifOther);
+            IClassification[] resultArr = new ClassificationImpl[result.size()];
+            resultArr = result.toArray(resultArr);
+            return resultArr;
         } else {
             return likelihoodsToProbas_(likelyhood, likelyhoodTot);
         }

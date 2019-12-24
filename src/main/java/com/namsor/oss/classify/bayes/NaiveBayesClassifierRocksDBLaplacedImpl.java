@@ -14,7 +14,7 @@ import org.rocksdb.WriteOptions;
 
 /**
  * Naive Bayes Classifier with Laplace smoothing and implementation with RocksDB
- * as key/value store. Learning is Synchronized by classification is not.
+ * as key/value store. Learning is Synchronized but classification is not.
  *
  * @author elian carsenat, NamSor SAS
  */
@@ -24,13 +24,22 @@ public class NaiveBayesClassifierRocksDBLaplacedImpl extends AbstractNaiveBayesC
     private static final double ALPHA = 1d;
     private final boolean variant;
     private final double alpha;
-
+    
+    public NaiveBayesClassifierRocksDBLaplacedImpl(String classifierName, String[] categories, String rootPathWritable, int topN) throws IOException, PersistentClassifierException {
+        this(classifierName, categories, rootPathWritable, ALPHA, VARIANT, topN);
+    }
     public NaiveBayesClassifierRocksDBLaplacedImpl(String classifierName, String[] categories, String rootPathWritable) throws IOException, PersistentClassifierException {
         this(classifierName, categories, rootPathWritable, ALPHA, VARIANT);
     }
-
+    
     public NaiveBayesClassifierRocksDBLaplacedImpl(String classifierName, String[] categories, String rootPathWritable, double alpha, boolean variant) throws IOException, PersistentClassifierException {
         super(classifierName, categories, rootPathWritable);
+        this.variant = variant;
+        this.alpha = alpha;
+    }
+
+    public NaiveBayesClassifierRocksDBLaplacedImpl(String classifierName, String[] categories, String rootPathWritable, double alpha, boolean variant, int topN) throws IOException, PersistentClassifierException {
+        super(classifierName, categories, rootPathWritable, topN);
         this.variant = variant;
         this.alpha = alpha;
     }

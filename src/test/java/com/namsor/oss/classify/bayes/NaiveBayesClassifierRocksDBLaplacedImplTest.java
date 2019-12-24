@@ -1,14 +1,14 @@
 package com.namsor.oss.classify.bayes;
 
-import static com.namsor.oss.classify.bayes.MainSample1.NO;
-import static com.namsor.oss.classify.bayes.MainSample1.YES;
-import static com.namsor.oss.classify.bayes.MainSample1.colName;
-import static com.namsor.oss.classify.bayes.MainSample1.data;
-import static com.namsor.oss.classify.bayes.MainSample2.ONE;
-import static com.namsor.oss.classify.bayes.MainSample2.X1;
-import static com.namsor.oss.classify.bayes.MainSample2.X2;
-import static com.namsor.oss.classify.bayes.MainSample2.Y;
-import static com.namsor.oss.classify.bayes.MainSample2.ZERO;
+import static com.namsor.oss.samples.MainSample1.NO;
+import static com.namsor.oss.samples.MainSample1.YES;
+import static com.namsor.oss.samples.MainSample1.colName;
+import static com.namsor.oss.samples.MainSample1.data;
+import static com.namsor.oss.samples.MainSample2.ONE;
+import static com.namsor.oss.samples.MainSample2.X1;
+import static com.namsor.oss.samples.MainSample2.X2;
+import static com.namsor.oss.samples.MainSample2.Y;
+import static com.namsor.oss.samples.MainSample2.ZERO;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;

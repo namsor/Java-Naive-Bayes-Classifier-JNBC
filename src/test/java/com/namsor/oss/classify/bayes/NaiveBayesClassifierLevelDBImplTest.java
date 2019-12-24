@@ -27,9 +27,9 @@ import static org.junit.Assert.*;
  *
  * @author elian
  */
-public class NaiveBayesClassifierRocksDBImplTest {
-    private static final String ROCKSDB_DIR = "/tmp/rocksdb";
-    public NaiveBayesClassifierRocksDBImplTest() {
+public class NaiveBayesClassifierLevelDBImplTest {
+    private static final String LEVELDB_DIR = "/tmp/leveldb";
+    public NaiveBayesClassifierLevelDBImplTest() {
     }
 
     @BeforeClass
@@ -42,11 +42,11 @@ public class NaiveBayesClassifierRocksDBImplTest {
 
     @Before
     public void setUp() {
-        File rocksdb = new File(ROCKSDB_DIR);
-        if( rocksdb.exists() && rocksdb.isDirectory() ) {
+        File leveldb = new File(LEVELDB_DIR);
+        if( leveldb.exists() && leveldb.isDirectory() ) {
             // ok
         } else {
-            rocksdb.mkdirs();
+            leveldb.mkdirs();
         }
     }
 
@@ -61,7 +61,7 @@ public class NaiveBayesClassifierRocksDBImplTest {
     @Test
     public void testTransientLearnClassifySample1() throws Exception {
         String[] cats = {YES, NO};
-        NaiveBayesClassifierRocksDBImpl bayes = new NaiveBayesClassifierRocksDBImpl("tennis", cats, ROCKSDB_DIR);
+        NaiveBayesClassifierLevelDBImpl bayes = new NaiveBayesClassifierLevelDBImpl("tennis", cats, LEVELDB_DIR);
         for (int i = 0; i < data.length; i++) {
             Map<String, String> features = new HashMap();
             for (int j = 0; j < colName.length - 1; j++) {
@@ -93,8 +93,8 @@ public class NaiveBayesClassifierRocksDBImplTest {
         String[] cats = {ZERO, ONE};
         // Create a new bayes classifier with string categories and string features.
         // INaiveBayesClassifier bayes1 = new NaiveBayesClassifierLevelDBImpl("sentiment", cats, ".", 100);
-        NaiveBayesClassifierRocksDBImpl bayes = new NaiveBayesClassifierRocksDBImpl("sentiment", cats, ROCKSDB_DIR);
-        //NaiveBayesClassifierRocksDBImpl bayes = new NaiveBayesClassifierRocksDBImpl("intro", cats, ".", 100);
+        NaiveBayesClassifierLevelDBImpl bayes = new NaiveBayesClassifierLevelDBImpl("sentiment", cats, LEVELDB_DIR);
+        //NaiveBayesClassifierLevelDBImpl bayes = new NaiveBayesClassifierLevelDBImpl("intro", cats, ".", 100);
 
 // Examples to learn from.
         for (int i = 0; i < Y.length; i++) {
@@ -129,9 +129,9 @@ public class NaiveBayesClassifierRocksDBImplTest {
     public void testLearnClassifySample3() throws Exception {
         String[] cats = {BANANA, ORANGE, OTHER};
         // Create a new bayes classifier with string categories and string features.
-        NaiveBayesClassifierRocksDBImpl bayes = new NaiveBayesClassifierRocksDBImpl("fruit", cats, ROCKSDB_DIR);
+        NaiveBayesClassifierLevelDBImpl bayes = new NaiveBayesClassifierLevelDBImpl("fruit", cats, LEVELDB_DIR);
         //NaiveBayesClassifierTransientLaplacedImpl bayes = new NaiveBayesClassifierTransientLaplacedImpl("fruit", cats);
-        //NaiveBayesClassifierRocksDBImpl bayes = new NaiveBayesClassifierRocksDBImpl("intro", cats, ".", 100);
+        //NaiveBayesClassifierLevelDBImpl bayes = new NaiveBayesClassifierLevelDBImpl("intro", cats, ".", 100);
 
         // Examples to learn from.
         for (int i = 0; i < MainSample3.data.length; i++) {

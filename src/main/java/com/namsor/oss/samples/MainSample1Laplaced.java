@@ -1,5 +1,13 @@
-package com.namsor.oss.classify.bayes;
+package com.namsor.oss.samples;
 
+import com.namsor.oss.classify.bayes.ClassifyException;
+import com.namsor.oss.classify.bayes.IClassification;
+import com.namsor.oss.classify.bayes.NaiveBayesClassifierLevelDBImpl;
+import com.namsor.oss.classify.bayes.NaiveBayesClassifierLevelDBLaplacedImpl;
+import com.namsor.oss.classify.bayes.NaiveBayesClassifierRocksDBImpl;
+import com.namsor.oss.classify.bayes.NaiveBayesClassifierRocksDBLaplacedImpl;
+import com.namsor.oss.classify.bayes.NaiveBayesClassifierTransientLaplacedImpl;
+import com.namsor.oss.classify.bayes.PersistentClassifierException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashMap;
@@ -13,7 +21,7 @@ import java.util.logging.Logger;
  *
  * @author elian
  */
-public class MainSample1 {
+public class MainSample1Laplaced {
 
     public static final String YES = "Yes";
     public static final String NO = "No";
@@ -52,8 +60,9 @@ public class MainSample1 {
         try {
             String[] cats = {YES, NO};
             // Create a new bayes classifier with string categories and string features.
-            NaiveBayesClassifierTransientImpl bayes = new NaiveBayesClassifierTransientImpl("tennis", cats);
-            //NaiveBayesClassifierRocksDBImpl bayes = new NaiveBayesClassifierRocksDBImpl("intro", cats, ".", 100);
+            //NaiveBayesClassifierTransientLaplacedImpl bayes = new NaiveBayesClassifierTransientLaplacedImpl ("tennis", cats, 1, false);
+            //NaiveBayesClassifierRocksDBLaplacedImpl bayes = new NaiveBayesClassifierRocksDBLaplacedImpl("tennis", cats, ".", 100);
+            NaiveBayesClassifierLevelDBLaplacedImpl bayes = new NaiveBayesClassifierLevelDBLaplacedImpl("tennis", cats, ".", 100);
 
 // Examples to learn from.
             for (int i = 0; i < data.length; i++) {
@@ -71,7 +80,7 @@ public class MainSample1 {
 
 // Here are is X(B,S) to classify.
             Map<String,String> features = new HashMap();
-            features.put("outlook","Sunny");
+            features.put("outlook","Overcast");
             features.put("temp","Cool");
             features.put("humidity","High");
             features.put("wind","Strong");
@@ -84,11 +93,11 @@ public class MainSample1 {
                 System.out.println("P(" + predict[i].getCategory() + ")=" + predict[i].getProbability());
             }
         } catch (PersistentClassifierException ex) {
-            Logger.getLogger(MainSample1.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(MainSample1Laplaced.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassifyException ex) {
-            Logger.getLogger(MainSample1.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(MainSample1Laplaced.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Throwable ex) {
-            Logger.getLogger(MainSample1.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(MainSample1Laplaced.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

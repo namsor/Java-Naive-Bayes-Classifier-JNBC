@@ -1,13 +1,8 @@
 package com.namsor.oss.classify.bayes;
 
-import java.io.*;
-import java.util.Arrays;
 
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Naive Bayes Classifier implementation with in-memory, concurrent
@@ -21,6 +16,10 @@ public class NaiveBayesClassifierTransientImpl extends AbstractNaiveBayesClassif
         super(classifierName, categories);
     }
 
+    public NaiveBayesClassifierTransientImpl(String classifierName, String[] categories, int topN) {
+        super(classifierName, categories, topN);
+    }
+    
     @Override
     public synchronized void learn(String category, Map<String, String> features, long weight) throws ClassifyException {
         String pathGlobal = pathGlobal();

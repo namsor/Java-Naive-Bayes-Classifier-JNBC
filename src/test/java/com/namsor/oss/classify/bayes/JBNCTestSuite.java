@@ -14,6 +14,8 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({com.namsor.oss.classify.bayes.NaiveBayesClassifierTransientImplTest.class, 
                      com.namsor.oss.classify.bayes.NaiveBayesClassifierTransientLaplacedImplTest.class,
+                     com.namsor.oss.classify.bayes.NaiveBayesClassifierLevelDBImplTest.class,
+                     com.namsor.oss.classify.bayes.NaiveBayesClassifierLevelDBLaplacedImplTest.class,
                      com.namsor.oss.classify.bayes.NaiveBayesClassifierRocksDBImplTest.class,
                      com.namsor.oss.classify.bayes.NaiveBayesClassifierRocksDBLaplacedImplTest.class,
 

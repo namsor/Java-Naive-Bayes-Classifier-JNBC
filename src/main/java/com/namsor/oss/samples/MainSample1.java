@@ -1,5 +1,9 @@
-package com.namsor.oss.classify.bayes;
+package com.namsor.oss.samples;
 
+import com.namsor.oss.classify.bayes.ClassifyException;
+import com.namsor.oss.classify.bayes.IClassification;
+import com.namsor.oss.classify.bayes.NaiveBayesClassifierTransientImpl;
+import com.namsor.oss.classify.bayes.PersistentClassifierException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashMap;
@@ -13,7 +17,7 @@ import java.util.logging.Logger;
  *
  * @author elian
  */
-public class MainSample1Laplaced {
+public class MainSample1 {
 
     public static final String YES = "Yes";
     public static final String NO = "No";
@@ -52,7 +56,7 @@ public class MainSample1Laplaced {
         try {
             String[] cats = {YES, NO};
             // Create a new bayes classifier with string categories and string features.
-            NaiveBayesClassifierTransientLaplacedImpl bayes = new NaiveBayesClassifierTransientLaplacedImpl ("tennis", cats, 1, false);
+            NaiveBayesClassifierTransientImpl bayes = new NaiveBayesClassifierTransientImpl("tennis", cats);
             //NaiveBayesClassifierRocksDBImpl bayes = new NaiveBayesClassifierRocksDBImpl("intro", cats, ".", 100);
 
 // Examples to learn from.
@@ -71,7 +75,7 @@ public class MainSample1Laplaced {
 
 // Here are is X(B,S) to classify.
             Map<String,String> features = new HashMap();
-            features.put("outlook","Overcast");
+            features.put("outlook","Sunny");
             features.put("temp","Cool");
             features.put("humidity","High");
             features.put("wind","Strong");
@@ -84,11 +88,11 @@ public class MainSample1Laplaced {
                 System.out.println("P(" + predict[i].getCategory() + ")=" + predict[i].getProbability());
             }
         } catch (PersistentClassifierException ex) {
-            Logger.getLogger(MainSample1Laplaced.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(MainSample1.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassifyException ex) {
-            Logger.getLogger(MainSample1Laplaced.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(MainSample1.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Throwable ex) {
-            Logger.getLogger(MainSample1Laplaced.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(MainSample1.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

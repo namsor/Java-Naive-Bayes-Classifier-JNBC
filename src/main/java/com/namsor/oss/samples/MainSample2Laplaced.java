@@ -1,8 +1,11 @@
-package com.namsor.oss.classify.bayes;
+package com.namsor.oss.samples;
 
 import com.namsor.oss.classify.bayes.ClassifyException;
+import com.namsor.oss.classify.bayes.ClassifyException;
+import com.namsor.oss.classify.bayes.IClassification;
 import com.namsor.oss.classify.bayes.IClassification;
 import com.namsor.oss.classify.bayes.NaiveBayesClassifierTransientImpl;
+import com.namsor.oss.classify.bayes.NaiveBayesClassifierTransientLaplacedImpl;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashMap;
@@ -16,7 +19,7 @@ import java.util.logging.Logger;
  *
  * @author elian
  */
-public class MainSample2 {
+public class MainSample2Laplaced {
 
     public static final String ZERO = "0";
     public static final String ONE = "1";
@@ -29,7 +32,7 @@ public class MainSample2 {
             String[] cats = {ZERO, ONE};
             // Create a new bayes classifier with string categories and string features.
             // INaiveBayesClassifier bayes1 = new NaiveBayesClassifierLevelDBImpl("sentiment", cats, ".", 100);
-            NaiveBayesClassifierTransientImpl bayes = new NaiveBayesClassifierTransientImpl("sentiment", cats);
+            NaiveBayesClassifierTransientLaplacedImpl bayes = new NaiveBayesClassifierTransientLaplacedImpl("sentiment", cats, 1, true);
             //NaiveBayesClassifierRocksDBImpl bayes = new NaiveBayesClassifierRocksDBImpl("intro", cats, ".", 100);
 
 // Examples to learn from.
@@ -52,9 +55,9 @@ public class MainSample2 {
                 System.out.println("P(" + predict[i].getCategory() + ")=" + predict[i].getProbability());
             }
         } catch (ClassifyException ex) {
-            Logger.getLogger(MainSample2.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(MainSample2Laplaced.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Throwable ex) {
-            Logger.getLogger(MainSample2.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(MainSample2Laplaced.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }
