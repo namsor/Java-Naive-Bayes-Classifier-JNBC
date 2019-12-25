@@ -3,7 +3,7 @@ package com.namsor.oss.samples;
 import com.namsor.oss.classify.bayes.ClassifyException;
 import com.namsor.oss.classify.bayes.IClassification;
 import com.namsor.oss.classify.bayes.INaiveBayesClassifier;
-import com.namsor.oss.classify.bayes.NaiveBayesClassifierTransientLaplacedImpl;
+import com.namsor.oss.classify.bayes.NaiveBayesClassifierMapLaplacedImpl;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Arrays;
@@ -34,7 +34,7 @@ public class MainSample4 {
         this.size = size;
         this.testRatio = testRatio;
         this.primes = primes(size);
-        this.classifier = new NaiveBayesClassifierTransientLaplacedImpl("sentiment", CATS);
+        this.classifier = new NaiveBayesClassifierMapLaplacedImpl("sentiment", CATS);
     }
 
     private static boolean[] primes(int size) {

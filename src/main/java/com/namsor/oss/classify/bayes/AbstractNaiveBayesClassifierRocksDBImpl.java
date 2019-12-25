@@ -88,7 +88,8 @@ public abstract class AbstractNaiveBayesClassifierRocksDBImpl extends AbstractNa
     }
     
 
-    public void dumpDb(Writer w) throws ClassifyException {
+    @Override
+    public synchronized void dumpDb(Writer w) throws ClassifyException {
         ReadOptions ro = new ReadOptions();
         ro.setSnapshot(getDb().getSnapshot());
 

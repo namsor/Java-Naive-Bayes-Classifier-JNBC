@@ -7,29 +7,28 @@ import java.util.Map.Entry;
 
 /**
  * Naive Bayes Classifier with Laplace smoothing and implementation with
- * in-memory, concurrent ConcurrentHashMap. The Laplace smoothing has two
- * variants as per Sample1 and Sample2.
+ * concurrent ConcurrentHashMap. The Laplace smoothing has two variants as per
+ * Sample1 and Sample2.
  *
  * @author elian carsenat, NamSor SAS
  */
-public class NaiveBayesClassifierTransientLaplacedImpl extends AbstractNaiveBayesClassifierTransientImpl implements INaiveBayesClassifier {
+public class NaiveBayesClassifierMapLaplacedImpl extends AbstractNaiveBayesClassifierMapImpl implements INaiveBayesClassifier {
 
     private static final boolean VARIANT = false;
     private static final double ALPHA = 1d;
     private final boolean variant;
     private final double alpha;
 
-
-    public NaiveBayesClassifierTransientLaplacedImpl(String classifierName, String[] categories, int topN) {
+    public NaiveBayesClassifierMapLaplacedImpl(String classifierName, String[] categories, int topN) {
         this(classifierName, categories, ALPHA, VARIANT, topN);
     }
 
-    public NaiveBayesClassifierTransientLaplacedImpl(String classifierName, String[] categories) {
+    public NaiveBayesClassifierMapLaplacedImpl(String classifierName, String[] categories) {
         this(classifierName, categories, ALPHA, VARIANT);
     }
 
     /**
-     * Create a classifier
+     * Create a classifier with in-memory Map
      *
      * @param classifierName
      * @param categories
@@ -37,14 +36,15 @@ public class NaiveBayesClassifierTransientLaplacedImpl extends AbstractNaiveBaye
      * @param variant
      * @throws IOException
      */
-    public NaiveBayesClassifierTransientLaplacedImpl(String classifierName, String[] categories, double alpha, boolean variant) {
+    public NaiveBayesClassifierMapLaplacedImpl(String classifierName, String[] categories, double alpha, boolean variant) {
         super(classifierName, categories);
         this.alpha = alpha;
         this.variant = variant;
     }
 
     /**
-     * Create a classifier, that will only return topN classifs
+     * Create a classifier, that will only return topN classifs, with in-memory
+     * Map
      *
      * @param classifierName
      * @param categories
@@ -52,12 +52,50 @@ public class NaiveBayesClassifierTransientLaplacedImpl extends AbstractNaiveBaye
      * @param variant
      * @throws IOException
      */
-    public NaiveBayesClassifierTransientLaplacedImpl(String classifierName, String[] categories, double alpha, boolean variant, int topN) {
+    public NaiveBayesClassifierMapLaplacedImpl(String classifierName, String[] categories, double alpha, boolean variant, int topN) {
         super(classifierName, categories, topN);
         this.alpha = alpha;
         this.variant = variant;
     }
 
+    public NaiveBayesClassifierMapLaplacedImpl(String classifierName, String[] categories, int topN, String rootPathWritable) {
+        this(classifierName, categories, ALPHA, VARIANT, topN, rootPathWritable);
+    }
+
+    public NaiveBayesClassifierMapLaplacedImpl(String classifierName, String[] categories, String rootPathWritable) {
+        this(classifierName, categories, ALPHA, VARIANT, rootPathWritable);
+    }
+
+    /**
+     * Create a classifier, that will only return topN classifs, with persistent
+     * map
+     *
+     * @param classifierName
+     * @param categories
+     * @param alpha Typically 1
+     * @param variant
+     * @param topN
+     * @param rootPathWritable
+     */
+    public NaiveBayesClassifierMapLaplacedImpl(String classifierName, String[] categories, double alpha, boolean variant, int topN, String rootPathWritable) {
+        super(classifierName, categories, topN, rootPathWritable);
+        this.alpha = alpha;
+        this.variant = variant;
+    }
+
+    /**
+     * Create a classifier with persistent map
+     * @param classifierName
+     * @param categories
+     * @param alpha
+     * @param variant
+     * @param rootPathWritable 
+     */
+    public NaiveBayesClassifierMapLaplacedImpl(String classifierName, String[] categories, double alpha, boolean variant, String rootPathWritable) {
+        super(classifierName, categories, rootPathWritable);
+        this.alpha = alpha;
+        this.variant = variant;
+    }
     
     @Override
     public synchronized void learn(String category, Map<String, String> features, long weight) throws ClassifyException {

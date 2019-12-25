@@ -2,7 +2,7 @@ package com.namsor.oss.samples;
 
 import com.namsor.oss.classify.bayes.ClassifyException;
 import com.namsor.oss.classify.bayes.IClassification;
-import com.namsor.oss.classify.bayes.NaiveBayesClassifierTransientImpl;
+import com.namsor.oss.classify.bayes.NaiveBayesClassifierMapImpl;
 import com.namsor.oss.classify.bayes.PersistentClassifierException;
 import java.io.StringWriter;
 import java.util.HashMap;
@@ -52,7 +52,7 @@ public class MainSample3 {
         try {
             String[] cats = {BANANA, ORANGE, OTHER};
             // Create a new bayes classifier with string categories and string features.
-            NaiveBayesClassifierTransientImpl bayes = new NaiveBayesClassifierTransientImpl("fruit", cats);
+            NaiveBayesClassifierMapImpl bayes = new NaiveBayesClassifierMapImpl("fruit", cats);
             //NaiveBayesClassifierTransientLaplacedImpl bayes = new NaiveBayesClassifierTransientLaplacedImpl("fruit", cats);
             //NaiveBayesClassifierRocksDBImpl bayes = new NaiveBayesClassifierRocksDBImpl("intro", cats, ".", 100);
 

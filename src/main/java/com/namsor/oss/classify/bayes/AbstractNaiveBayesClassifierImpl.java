@@ -14,7 +14,12 @@ import java.util.Map;
  * @author elian carsenat, NamSor SAS
  */
 public abstract class AbstractNaiveBayesClassifierImpl implements INaiveBayesClassifier {
-
+    private static final String P0 = "0";
+    private static final String P1 = "1";
+    private static final String P2 = "2";
+    private static final String P3 = "3";
+    private static final String P4 = "4";
+    private static final String P5 = "5";
     private static final String KEY_GLOBAL = "~gL";
     private static final String KEY_CATEGORY = "~cA";
     private static final String KEY_COUNT = ".count";
@@ -81,7 +86,7 @@ public abstract class AbstractNaiveBayesClassifierImpl implements INaiveBayesCla
      * @return Path to the total number of observations
      */
     protected static String pathGlobal() {
-        return KEY_GLOBAL;
+        return P0+KEY_GLOBAL;
     }
 
     /**
@@ -90,7 +95,7 @@ public abstract class AbstractNaiveBayesClassifierImpl implements INaiveBayesCla
      * @return Path to the total count of distinct categories
      */
     protected static String pathGlobalCountCategories() {
-        return KEY_GLOBAL + KEY_COUNT;
+        return P0+KEY_GLOBAL+KEY_COUNT;
     }
 
     /**
@@ -100,7 +105,7 @@ public abstract class AbstractNaiveBayesClassifierImpl implements INaiveBayesCla
      * @return Path to the number of observations in a category
      */
     protected static String pathCategory(String category) {
-        return KEY_GLOBAL + KEY_SEPARATOR + KEY_CATEGORY + KEY_SEPARATOR + category;
+        return P1+KEY_GLOBAL + KEY_SEPARATOR + KEY_CATEGORY + KEY_SEPARATOR + category;
     }
 
     /**
@@ -112,7 +117,7 @@ public abstract class AbstractNaiveBayesClassifierImpl implements INaiveBayesCla
      * featureKey
      */
     protected static String pathCategoryFeatureKey(String category, String featureKey) {
-        return KEY_GLOBAL + KEY_SEPARATOR + KEY_CATEGORY + KEY_SEPARATOR + category + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + featureKey;
+        return P3+KEY_GLOBAL + KEY_SEPARATOR + KEY_CATEGORY + KEY_SEPARATOR + category + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + featureKey;
     }
 
     /**
@@ -125,7 +130,7 @@ public abstract class AbstractNaiveBayesClassifierImpl implements INaiveBayesCla
      * feature value featureValue
      */
     protected static String pathFeatureKeyValue(String featureKey, String featureValue) {
-        return KEY_GLOBAL + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + featureKey + KEY_FEATURE_EQVAL + featureValue;
+        return P4+KEY_GLOBAL + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + featureKey + KEY_FEATURE_EQVAL + featureValue;
     }
 
     /**
@@ -135,7 +140,7 @@ public abstract class AbstractNaiveBayesClassifierImpl implements INaiveBayesCla
      * @return Path to the counter for feature featureKey
      */
     protected static String pathFeatureKey(String featureKey) {
-        return KEY_GLOBAL + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + featureKey;
+        return P2+KEY_GLOBAL + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + featureKey;
     }
 
     /**
@@ -145,7 +150,7 @@ public abstract class AbstractNaiveBayesClassifierImpl implements INaiveBayesCla
      * @return Path to the number of distinct value types for feature featureKey
      */
     protected static String pathFeatureKeyCountValueTypes(String featureKey) {
-        return KEY_GLOBAL + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + featureKey + KEY_COUNT;
+        return P2+KEY_GLOBAL + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + featureKey + KEY_COUNT;
     }
 
     /**
@@ -158,7 +163,7 @@ public abstract class AbstractNaiveBayesClassifierImpl implements INaiveBayesCla
      * @return
      */
     protected static String pathCategoryFeatureKeyValue(String category, String featureKey, String featureValue) {
-        return KEY_GLOBAL + KEY_SEPARATOR + KEY_CATEGORY + KEY_SEPARATOR + category + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + featureKey + KEY_FEATURE_EQVAL + featureValue;
+        return P5+KEY_GLOBAL + KEY_SEPARATOR + KEY_CATEGORY + KEY_SEPARATOR + category + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + featureKey + KEY_FEATURE_EQVAL + featureValue;
     }
 
     protected IClassification[] likelihoodsToProbas(double[] likelyhood, double likelyhoodTot) {

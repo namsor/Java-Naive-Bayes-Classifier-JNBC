@@ -1,5 +1,6 @@
 package com.namsor.oss.classify.bayes;
 
+import java.io.Writer;
 import java.util.Map;
 
 /**
@@ -61,4 +62,11 @@ public interface INaiveBayesClassifier {
      * @throws PersistentClassifierException 
      */
     long dbSize() throws PersistentClassifierException;
+    
+    /**
+     * Dump the current state of the model (can be large)
+     * @param w
+     * @throws ClassifyException 
+     */
+    void dumpDb(Writer w) throws ClassifyException;
 }

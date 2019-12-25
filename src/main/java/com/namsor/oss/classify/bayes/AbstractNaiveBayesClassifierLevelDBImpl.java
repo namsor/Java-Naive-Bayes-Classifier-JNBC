@@ -4,11 +4,9 @@ import com.google.common.primitives.Longs;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
-import static org.fusesource.leveldbjni.JniDBFactory.*;
-import java.util.Arrays;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Map;
+import static org.iq80.leveldb.impl.Iq80DBFactory.*;
+//import static org.fusesource.leveldbjni.JniDBFactory.*;
 import org.iq80.leveldb.CompressionType;
 import org.iq80.leveldb.DB;
 import org.iq80.leveldb.DBIterator;
@@ -16,7 +14,9 @@ import org.iq80.leveldb.Options;
 import org.iq80.leveldb.ReadOptions;
 
 /**
- * Persistence methods
+ * Persistence methods : you can switch between using 
+ * - the JNI Level DB implementation (import static org.fusesource.leveldbjni.JniDBFactory.*;) or 
+ * - the pure Java port (import static org.iq80.leveldb.impl.Iq80DBFactory.*;)
  *
  * @author elian
  */
@@ -33,6 +33,7 @@ public abstract class AbstractNaiveBayesClassifierLevelDBImpl extends AbstractNa
         options.createIfMissing(true);
         options.cacheSize(cacheSizeMb * 1048576); // 100MB cache
         options.compressionType(CompressionType.NONE);
+        
         try {
             db = factory.open(new File(rootPathWritable + "/" + classifierName), options);
         } catch (IOException ex) {
@@ -52,13 +53,27 @@ public abstract class AbstractNaiveBayesClassifierLevelDBImpl extends AbstractNa
         this(classifierName, categories, CACHE_SIZE_DEFAULT, rootPathWritable, -1);
     }
 
+    @Override
     public long dbSize() throws PersistentClassifierException {
-        // not sure this exists, as for rocksdb
-        String dbSize = getDb().getProperty("leveldb.estimate-num-keys");
-        if (dbSize != null) {
-            return Long.parseLong(dbSize);
-        } else {
-            return -1;
+        long dbSize = 0;
+        ReadOptions ro = new ReadOptions();
+        ro.snapshot(getDb().getSnapshot());
+        DBIterator iterator = getDb().iterator(ro);
+        try {
+            for (iterator.seekToFirst(); iterator.hasNext(); iterator.next()) {
+                Map.Entry<byte[],byte[]> nextEntry = iterator.peekNext();
+                dbSize++;
+            }
+            return dbSize;
+        } catch (Throwable ex) {
+            throw new PersistentClassifierException(ex);
+        } finally {
+            try {
+                // Make sure you close the snapshot to avoid resource leaks.
+                ro.snapshot().close();
+            } catch (IOException ex) {
+                throw new PersistentClassifierException(ex);
+            }
         }
     }
 
@@ -103,14 +118,16 @@ public abstract class AbstractNaiveBayesClassifierLevelDBImpl extends AbstractNa
         return db;
     }
 
-    public void dumpDb(Writer w) throws ClassifyException {
+    @Override
+    public synchronized void dumpDb(Writer w) throws ClassifyException {
         ReadOptions ro = new ReadOptions();
         ro.snapshot(getDb().getSnapshot());
         DBIterator iterator = getDb().iterator(ro);
         try {
             for (iterator.seekToFirst(); iterator.hasNext(); iterator.next()) {
-                String key = asString(iterator.peekNext().getKey());
-                long value = Longs.fromByteArray(iterator.peekNext().getValue());
+                Map.Entry<byte[],byte[]> nextEntry = iterator.peekNext();
+                String key = asString(nextEntry.getKey());
+                long value = Longs.fromByteArray(nextEntry.getValue());
                 w.append(key + "|" + value + "\n");
             }
         } catch (IOException ex) {

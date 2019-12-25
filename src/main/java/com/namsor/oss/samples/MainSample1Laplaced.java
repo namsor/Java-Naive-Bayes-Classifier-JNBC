@@ -6,7 +6,7 @@ import com.namsor.oss.classify.bayes.NaiveBayesClassifierLevelDBImpl;
 import com.namsor.oss.classify.bayes.NaiveBayesClassifierLevelDBLaplacedImpl;
 import com.namsor.oss.classify.bayes.NaiveBayesClassifierRocksDBImpl;
 import com.namsor.oss.classify.bayes.NaiveBayesClassifierRocksDBLaplacedImpl;
-import com.namsor.oss.classify.bayes.NaiveBayesClassifierTransientLaplacedImpl;
+import com.namsor.oss.classify.bayes.NaiveBayesClassifierMapLaplacedImpl;
 import com.namsor.oss.classify.bayes.PersistentClassifierException;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -62,7 +62,8 @@ public class MainSample1Laplaced {
             // Create a new bayes classifier with string categories and string features.
             //NaiveBayesClassifierTransientLaplacedImpl bayes = new NaiveBayesClassifierTransientLaplacedImpl ("tennis", cats, 1, false);
             //NaiveBayesClassifierRocksDBLaplacedImpl bayes = new NaiveBayesClassifierRocksDBLaplacedImpl("tennis", cats, ".", 100);
-            NaiveBayesClassifierLevelDBLaplacedImpl bayes = new NaiveBayesClassifierLevelDBLaplacedImpl("tennis", cats, ".", 100);
+            //NaiveBayesClassifierLevelDBLaplacedImpl bayes = new NaiveBayesClassifierLevelDBLaplacedImpl("tennis", cats, ".", 100);
+            NaiveBayesClassifierMapLaplacedImpl bayes = new NaiveBayesClassifierMapLaplacedImpl ("tennis", cats, 1, false, 10, "c:/tmp/mappdb");
 
 // Examples to learn from.
             for (int i = 0; i < data.length; i++) {

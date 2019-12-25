@@ -2,7 +2,7 @@ package com.namsor.oss.samples;
 
 import com.namsor.oss.classify.bayes.ClassifyException;
 import com.namsor.oss.classify.bayes.IClassification;
-import com.namsor.oss.classify.bayes.NaiveBayesClassifierTransientImpl;
+import com.namsor.oss.classify.bayes.NaiveBayesClassifierMapImpl;
 import com.namsor.oss.classify.bayes.PersistentClassifierException;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -56,8 +56,9 @@ public class MainSample1 {
         try {
             String[] cats = {YES, NO};
             // Create a new bayes classifier with string categories and string features.
-            NaiveBayesClassifierTransientImpl bayes = new NaiveBayesClassifierTransientImpl("tennis", cats);
+            NaiveBayesClassifierMapImpl bayes = new NaiveBayesClassifierMapImpl("tennis", cats);
             //NaiveBayesClassifierRocksDBImpl bayes = new NaiveBayesClassifierRocksDBImpl("intro", cats, ".", 100);
+            //NaiveBayesClassifierHsqlDBImpl bayes = new NaiveBayesClassifierHsqlDBImpl("intro", cats, "./hsqldb");
 
 // Examples to learn from.
             for (int i = 0; i < data.length; i++) {

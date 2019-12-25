@@ -4,8 +4,8 @@ import com.namsor.oss.classify.bayes.ClassifyException;
 import com.namsor.oss.classify.bayes.ClassifyException;
 import com.namsor.oss.classify.bayes.IClassification;
 import com.namsor.oss.classify.bayes.IClassification;
-import com.namsor.oss.classify.bayes.NaiveBayesClassifierTransientImpl;
-import com.namsor.oss.classify.bayes.NaiveBayesClassifierTransientLaplacedImpl;
+import com.namsor.oss.classify.bayes.NaiveBayesClassifierMapImpl;
+import com.namsor.oss.classify.bayes.NaiveBayesClassifierMapLaplacedImpl;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashMap;
@@ -32,7 +32,7 @@ public class MainSample2Laplaced {
             String[] cats = {ZERO, ONE};
             // Create a new bayes classifier with string categories and string features.
             // INaiveBayesClassifier bayes1 = new NaiveBayesClassifierLevelDBImpl("sentiment", cats, ".", 100);
-            NaiveBayesClassifierTransientLaplacedImpl bayes = new NaiveBayesClassifierTransientLaplacedImpl("sentiment", cats, 1, true);
+            NaiveBayesClassifierMapLaplacedImpl bayes = new NaiveBayesClassifierMapLaplacedImpl("sentiment", cats, 1, true);
             //NaiveBayesClassifierRocksDBImpl bayes = new NaiveBayesClassifierRocksDBImpl("intro", cats, ".", 100);
 
 // Examples to learn from.

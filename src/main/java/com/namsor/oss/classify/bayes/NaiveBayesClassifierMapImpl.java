@@ -10,14 +10,46 @@ import java.util.Map.Entry;
  *
  * @author elian carsenat, NamSor SAS
  */
-public class NaiveBayesClassifierTransientImpl extends AbstractNaiveBayesClassifierTransientImpl implements INaiveBayesClassifier {
+public class NaiveBayesClassifierMapImpl extends AbstractNaiveBayesClassifierMapImpl implements INaiveBayesClassifier {
 
-    public NaiveBayesClassifierTransientImpl(String classifierName, String[] categories) {
+    /**
+     * Create in-memory classifier
+     * @param classifierName
+     * @param categories 
+     */
+    public NaiveBayesClassifierMapImpl(String classifierName, String[] categories) {
         super(classifierName, categories);
     }
 
-    public NaiveBayesClassifierTransientImpl(String classifierName, String[] categories, int topN) {
+    /**
+     * Create in-memory classifier
+     * @param classifierName
+     * @param categories
+     * @param topN 
+     */
+    public NaiveBayesClassifierMapImpl(String classifierName, String[] categories, int topN) {
         super(classifierName, categories, topN);
+    }
+
+    /**
+     * Create persistent classifier
+     * @param classifierName
+     * @param categories
+     * @param rootPathWritable 
+     */
+    public NaiveBayesClassifierMapImpl(String classifierName, String[] categories, String rootPathWritable) {
+        super(classifierName, categories, rootPathWritable);
+    }
+
+    /**
+     * Create persistent classifier
+     * @param classifierName
+     * @param categories
+     * @param topN
+     * @param rootPathWritable 
+     */
+    public NaiveBayesClassifierMapImpl(String classifierName, String[] categories, int topN, String rootPathWritable) {
+        super(classifierName, categories, topN, rootPathWritable);
     }
     
     @Override

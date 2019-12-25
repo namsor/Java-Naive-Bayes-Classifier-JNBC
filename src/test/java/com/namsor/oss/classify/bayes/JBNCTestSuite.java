@@ -12,8 +12,8 @@ import org.junit.runners.Suite;
  * @author elian
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({com.namsor.oss.classify.bayes.NaiveBayesClassifierTransientImplTest.class, 
-                     com.namsor.oss.classify.bayes.NaiveBayesClassifierTransientLaplacedImplTest.class,
+@Suite.SuiteClasses({com.namsor.oss.classify.bayes.NaiveBayesClassifierMapImplTest.class, 
+                     com.namsor.oss.classify.bayes.NaiveBayesClassifierMapLaplacedImplTest.class,
                      com.namsor.oss.classify.bayes.NaiveBayesClassifierLevelDBImplTest.class,
                      com.namsor.oss.classify.bayes.NaiveBayesClassifierLevelDBLaplacedImplTest.class,
                      com.namsor.oss.classify.bayes.NaiveBayesClassifierRocksDBImplTest.class,
