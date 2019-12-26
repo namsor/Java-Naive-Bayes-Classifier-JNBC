@@ -66,11 +66,11 @@ public abstract class AbstractNaiveBayesClassifierImpl implements INaiveBayesCla
         return categories;
     }
 
-    protected final Comparator<IClassification> orderByProba = new Comparator() {
+    protected final Comparator<IClassProbability> orderByProba = new Comparator() {
         @Override
         public int compare(Object o1, Object o2) {
-            IClassification c1 = (IClassification) o1;
-            IClassification c2 = (IClassification) o2;
+            IClassProbability c1 = (IClassProbability) o1;
+            IClassProbability c2 = (IClassProbability) o2;
             return ((Double) c2.getProbability()).compareTo((Double) c1.getProbability());
         }
     };
@@ -166,12 +166,12 @@ public abstract class AbstractNaiveBayesClassifierImpl implements INaiveBayesCla
         return P5+KEY_GLOBAL + KEY_SEPARATOR + KEY_CATEGORY + KEY_SEPARATOR + category + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + featureKey + KEY_FEATURE_EQVAL + featureValue;
     }
 
-    protected IClassification[] likelihoodsToProbas(double[] likelyhood, double likelyhoodTot) {
+    protected IClassProbability[] likelihoodsToProbas(double[] likelyhood, double likelyhoodTot) {
         if (topN > 0 && likelyhood.length > topN) {
             double[] likelyhoodSorted = likelyhood.clone(); // Arrays.copyOf(likelyhood, topN);
             Arrays.sort(likelyhoodSorted);
             double likelyhoodN = likelyhoodSorted[likelyhood.length - topN];
-            List<IClassification> result = new ArrayList(topN + 1);
+            List<IClassProbability> result = new ArrayList(topN + 1);
             double probaTopN = 0;
             for (int i = 0; i < getCategories().length; i++) {
                 double proba = likelyhood[i] / likelyhoodTot;
@@ -182,15 +182,15 @@ public abstract class AbstractNaiveBayesClassifierImpl implements INaiveBayesCla
                     proba = 0d;
                 }
                 if (likelyhood[i] >= likelyhoodN) {
-                    ClassificationImpl classif = new ClassificationImpl(getCategories()[i], proba);
+                    ClassProbabilityImpl classif = new ClassProbabilityImpl(getCategories()[i], proba);
                     result.add(classif);
                     probaTopN+=proba;
                 }
             }
             Collections.sort(result, orderByProba);
-            ClassificationImpl classifOther = new ClassificationImpl(IClassification.SPECIAL_CATEGORY_OTHER, (1d-probaTopN));
+            ClassProbabilityImpl classifOther = new ClassProbabilityImpl(IClassProbability.SPECIAL_CATEGORY_OTHER, (1d-probaTopN));
             result.add(classifOther);
-            IClassification[] resultArr = new ClassificationImpl[result.size()];
+            IClassProbability[] resultArr = new ClassProbabilityImpl[result.size()];
             resultArr = result.toArray(resultArr);
             return resultArr;
         } else {
@@ -198,8 +198,8 @@ public abstract class AbstractNaiveBayesClassifierImpl implements INaiveBayesCla
         }
     }
 
-    protected IClassification[] likelihoodsToProbas_(double[] likelyhood, double likelyhoodTot) {
-        IClassification[] result = new ClassificationImpl[getCategories().length];
+    protected IClassProbability[] likelihoodsToProbas_(double[] likelyhood, double likelyhoodTot) {
+        IClassProbability[] result = new ClassProbabilityImpl[getCategories().length];
         for (int i = 0; i < getCategories().length; i++) {
             double proba = likelyhood[i] / likelyhoodTot;
             if (proba > 1d) {
@@ -208,7 +208,7 @@ public abstract class AbstractNaiveBayesClassifierImpl implements INaiveBayesCla
             } else if (proba < 0) {
                 proba = 0d;
             }
-            ClassificationImpl classif = new ClassificationImpl(getCategories()[i], proba);
+            ClassProbabilityImpl classif = new ClassProbabilityImpl(getCategories()[i], proba);
             result[i] = classif;
         }
         Arrays.sort(result, orderByProba);

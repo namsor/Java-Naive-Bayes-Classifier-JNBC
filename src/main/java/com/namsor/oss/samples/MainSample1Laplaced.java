@@ -1,7 +1,6 @@
 package com.namsor.oss.samples;
 
 import com.namsor.oss.classify.bayes.ClassifyException;
-import com.namsor.oss.classify.bayes.IClassification;
 import com.namsor.oss.classify.bayes.NaiveBayesClassifierLevelDBImpl;
 import com.namsor.oss.classify.bayes.NaiveBayesClassifierLevelDBLaplacedImpl;
 import com.namsor.oss.classify.bayes.NaiveBayesClassifierRocksDBImpl;
@@ -14,6 +13,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import com.namsor.oss.classify.bayes.IClassProbability;
+import com.namsor.oss.classify.bayes.IClassification;
 
 /**
  * Simple test inspired by
@@ -86,12 +87,17 @@ public class MainSample1Laplaced {
             features.put("humidity","High");
             features.put("wind","Strong");
 
-            IClassification[] predict = bayes.classify(features);
+            IClassification predict = bayes.classify(features,true);
             StringWriter sw = new StringWriter();
             bayes.dumpDb(sw);
             System.out.println(sw);
-            for (int i = 0; i < predict.length; i++) {
-                System.out.println("P(" + predict[i].getCategory() + ")=" + predict[i].getProbability());
+            for (int i = 0; i < predict.getClassProbabilities().length; i++) {
+                System.out.println("P(" + predict.getClassProbabilities()[i].getCategory() + ")=" + predict.getClassProbabilities()[i].getProbability());
+            }
+            if( predict.getExplanation()!=null) {
+                for (Map.Entry<String, Long> entry : predict.getExplanation().entrySet()) {
+                   System.out.println(entry.getKey()+"="+entry.getValue());                    
+                }
             }
         } catch (PersistentClassifierException ex) {
             Logger.getLogger(MainSample1Laplaced.class.getName()).log(Level.SEVERE, null, ex);

@@ -1,6 +1,7 @@
 package com.namsor.oss.classify.bayes;
 
 import java.io.*;
+import java.util.HashMap;
 
 import java.util.Map;
 import java.util.Map.Entry;
@@ -85,18 +86,19 @@ public class NaiveBayesClassifierMapLaplacedImpl extends AbstractNaiveBayesClass
 
     /**
      * Create a classifier with persistent map
+     *
      * @param classifierName
      * @param categories
      * @param alpha
      * @param variant
-     * @param rootPathWritable 
+     * @param rootPathWritable
      */
     public NaiveBayesClassifierMapLaplacedImpl(String classifierName, String[] categories, double alpha, boolean variant, String rootPathWritable) {
         super(classifierName, categories, rootPathWritable);
         this.alpha = alpha;
         this.variant = variant;
     }
-    
+
     @Override
     public synchronized void learn(String category, Map<String, String> features, long weight) throws ClassifyException {
         String pathGlobal = pathGlobal();
@@ -130,30 +132,53 @@ public class NaiveBayesClassifierMapLaplacedImpl extends AbstractNaiveBayesClass
     }
 
     @Override
-    public IClassification[] classify(Map<String, String> features) throws ClassifyException {
+    public IClassification classify(Map<String, String> features, final boolean explain) throws ClassifyException {
+        Map<String, Long> explanation = null;
+        if (explain) {
+            explanation = new HashMap();
+        }
         String pathGlobal = pathGlobal();
         String pathGlobalCountCategories = pathGlobalCountCategories();
         long globalCount = (getDb().containsKey(pathGlobal) ? getDb().get(pathGlobal) : 0);
+        if (explain) {
+            explanation.put(pathGlobal, globalCount);
+        }
         long globalCountCategories = (getDb().containsKey(pathGlobalCountCategories) ? getDb().get(pathGlobalCountCategories) : 0);
+        if (explain) {
+            explanation.put(pathGlobalCountCategories, globalCountCategories);
+        }
         double[] likelyhood = new double[getCategories().length];
         double likelyhoodTot = 0;
         for (int i = 0; i < getCategories().length; i++) {
             String category = getCategories()[i];
             String pathCategory = pathCategory(category);
             long categoryCount = (getDb().containsKey(pathCategory) ? getDb().get(pathCategory) : 0);
+            if (explain) {
+                explanation.put(pathCategory, categoryCount);
+            }
             double product = 1.0d;
             for (Entry<String, String> feature : features.entrySet()) {
                 String pathFeatureKey = pathFeatureKey(feature.getKey());
-                double featureCount = (getDb().containsKey(pathFeatureKey) ? getDb().get(pathFeatureKey) : 0);
+                long featureCount = (getDb().containsKey(pathFeatureKey) ? getDb().get(pathFeatureKey) : 0);
+                if (explain) {
+                    explanation.put(pathFeatureKey, featureCount);
+                }
                 if (featureCount > 0) {
                     String pathCategoryFeatureKey = pathCategoryFeatureKey(category, feature.getKey());
-                    double categoryFeatureCount = (getDb().containsKey(pathCategoryFeatureKey) ? getDb().get(pathCategoryFeatureKey) : 0);
-
+                    long categoryFeatureCount = (getDb().containsKey(pathCategoryFeatureKey) ? getDb().get(pathCategoryFeatureKey) : 0);
+                    if (explain) {
+                        explanation.put(pathCategoryFeatureKey, categoryFeatureCount);
+                    }
                     String pathFeatureKeyCountValueTypes = pathFeatureKeyCountValueTypes(feature.getKey());
-                    double featureCountValueTypes = (getDb().containsKey(pathFeatureKeyCountValueTypes) ? getDb().get(pathFeatureKeyCountValueTypes) : 0);
-
+                    long featureCountValueTypes = (getDb().containsKey(pathFeatureKeyCountValueTypes) ? getDb().get(pathFeatureKeyCountValueTypes) : 0);
+                    if (explain) {
+                        explanation.put(pathFeatureKeyCountValueTypes, featureCountValueTypes);
+                    }
                     String pathCategoryFeatureKeyValue = pathCategoryFeatureKeyValue(category, feature.getKey(), feature.getValue());
-                    double categoryFeatureValueCount = (getDb().containsKey(pathCategoryFeatureKeyValue) ? getDb().get(pathCategoryFeatureKeyValue) : 0);
+                    long categoryFeatureValueCount = (getDb().containsKey(pathCategoryFeatureKeyValue) ? getDb().get(pathCategoryFeatureKeyValue) : 0);
+                    if (explain) {
+                        explanation.put(pathCategoryFeatureKeyValue, categoryFeatureValueCount);
+                    }
                     double basicProbability = (categoryFeatureCount == 0 ? 0 : 1d * (categoryFeatureValueCount + alpha) / (categoryFeatureCount + featureCountValueTypes * alpha));
                     product *= basicProbability;
                 }
@@ -165,7 +190,7 @@ public class NaiveBayesClassifierMapLaplacedImpl extends AbstractNaiveBayesClass
             }
             likelyhoodTot += likelyhood[i];
         }
-        return likelihoodsToProbas(likelyhood, likelyhoodTot);
+        return new ClassificationImpl(likelihoodsToProbas(likelyhood, likelyhoodTot), explanation);
     }
 
 }

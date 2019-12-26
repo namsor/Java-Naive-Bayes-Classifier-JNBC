@@ -70,13 +70,13 @@ public class NaiveBayesClassifierRocksDBLaplacedImplTest {
         features.put("temp", "Cool");
         features.put("humidity", "High");
         features.put("wind", "Strong");
-        IClassification[] predict = bayes.classify(features);
+        IClassification predict = bayes.classify(features,true);
         assertNotNull(predict);
-        assertEquals(predict.length, 2);
-        assertEquals(predict[0].getCategory(), "Yes");
-        assertEquals(predict[1].getCategory(), "No");
-        assertEquals(predict[0].getProbability(), 0.7215830648872527, .0001);
-        assertEquals(predict[1].getProbability(), 0.2784169351127473, .0001);
+        assertEquals(predict.getClassProbabilities().length, 2);
+        assertEquals(predict.getClassProbabilities()[0].getCategory(), "Yes");
+        assertEquals(predict.getClassProbabilities()[1].getCategory(), "No");
+        assertEquals(predict.getClassProbabilities()[0].getProbability(), 0.7215830648872527, .0001);
+        assertEquals(predict.getClassProbabilities()[1].getProbability(), 0.2784169351127473, .0001);
         bayes.dbCloseAndDestroy();
         
     }
@@ -105,13 +105,13 @@ public class NaiveBayesClassifierRocksDBLaplacedImplTest {
         Map<String, String> features = new HashMap();
         features.put("X1", "B");
         features.put("X2", "S");
-        IClassification[] predict = bayes.classify(features);
+        IClassification predict = bayes.classify(features,true);
         assertNotNull(predict);
-        assertEquals(predict.length, 2);
-        assertEquals(predict[0].getCategory(), "0");
-        assertEquals(predict[1].getCategory(), "1");
-        assertEquals(predict[0].getProbability(), 0.6511627906976744, .0001);
-        assertEquals(predict[1].getProbability(), 0.3488372093023256, .0001);
+        assertEquals(predict.getClassProbabilities().length, 2);
+        assertEquals(predict.getClassProbabilities()[0].getCategory(), "0");
+        assertEquals(predict.getClassProbabilities()[1].getCategory(), "1");
+        assertEquals(predict.getClassProbabilities()[0].getProbability(), 0.6511627906976744, .0001);
+        assertEquals(predict.getClassProbabilities()[1].getProbability(), 0.3488372093023256, .0001);
         bayes.dbCloseAndDestroy();
         
     }

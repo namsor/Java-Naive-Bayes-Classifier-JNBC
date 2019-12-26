@@ -74,13 +74,13 @@ public class NaiveBayesClassifierLevelDBImplTest {
         features.put("temp", "Cool");
         features.put("humidity", "High");
         features.put("wind", "Strong");
-        IClassification[] predict = bayes.classify(features);
+        IClassification predict = bayes.classify(features,true);
         assertNotNull(predict);
-        assertEquals(predict.length, 2);
-        assertEquals(predict[0].getCategory(), "No");
-        assertEquals(predict[1].getCategory(), "Yes");
-        assertEquals(predict[0].getProbability(), 0.795417348608838, .0001);
-        assertEquals(predict[1].getProbability(), 0.204582651391162, .0001);
+        assertEquals(predict.getClassProbabilities().length, 2);
+        assertEquals(predict.getClassProbabilities()[0].getCategory(), "No");
+        assertEquals(predict.getClassProbabilities()[1].getCategory(), "Yes");
+        assertEquals(predict.getClassProbabilities()[0].getProbability(), 0.795417348608838, .0001);
+        assertEquals(predict.getClassProbabilities()[1].getProbability(), 0.204582651391162, .0001);
         bayes.dbCloseAndDestroy();
     }
 
@@ -108,13 +108,13 @@ public class NaiveBayesClassifierLevelDBImplTest {
         Map<String, String> features = new HashMap();
         features.put("X1", "B");
         features.put("X2", "S");
-        IClassification[] predict = bayes.classify(features);
+        IClassification predict = bayes.classify(features,true);
         assertNotNull(predict);
-        assertEquals(predict.length, 2);
-        assertEquals(predict[0].getCategory(), "0");
-        assertEquals(predict[1].getCategory(), "1");
-        assertEquals(predict[0].getProbability(), 0.75, .0001);
-        assertEquals(predict[1].getProbability(), 0.25, .0001);
+        assertEquals(predict.getClassProbabilities().length, 2);
+        assertEquals(predict.getClassProbabilities()[0].getCategory(), "0");
+        assertEquals(predict.getClassProbabilities()[1].getCategory(), "1");
+        assertEquals(predict.getClassProbabilities()[0].getProbability(), 0.75, .0001);
+        assertEquals(predict.getClassProbabilities()[1].getProbability(), 0.25, .0001);
         bayes.dbCloseAndDestroy();
         
     }
@@ -151,15 +151,15 @@ public class NaiveBayesClassifierLevelDBImplTest {
         features.put("Sweet", "Yes");
         features.put("Yellow", "Yes");
         features.put("Dummy", "Yes");
-        IClassification[] predict = bayes.classify(features);
+        IClassification predict = bayes.classify(features,true);
         assertNotNull(predict);
-        assertEquals(predict.length, 3);
-        assertEquals(predict[0].getCategory(), BANANA);
-        assertEquals(predict[1].getCategory(), OTHER);
-        assertEquals(predict[2].getCategory(), ORANGE);
-        assertEquals(predict[0].getProbability(), 0.9307479224376731, .0001);
-        assertEquals(predict[1].getProbability(), 0.06925207756232689, .0001);
-        assertEquals(predict[2].getProbability(), 0, .0001);
+        assertEquals(predict.getClassProbabilities().length, 3);
+        assertEquals(predict.getClassProbabilities()[0].getCategory(), BANANA);
+        assertEquals(predict.getClassProbabilities()[1].getCategory(), OTHER);
+        assertEquals(predict.getClassProbabilities()[2].getCategory(), ORANGE);
+        assertEquals(predict.getClassProbabilities()[0].getProbability(), 0.9307479224376731, .0001);
+        assertEquals(predict.getClassProbabilities()[1].getProbability(), 0.06925207756232689, .0001);
+        assertEquals(predict.getClassProbabilities()[2].getProbability(), 0, .0001);
     }
     
 }

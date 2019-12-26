@@ -1,46 +1,37 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package com.namsor.oss.classify.bayes;
 
+import java.util.Map;
+
 /**
- * Classification output and probability estimate.
- * @author elian carsenat, NamSor SAS
+ *
+ * @author elian
  */
 public class ClassificationImpl implements IClassification {
 
-    private final String category;
-    private final double probability;
-    private final boolean other;
+    private final IClassProbability[] classProbabilities;
+    private final Map<String, Long> explanation;
 
-    public ClassificationImpl(String category, double probability) {
-        this.category = category;
-        this.probability = probability;
-        this.other = false;
+    public ClassificationImpl(IClassProbability[] classProbabilities, Map<String, Long> explanation) {
+        this.classProbabilities = classProbabilities;
+        this.explanation = explanation;
     }
 
-    public ClassificationImpl(String category, double probability, boolean other) {
-        this.category = category;
-        this.probability = probability;
-        this.other = other;
-    }
-    
-    @Override
-    public String getCategory() {
-        return category;
+    /**
+     * @return the classProbabilities
+     */
+    public IClassProbability[] getClassProbabilities() {
+        return classProbabilities;
     }
 
-    @Override
-    public double getProbability() {
-        return probability;
+    /**
+     * @return the explanation
+     */
+    public Map<String, Long> getExplanation() {
+        return explanation;
     }
-
-    @Override
-    public String toString() {
-        return "P(" + category + ")=" + probability;
-    }
-
-
-    @Override
-    public boolean isOther() {
-        return other;
-    }
-
 }

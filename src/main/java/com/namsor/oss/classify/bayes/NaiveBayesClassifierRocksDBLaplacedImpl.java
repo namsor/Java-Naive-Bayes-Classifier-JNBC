@@ -5,6 +5,7 @@ import static com.namsor.oss.classify.bayes.AbstractNaiveBayesClassifierImpl.pat
 import static com.namsor.oss.classify.bayes.AbstractNaiveBayesClassifierImpl.pathGlobal;
 
 import java.io.*;
+import java.util.HashMap;
 
 import java.util.Map;
 import org.rocksdb.ReadOptions;
@@ -24,14 +25,15 @@ public class NaiveBayesClassifierRocksDBLaplacedImpl extends AbstractNaiveBayesC
     private static final double ALPHA = 1d;
     private final boolean variant;
     private final double alpha;
-    
+
     public NaiveBayesClassifierRocksDBLaplacedImpl(String classifierName, String[] categories, String rootPathWritable, int topN) throws IOException, PersistentClassifierException {
         this(classifierName, categories, rootPathWritable, ALPHA, VARIANT, topN);
     }
+
     public NaiveBayesClassifierRocksDBLaplacedImpl(String classifierName, String[] categories, String rootPathWritable) throws IOException, PersistentClassifierException {
         this(classifierName, categories, rootPathWritable, ALPHA, VARIANT);
     }
-    
+
     public NaiveBayesClassifierRocksDBLaplacedImpl(String classifierName, String[] categories, String rootPathWritable, double alpha, boolean variant) throws IOException, PersistentClassifierException {
         super(classifierName, categories, rootPathWritable);
         this.variant = variant;
@@ -90,31 +92,56 @@ public class NaiveBayesClassifierRocksDBLaplacedImpl extends AbstractNaiveBayesC
     }
 
     @Override
-    public IClassification[] classify(Map<String, String> features) throws ClassifyException {
+    public IClassification classify(Map<String, String> features, final boolean explain) throws ClassifyException {
+        Map<String, Long> explanation = null;
+        if (explain) {
+            explanation = new HashMap();
+        }
         ReadOptions ro = new ReadOptions();
         ro.setSnapshot(getDb().getSnapshot());
         try {
             String pathGlobal = pathGlobal();
             String pathGlobalCountCategories = pathGlobalCountCategories();
             long globalCount = (getDb().get(ro, bytes(pathGlobal)) == null ? 0 : Longs.fromByteArray(getDb().get(ro, bytes(pathGlobal))));
+            if (explain) {
+                explanation.put(pathGlobal, globalCount);
+            }
             long globalCountCategories = (getDb().get(ro, bytes(pathGlobalCountCategories)) == null ? 0 : Longs.fromByteArray(getDb().get(ro, bytes(pathGlobalCountCategories))));
+            if (explain) {
+                explanation.put(pathGlobalCountCategories, globalCountCategories);
+            }
             double[] likelyhood = new double[getCategories().length];
             double likelyhoodTot = 0;
             for (int i = 0; i < getCategories().length; i++) {
                 String category = getCategories()[i];
                 String pathCategory = pathCategory(category);
                 long categoryCount = (getDb().get(ro, bytes(pathCategory)) == null ? 0 : Longs.fromByteArray(getDb().get(ro, bytes(pathCategory))));
+                if (explain) {
+                    explanation.put(pathCategory, categoryCount);
+                }
                 double product = 1.0d;
                 for (Map.Entry<String, String> feature : features.entrySet()) {
                     String pathFeatureKey = pathFeatureKey(feature.getKey());
-                    double featureCount = (getDb().get(ro, bytes(pathFeatureKey)) == null ? 0 : Longs.fromByteArray(getDb().get(ro, bytes(pathFeatureKey))));
+                    long featureCount = (getDb().get(ro, bytes(pathFeatureKey)) == null ? 0 : Longs.fromByteArray(getDb().get(ro, bytes(pathFeatureKey))));
+                    if (explain) {
+                        explanation.put(pathFeatureKey, featureCount);
+                    }
                     if (featureCount > 0) {
                         String pathCategoryFeatureKey = pathCategoryFeatureKey(category, feature.getKey());
-                        double categoryFeatureCount = (getDb().get(ro, bytes(pathCategoryFeatureKey)) == null ? 0 : Longs.fromByteArray(getDb().get(ro, bytes(pathCategoryFeatureKey))));
+                        long categoryFeatureCount = (getDb().get(ro, bytes(pathCategoryFeatureKey)) == null ? 0 : Longs.fromByteArray(getDb().get(ro, bytes(pathCategoryFeatureKey))));
+                        if (explain) {
+                            explanation.put(pathCategoryFeatureKey, categoryFeatureCount);
+                        }
                         String pathFeatureKeyCountValueTypes = pathFeatureKeyCountValueTypes(feature.getKey());
-                        double featureCountValueTypes = (getDb().get(ro, bytes(pathFeatureKeyCountValueTypes)) == null ? 0 : Longs.fromByteArray(getDb().get(ro, bytes(pathFeatureKeyCountValueTypes))));
+                        long featureCountValueTypes = (getDb().get(ro, bytes(pathFeatureKeyCountValueTypes)) == null ? 0 : Longs.fromByteArray(getDb().get(ro, bytes(pathFeatureKeyCountValueTypes))));
+                        if (explain) {
+                            explanation.put(pathFeatureKeyCountValueTypes, featureCountValueTypes);
+                        }
                         String pathCategoryFeatureKeyValue = pathCategoryFeatureKeyValue(category, feature.getKey(), feature.getValue());
-                        double categoryFeatureValueCount = (getDb().get(ro, bytes(pathCategoryFeatureKeyValue)) == null ? 0 : Longs.fromByteArray(getDb().get(ro, bytes(pathCategoryFeatureKeyValue))));
+                        long categoryFeatureValueCount = (getDb().get(ro, bytes(pathCategoryFeatureKeyValue)) == null ? 0 : Longs.fromByteArray(getDb().get(ro, bytes(pathCategoryFeatureKeyValue))));
+                        if (explain) {
+                            explanation.put(pathCategoryFeatureKeyValue, categoryFeatureValueCount);
+                        }
                         double basicProbability = (categoryFeatureCount == 0 ? 0 : 1d * (categoryFeatureValueCount + alpha) / (categoryFeatureCount + featureCountValueTypes * alpha));
                         product *= basicProbability;
                     }
@@ -126,7 +153,7 @@ public class NaiveBayesClassifierRocksDBLaplacedImpl extends AbstractNaiveBayesC
                 }
                 likelyhoodTot += likelyhood[i];
             }
-            return likelihoodsToProbas(likelyhood, likelyhoodTot);
+            return new ClassificationImpl(likelihoodsToProbas(likelyhood, likelyhoodTot), explanation);
         } catch (RocksDBException ex) {
             throw new PersistentClassifierException(ex);
         } finally {

@@ -5,10 +5,9 @@ import static com.namsor.oss.classify.bayes.AbstractNaiveBayesClassifierImpl.pat
 import static com.namsor.oss.classify.bayes.AbstractNaiveBayesClassifierImpl.pathGlobal;
 
 import java.io.*;
+import java.util.HashMap;
 
 import java.util.Map;
-import static org.fusesource.leveldbjni.JniDBFactory.asString;
-import org.iq80.leveldb.DBIterator;
 import org.iq80.leveldb.ReadOptions;
 import org.iq80.leveldb.WriteBatch;
 
@@ -64,28 +63,47 @@ public class NaiveBayesClassifierLevelDBImpl extends AbstractNaiveBayesClassifie
     }
 
     @Override
-    public IClassification[] classify(Map<String, String> features) throws ClassifyException {
+    public IClassification classify(Map<String, String> features, final boolean explain) throws ClassifyException {
+        Map<String, Long> explanation = null;
+        if (explain) {
+            explanation = new HashMap();
+        }
         ReadOptions ro = new ReadOptions();
         ro.snapshot(getDb().getSnapshot());
         try {
             String pathGlobal = pathGlobal();
-            long globalCount = (getDb().get(bytes(pathGlobal), ro) == null ? 0 : Longs.fromByteArray(getDb().get(bytes(pathGlobal), ro)));            
+            long globalCount = (getDb().get(bytes(pathGlobal), ro) == null ? 0 : Longs.fromByteArray(getDb().get(bytes(pathGlobal), ro)));
+            if (explain) {
+                explanation.put(pathGlobal, globalCount);
+            }
             double[] likelyhood = new double[getCategories().length];
             double likelyhoodTot = 0;
             for (int i = 0; i < getCategories().length; i++) {
                 String category = getCategories()[i];
                 String pathCategory = pathCategory(category);
                 long categoryCount = (getDb().get(bytes(pathCategory), ro) == null ? 0 : Longs.fromByteArray(getDb().get(bytes(pathCategory), ro)));
+                if (explain) {
+                    explanation.put(pathCategory, categoryCount);
+                }
                 double product = 1.0d;
                 for (Map.Entry<String, String> feature : features.entrySet()) {
                     String pathFeatureKey = pathFeatureKey(feature.getKey());
                     //double featureCount = (getDb().get(ro, bytes(pathFeatureKey)) == null ? 0 : Longs.fromByteArray(getDb().get(ro, bytes(pathFeatureKey))));
-                    double featureCount = (getDb().get(bytes(pathFeatureKey), ro) == null ? 0 : Longs.fromByteArray(getDb().get(bytes(pathFeatureKey),ro)));
+                    long featureCount = (getDb().get(bytes(pathFeatureKey), ro) == null ? 0 : Longs.fromByteArray(getDb().get(bytes(pathFeatureKey), ro)));
+                    if (explain) {
+                        explanation.put(pathFeatureKey, featureCount);
+                    }
                     if (featureCount > 0) {
                         String pathCategoryFeatureKey = pathCategoryFeatureKey(category, feature.getKey());
-                        double categoryFeatureCount = (getDb().get(bytes(pathCategoryFeatureKey),ro) == null ? 0 : Longs.fromByteArray(getDb().get(bytes(pathCategoryFeatureKey),ro)));
+                        long categoryFeatureCount = (getDb().get(bytes(pathCategoryFeatureKey), ro) == null ? 0 : Longs.fromByteArray(getDb().get(bytes(pathCategoryFeatureKey), ro)));
+                        if (explain) {
+                            explanation.put(pathCategoryFeatureKey, categoryFeatureCount);
+                        }
                         String pathCategoryFeatureKeyValue = pathCategoryFeatureKeyValue(category, feature.getKey(), feature.getValue());
-                        double categoryFeatureValueCount = (getDb().get(bytes(pathCategoryFeatureKeyValue),ro) == null ? 0 : Longs.fromByteArray(getDb().get(bytes(pathCategoryFeatureKeyValue),ro)));
+                        long categoryFeatureValueCount = (getDb().get(bytes(pathCategoryFeatureKeyValue), ro) == null ? 0 : Longs.fromByteArray(getDb().get(bytes(pathCategoryFeatureKeyValue), ro)));
+                        if (explain) {
+                            explanation.put(pathCategoryFeatureKeyValue, categoryFeatureValueCount);
+                        }
                         double basicProbability = (categoryFeatureCount == 0 ? 0 : 1d * categoryFeatureValueCount / categoryFeatureCount);
                         product *= basicProbability;
                     }
@@ -93,7 +111,7 @@ public class NaiveBayesClassifierLevelDBImpl extends AbstractNaiveBayesClassifie
                 likelyhood[i] = 1d * categoryCount / globalCount * product;
                 likelyhoodTot += likelyhood[i];
             }
-            return likelihoodsToProbas(likelyhood, likelyhoodTot);
+            return new ClassificationImpl(likelihoodsToProbas(likelyhood, likelyhoodTot), explanation);
         } finally {
             try {
                 // Make sure you close the snapshot to avoid resource leaks.

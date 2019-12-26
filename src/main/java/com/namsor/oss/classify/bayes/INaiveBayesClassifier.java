@@ -32,10 +32,12 @@ public interface INaiveBayesClassifier {
     /**
      * Predict most probable class
      *
-     * @param features
-     * @return
+     * @param features The features
+     * @param explain If should return the explanation
+     * @return The most likely classes with probability and (optionally) the explanation
+     * @throws ClassifyException 
      */
-    IClassification[] classify(Map<String, String> features) throws ClassifyException;
+    IClassification classify(Map<String, String> features, boolean explain) throws ClassifyException;
 
     /**
      * This classifier has an immutable list of categories
