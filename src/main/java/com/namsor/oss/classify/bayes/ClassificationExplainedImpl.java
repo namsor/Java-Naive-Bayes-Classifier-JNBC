@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.namsor.oss.classify.bayes;
 
 import java.io.StringWriter;
@@ -13,7 +8,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * The detailed explanation of a classification :
+ * - likelyhood values
+ * - likelyhood formulae (in a readable format)
+ * - likelyhood expressions (in a readable format)
+ * The toString() function generates a JavaScript that can interpreted 
  * @author elian
  */
 public class ClassificationExplainedImpl implements IClassificationExplained {
@@ -31,6 +30,13 @@ public class ClassificationExplainedImpl implements IClassificationExplained {
     private final String[] likelyhoodFormulae;
     private final String[] likelyhoodExpressions;
 
+    /**
+     * Create an immutable detailed explanation of a classification :
+     * @param classification The classification output and explainData
+     * @param likelyhoods The likelyhood values
+     * @param likelyhoodFormulae The likelyhood formulae
+     * @param likelyhoodExpressions The likelyhood expressions
+     */
     public ClassificationExplainedImpl(IClassification classification, double[] likelyhoods, String[] likelyhoodFormulae, String[] likelyhoodExpressions) {
         this.classification = classification;
         this.likelyhoods = likelyhoods;
@@ -97,7 +103,7 @@ public class ClassificationExplainedImpl implements IClassificationExplained {
     }
     
     /**
-     * Print to String that can be interpreted as JavaScript
+     * Print to String that can be interpreted as JavaScript and return the highest probability value
      * @return The Javascript text 
      */
     @Override

@@ -14,7 +14,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
 /**
- * Simple test inspired by
+ * Simple example of Naive Bayes Classification (Sport / No Sport) inspired by
  * http://ai.fon.bg.ac.rs/wp-content/uploads/2015/04/ML-Classification-NaiveBayes-2014.pdf
  *
  * @author elian
@@ -57,30 +57,24 @@ public class MainSample1 {
             String[] cats = {YES, NO};
             // Create a new bayes classifier with string categories and string features.
             NaiveBayesClassifierMapImpl bayes = new NaiveBayesClassifierMapImpl("tennis", cats);
-            //NaiveBayesClassifierRocksDBImpl bayes = new NaiveBayesClassifierRocksDBImpl("intro", cats, ".", 100);
-            //NaiveBayesClassifierHsqlDBImpl bayes = new NaiveBayesClassifierHsqlDBImpl("intro", cats, "./hsqldb");
-
-// Examples to learn from.
+            
+            // Examples to learn from.
             for (int i = 0; i < data.length; i++) {
                 Map<String, String> features = new HashMap();
                 for (int j = 0; j < colName.length - 1; j++) {
                     features.put(colName[j], data[i][j]);
                 }
+                // learn ex. Category=Yes Conditions=Sunny, Cool, Normal and Weak.
                 bayes.learn(data[i][colName.length - 1], features);
             }
-            /**
-             * Calculate the likelihood that: Outlook = sunny (0.22) Temperature
-             * = cool (0.33) Humidity = high (0.33) Windy = true (0.33) Play =
-             * yes (0.64)
-             */
 
-// Here are is X(B,S) to classify.
             Map<String, String> features = new HashMap();
             features.put("outlook", "Sunny");
             features.put("temp", "Cool");
             features.put("humidity", "High");
             features.put("wind", "Strong");
 
+            // Shall we play given given weather conditions Sunny, Cool, Rainy and Windy ?
             IClassification predict = bayes.classify(features, true);
             for (int i = 0; i < predict.getClassProbabilities().length; i++) {
                 System.out.println("P(" + predict.getClassProbabilities()[i].getCategory() + ")=" + predict.getClassProbabilities()[i].getProbability());
@@ -93,8 +87,8 @@ public class MainSample1 {
                 ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
                 ScriptEngine scriptEngine = scriptEngineManager.getEngineByName("JavaScript");
                 // JavaScript code from String
-                Object ob = scriptEngine.eval(explained.toString());
-                System.out.println("Result of evaluating mathematical expressions in String = " + ob);
+                Double proba = (Double) scriptEngine.eval(explained.toString());
+                System.out.println("Result of evaluating mathematical expressions in String = " + proba);
             }
         } catch (PersistentClassifierException ex) {
             Logger.getLogger(MainSample1.class.getName()).log(Level.SEVERE, null, ex);

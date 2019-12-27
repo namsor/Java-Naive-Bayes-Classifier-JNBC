@@ -16,7 +16,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
 /**
- * Simple test inspired by
+ * Simple example of Naive Bayes Classification (Banana, Orange or other Fruit) inspired by
  * https://www.machinelearningplus.com/predictive-modeling/how-naive-bayes-algorithm-works-with-example-and-full-code/
  *
  * @author elian

@@ -14,6 +14,7 @@ import org.iq80.leveldb.Options;
 import org.iq80.leveldb.ReadOptions;
 
 /**
+ * A persistent Naive Bayes Classifier, based on LevelDB key-value store.
  * Persistence methods : you can switch between using 
  * - the JNI Level DB implementation (import static org.fusesource.leveldbjni.JniDBFactory.*;) or 
  * - the pure Java port (import static org.iq80.leveldb.impl.Iq80DBFactory.*;)
@@ -26,6 +27,14 @@ public abstract class AbstractNaiveBayesClassifierLevelDBImpl extends AbstractNa
     private final String rootPathWritable;
     private final DB db;
 
+    /**
+     * Create a persistent Naive Bayes Classifier using LevelDB
+     * @param classifierName The classifier name
+     * @param categories The immutable classification categories
+     * @param cacheSizeMb LevelDB cache size (ex 100mb)
+     * @param rootPathWritable The writable directory for LevelDB storage
+     * @throws PersistentClassifierException The persistence error and cause
+     */
     public AbstractNaiveBayesClassifierLevelDBImpl(String classifierName, String[] categories, int cacheSizeMb, String rootPathWritable) throws PersistentClassifierException {
         super(classifierName, categories);
         this.rootPathWritable = rootPathWritable;
@@ -40,7 +49,14 @@ public abstract class AbstractNaiveBayesClassifierLevelDBImpl extends AbstractNa
             throw new PersistentClassifierException(ex);
         }
     }
-    
+
+    /**
+     * Create a persistent Naive Bayes Classifier using LevelDB, with default cache size
+     * @param classifierName The classifier name
+     * @param categories The immutable classification categories
+     * @param rootPathWritable The writable directory for LevelDB storage
+     * @throws PersistentClassifierException The persistence error and cause
+     */
     public AbstractNaiveBayesClassifierLevelDBImpl(String classifierName, String[] categories, String rootPathWritable) throws PersistentClassifierException {
         this(classifierName, categories, CACHE_SIZE_DEFAULT, rootPathWritable);
     }
@@ -112,7 +128,7 @@ public abstract class AbstractNaiveBayesClassifierLevelDBImpl extends AbstractNa
     }
 
     @Override
-    public synchronized void dumpDb(Writer w) throws ClassifyException {
+    public synchronized void dumpDb(Writer w) throws PersistentClassifierException {
         ReadOptions ro = new ReadOptions();
         ro.snapshot(getDb().getSnapshot());
         DBIterator iterator = getDb().iterator(ro);
@@ -124,13 +140,13 @@ public abstract class AbstractNaiveBayesClassifierLevelDBImpl extends AbstractNa
                 w.append(key + "|" + value + "\n");
             }
         } catch (IOException ex) {
-            throw new ClassifyException(ex);
+            throw new PersistentClassifierException(ex);
         } finally {
             try {
                 // Make sure you close the snapshot to avoid resource leaks.
                 ro.snapshot().close();
             } catch (IOException ex) {
-                throw new ClassifyException(ex);
+                throw new PersistentClassifierException(ex);
             }
         }
     }

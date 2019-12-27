@@ -1,19 +1,15 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.namsor.oss.classify.bayes;
 
 /**
  * Contains additional details on the classifications, such as the formulas or the algebraic calculation.
+ * The toString() method returns the explanation in human-readable form, and interpretable using JavaScript
  * @author elian
  */
 public interface IClassificationExplained extends IClassification {
     
     /**
      * Get the likelyhoods values, ex. 0.011806375442739082
-     * @return 
+     * @return The likelyhood values
      */
     double[] getLikelyhoods();
     
@@ -24,7 +20,7 @@ public interface IClassificationExplained extends IClassification {
      * (gL_cA_Yes_fE_humidity_is_High + alpha)/(gL_cA_Yes_fE_humidity + ( gL_fE_humidity_count * alpha )) * 
      * (gL_cA_Yes_fE_outlook_is_Overcast + alpha)/(gL_cA_Yes_fE_outlook + ( gL_fE_outlook_count * alpha )) * 
      * (gL_cA_Yes_fE_wind_is_Strong + alpha)/(gL_cA_Yes_fE_wind + ( gL_fE_wind_count * alpha )) * 1 )
-     * @return The formula 
+     * @return The likelyhood formulae
      */
     String[] getLikelyhoodFormulae();
     
@@ -35,7 +31,7 @@ public interface IClassificationExplained extends IClassification {
      * (3 + 1.0 )/(9 + ( 2 * 1.0 )) * 
      * (4 + 1.0 )/(9 + ( 3 * 1.0 )) * 
      * (3 + 1.0 )/(9 + ( 2 * 1.0 )) * 1 )
-     * @return The algebraic expression
+     * @return The likelyhood algebraic expression
      */
     String[] getLikelyhoodExpressions();       
 }

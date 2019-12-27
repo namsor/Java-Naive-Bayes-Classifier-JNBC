@@ -26,13 +26,30 @@ public class NaiveBayesClassifierRocksDBLaplacedImpl extends AbstractNaiveBayesC
     private final boolean variant;
     private final double alpha;
 
-    public NaiveBayesClassifierRocksDBLaplacedImpl(String classifierName, String[] categories, String rootPathWritable, double alpha, boolean variant) throws IOException, PersistentClassifierException {
+    /**
+     * Create a Naive Bayes Classifier implementation with RocksDB as key/value store.
+     * @param classifierName The classifier name
+     * @param categories The classification categories
+     * @param rootPathWritable A writable path for RocksDB
+     * @param alpha The Laplace alpha, typically 1.0
+     * @param variant The Laplace variant 
+     * @throws PersistentClassifierException The persistence error and cause
+     */
+
+    public NaiveBayesClassifierRocksDBLaplacedImpl(String classifierName, String[] categories, String rootPathWritable, double alpha, boolean variant) throws PersistentClassifierException {
         super(classifierName, categories, rootPathWritable);
         this.variant = variant;
         this.alpha = alpha;
     }
 
-    public NaiveBayesClassifierRocksDBLaplacedImpl(String classifierName, String[] categories, String rootPathWritable) throws IOException, PersistentClassifierException {
+    /**
+     * Create a Naive Bayes Classifier implementation with RocksDB as key/value store and defaults for Laplace smoothing (ALPHA=1 and VARIANT=false)
+     * @param classifierName The classifier name
+     * @param categories The classification categories
+     * @param rootPathWritable A writable path for RocksDB
+     * @throws PersistentClassifierException The persistence error and cause
+     */
+    public NaiveBayesClassifierRocksDBLaplacedImpl(String classifierName, String[] categories, String rootPathWritable) throws PersistentClassifierException {
         this(classifierName, categories, rootPathWritable, ALPHA, VARIANT);
     }
 

@@ -19,7 +19,14 @@ import org.iq80.leveldb.WriteBatch;
  */
 public class NaiveBayesClassifierLevelDBImpl extends AbstractNaiveBayesClassifierLevelDBImpl implements INaiveBayesClassifier {
 
-    public NaiveBayesClassifierLevelDBImpl(String classifierName, String[] categories, String rootPathWritable) throws IOException, PersistentClassifierException {
+    /**
+     * Create a persistent Naive Bayes Classifier using LevelDB, with default cache size
+     * @param classifierName The classifier name
+     * @param categories The immutable classification categories
+     * @param rootPathWritable The writable directory for LevelDB storage
+     * @throws PersistentClassifierException The persistence error and cause
+     */
+    public NaiveBayesClassifierLevelDBImpl(String classifierName, String[] categories, String rootPathWritable) throws PersistentClassifierException {
         super(classifierName, categories, rootPathWritable);
     }
 

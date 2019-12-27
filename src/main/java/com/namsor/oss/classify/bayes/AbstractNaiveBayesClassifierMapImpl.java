@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.namsor.oss.classify.bayes;
 
 import java.io.File;
@@ -10,11 +5,8 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.iq80.leveldb.Options;
-import static org.iq80.leveldb.impl.Iq80DBFactory.factory;
 import org.iq80.leveldb.util.FileUtils;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
@@ -22,7 +14,8 @@ import org.mapdb.HTreeMap;
 import org.mapdb.Serializer;
 
 /**
- * 
+ * A simple, scalable Naive Bayes Classifier, based on a key-value store (in
+ * memory using ConcurrentHashMap, or disk-based using org.mapdb.HTreeMap)
  * @author elian
  */
 public abstract class AbstractNaiveBayesClassifierMapImpl extends AbstractNaiveBayesClassifierImpl {
@@ -32,10 +25,9 @@ public abstract class AbstractNaiveBayesClassifierMapImpl extends AbstractNaiveB
     private final HTreeMap<String, Long> dbPersistent;
 
     /**
-     * Create in-memory ConcurrentHashMap classifier
-     * @param classifierName
-     * @param categories
-     * @param topN 
+     * Create in-memory classifier using ConcurrentHashMap
+     * @param classifierName The classifier name
+     * @param categories The classification categories
      */
     public AbstractNaiveBayesClassifierMapImpl(String classifierName, String[] categories) {
         super(classifierName, categories);
@@ -45,11 +37,10 @@ public abstract class AbstractNaiveBayesClassifierMapImpl extends AbstractNaiveB
     }
 
     /**
-     * Create persistent org.mapdb.HTreeMap classifier
-     * @param classifierName
-     * @param categories
-     * @param topN
-     * @param rootPathWritable 
+     * Create persistent classifier using org.mapdb.HTreeMap 
+     * @param classifierName The classifier name
+     * @param categories The classification categories
+     * @param rootPathWritable A writable directory for org.mapdb.HTreeMap storage
      */
     public AbstractNaiveBayesClassifierMapImpl(String classifierName, String[] categories, String rootPathWritable) {
         super(classifierName, categories);
@@ -92,7 +83,7 @@ public abstract class AbstractNaiveBayesClassifierMapImpl extends AbstractNaiveB
     }
 
     @Override
-    public synchronized void dumpDb(Writer w) throws ClassifyException {
+    public synchronized void dumpDb(Writer w) throws PersistentClassifierException {
         for (Map.Entry<String, Long> entry : getDb().entrySet()) {
             String key = entry.getKey();
             long value = entry.getValue();
@@ -100,7 +91,7 @@ public abstract class AbstractNaiveBayesClassifierMapImpl extends AbstractNaiveB
                 w.append(key + "|" + value + "\n");
             } catch (IOException ex) {
                 Logger.getLogger(NaiveBayesClassifierMapImpl.class.getName()).log(Level.SEVERE, null, ex);
-                throw new ClassifyException(ex);
+                throw new PersistentClassifierException(ex);
             }
         }
     }
@@ -108,7 +99,7 @@ public abstract class AbstractNaiveBayesClassifierMapImpl extends AbstractNaiveB
     /**
      * @return the db
      */
-    public Map<String, Long> getDb() {
+    protected Map<String, Long> getDb() {
         return db;
     }
 

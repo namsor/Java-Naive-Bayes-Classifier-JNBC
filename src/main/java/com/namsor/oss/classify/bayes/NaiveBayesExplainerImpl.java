@@ -1,22 +1,22 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.namsor.oss.classify.bayes;
 
-import static com.namsor.oss.classify.bayes.AbstractNaiveBayesImpl.pathGlobal;
 import java.io.StringWriter;
-import java.util.Comparator;
 import java.util.Map;
-import java.util.logging.Logger;
 
 /**
- *
+ * Explain the details of the Naive Bayes Classification, ie. formulae and algebraic
+ * expression. This will re-run the algorithm but append additional information : 
+ * - likelyhood values
+ * - likelyhood formulae
+ * - likelyhood expressions
  * @author elian
  */
 public class NaiveBayesExplainerImpl extends AbstractNaiveBayesImpl implements INaiveBayesExplainer {
 
+    /**
+     * Create an explainer
+     */
     public NaiveBayesExplainerImpl() {
     }
 
@@ -93,11 +93,11 @@ public class NaiveBayesExplainerImpl extends AbstractNaiveBayesImpl implements I
             } else if (proba < 0) {
                 proba = 0d;
             }
-            if (Math.abs(proba - classification.getClassProbabilities()[i].getProbability()) > epsilon) {
+            if (Math.abs(proba - classification.getClassProbabilities()[i].getProbability()) > EPSILON) {
                 throw new IllegalStateException("Class " + classification.getClassProbabilities()[i].getCategory() + " probability differs PExplained = " + proba + " <> P = " + classification.getClassProbabilities()[i].getProbability());
             }
         }
         return new ClassificationExplainedImpl(classification, likelyhood, formulae, algebraicExpressions);
     }
-    private final double epsilon = 0.00001;
+    private static final double EPSILON = 0.00001;
 }

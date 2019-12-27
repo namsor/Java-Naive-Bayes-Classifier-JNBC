@@ -21,7 +21,14 @@ import org.rocksdb.WriteOptions;
  */
 public class NaiveBayesClassifierRocksDBImpl extends AbstractNaiveBayesClassifierRocksDBImpl implements INaiveBayesClassifier {
 
-    public NaiveBayesClassifierRocksDBImpl(String classifierName, String[] categories, String rootPathWritable) throws IOException, PersistentClassifierException {
+    /**
+     * Create a Naive Bayes Classifier implementation with RocksDB as key/value store.
+     * @param classifierName The classifier name
+     * @param categories The classification categories
+     * @param rootPathWritable A writable path for RocksDB
+     * @throws PersistentClassifierException The persistence error and cause
+     */
+    public NaiveBayesClassifierRocksDBImpl(String classifierName, String[] categories, String rootPathWritable) throws PersistentClassifierException {
         super(classifierName, categories, rootPathWritable);
     }
 

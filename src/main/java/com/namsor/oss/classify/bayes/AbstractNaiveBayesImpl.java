@@ -1,11 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.namsor.oss.classify.bayes;
-
-import java.util.Arrays;
 
 /**
  * Functions common to the Naive Bayes Classifier and the Explainer
@@ -100,7 +93,7 @@ public class AbstractNaiveBayesImpl {
      * @param category the Category
      * @param featureKey the featureKey
      * @param featureValue the featureValue
-     * @return
+     * @return Path the he number of observations in a category, with feature featureKey and value featureValue
      */
     protected static String pathCategoryFeatureKeyValue(String category, String featureKey, String featureValue) {
         return KEY_GLOBAL + KEY_SEPARATOR + KEY_CATEGORY + KEY_SEPARATOR + category + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + featureKey + KEY_FEATURE_EQUAL + featureValue;

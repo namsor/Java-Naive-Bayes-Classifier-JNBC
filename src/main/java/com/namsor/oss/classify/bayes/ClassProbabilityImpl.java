@@ -8,20 +8,17 @@ public class ClassProbabilityImpl implements IClassProbability {
 
     private final String category;
     private final double probability;
-    private final boolean other;
 
+    /**
+     * Create an immutable classification output
+     * @param category The classification category
+     * @param probability The probability (likelyHood/sum(likelyhoods))
+     */
     public ClassProbabilityImpl(String category, double probability) {
         this.category = category;
         this.probability = probability;
-        this.other = false;
     }
 
-    public ClassProbabilityImpl(String category, double probability, boolean other) {
-        this.category = category;
-        this.probability = probability;
-        this.other = other;
-    }
-    
     @Override
     public String getCategory() {
         return category;
@@ -35,12 +32,6 @@ public class ClassProbabilityImpl implements IClassProbability {
     @Override
     public String toString() {
         return "P(" + category + ")=" + probability;
-    }
-
-
-    @Override
-    public boolean isOther() {
-        return other;
     }
 
 }

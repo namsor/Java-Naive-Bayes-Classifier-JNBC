@@ -15,7 +15,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
 /**
- * Simple test inspired by
+ * Simple example of Naive Bayes Classification (Sport / No Sport) with Laplace smoothing inspired by
  * http://ai.fon.bg.ac.rs/wp-content/uploads/2015/04/ML-Classification-NaiveBayes-2014.pdf
  *
  * @author elian

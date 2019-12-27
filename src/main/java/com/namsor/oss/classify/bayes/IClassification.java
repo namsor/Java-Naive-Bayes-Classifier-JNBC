@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.namsor.oss.classify.bayes;
 
 import java.util.Map;
@@ -34,19 +29,19 @@ public interface IClassification {
     /**
      * If Laplace Smoothed With variant, then:  likelyhood[i] = 1d * ((categoryCount + alpha) / (globalCount + globalCountCategories * alpha)) * product;
      * otherwise: likelyhood[i] = 1d * categoryCount / globalCount * product;
-     * @return 
+     * @return If Laplace smothing variant used
      */
     boolean isLaplaceSmoothedVariant();
 
     /**
      * The input features
-     * @return 
+     * @return The input features
      */
     Map<String, String> getFeatures();
     
     /**
      * The alpha value used for Laplace smoothing
-     * @return 
+     * @return The alpha value, usually 1.0
      */
     double getLaplaceSmoothingAlpha();
 }

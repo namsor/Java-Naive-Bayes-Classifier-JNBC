@@ -19,7 +19,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
 /**
- * Simple test inspired by
+ * Simple example of Naive Bayes Classification inspired by
  * https://towardsdatascience.com/introduction-to-na%C3%AFve-bayes-classifier-fa59e3e24aaf
  *
  * @author elian
