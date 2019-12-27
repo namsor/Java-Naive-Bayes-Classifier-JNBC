@@ -1,6 +1,9 @@
 # Java-Naive-Bayes-Classifier-JNBC
 A Java Naive Bayes Classifier that works in-memory or off the heap on fast key-value stores (MapDB, LevelDB or RocksDB). Naive Bayes Classification is fast. The objective of this ground-up implementations is to provide a self-contained, vertically scalable and explainable implementation.  
 
+See https://naivebayesclassifier.org/ for more information.
+
+
 Maven Quick-Start
 ------------------
 
