@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html">
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Naive Bayes Classifier that works in-memory or off the heap on fast key-value stores (MapDB, LevelDB or RocksDB)" />
+    <script src="scripts/prettify/run_prettify.js"></script>
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+    <title>JavaNaive Bayes Classifier JNBC</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/namsor/Java-Naive-Bayes-Classifier-JNBC">View on GitHub</a>
+          <h1 id="project_title">Java Naive Bayes Classifier JNBC</h1>
+          <h2 id="project_tagline">Naive Bayes Classifier that works in-memory<br>or off the heap on fast key-value stores (MapDB, LevelDB or RocksDB)</h2>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+
+<p>
+A Java Naive Bayes Classifier that works in-memory or off the heap on fast key-value stores (MapDB, LevelDB or RocksDB). 
+Naive Bayes Classification is known to be fast. 
+The objective of this ground-up implementations is to provide a self-contained, vertically scalable and explainable implementation.
+</p>
+
+<p>It comes with three classic examples and unit tests :
+<ul>
+<li><a href="http://ai.fon.bg.ac.rs/wp-content/uploads/2015/04/ML-Classification-NaiveBayes-2014.pdf" target="top">Sport / No Sport, based on weather conditions</a>,
+<li><a href="https://towardsdatascience.com/introduction-to-na%C3%AFve-bayes-classifier-fa59e3e24aaf" target="top">An Introduction to Naïve Bayes Classifier</a>,
+<li><a href="https://www.machinelearningplus.com/predictive-modeling/how-naive-bayes-algorithm-works-with-example-and-full-code/" target="top">Banana / Orange or other Fruit</a>.
+</ul>
+</p>
+
+<h3>Features</h3>
+<ul>
+  <li>learn and classify : NaiveBayesClassifierMapImpl works in-memory with a ConcurrentHashMap or off-the-heap using org.mapdb.HTreeMap</li>
+  <li>NaiveBayesClassifierMapLaplacedImpl adds Laplace smoothing to the implementation above</li>
+  <li>other popular Key-Value stores are supported : LevelDB and RocksDB</li>
+  <li>explain : NaiveBayesExplainerImpl provides explainable trace of the algorithm, so it can be interpreted by human (formulae and expressions) or plain JavaScript</li>
+  <li><a href="apidocs/index.html">Javadoc</a> documentation</li>
+  <li><a href="https://search.maven.org/artifact/com.namsor/Java-Naive-Bayes-Classifier-JNBC">Maven</a> central signed JARs</li>  
+</ul>
+
+
+
+<h3>API</h3>
+
+<p>JNPC has a simple API for train, classify and explain.</p>
+
+<p>Simply add this dependency to the project:<p>
+
+<pre class="prettyprint lang-xml">
+        &lt;dependency>
+            &lt;groupId>com.namsor&lt;/groupId>
+            &lt;artifactId>Java-Naive-Bayes-Classifier-JNBC&lt;/artifactId>
+            &lt;version>2.0.4&lt;/version>
+        &lt;/dependency>
+</pre>
+
+<p>and then use the <code>INaiveBayesClassifier</code> and <code>INaiveBayesExplainer</code> like this:</p>
+
+<pre class="prettyprint lang-java">
+ String[] cats = {YES, NO};
+ INaiveBayesClassifier bayes = new NaiveBayesClassifierMapImpl("tennis", cats);
+ // learn ex. Category=Yes Conditions=Sunny, Cool, Normal and Weak.
+ String category = YES;
+ for(...) { // training loop
+	 Map<String, String> features = new HashMap();
+	 // put features
+	 bayes.learn(category, features); 
+ }
+ // Shall we play given weather conditions Sunny, Cool, Rainy and Windy ?
+ Map<String, String> features = new HashMap();
+ features.put("outlook", "Sunny");
+ features.put("temp", "Cool");
+ features.put("humidity", "High");
+ features.put("wind", "Strong");
+ IClassification predict = bayes.classify(features, true);
+ // How do you explain that result? 
+ INaiveBayesExplainer explainer = new NaiveBayesExplainerImpl();
+ IClassificationExplained explained = explainer.explain(predict);
+ System.out.println(explained.toString());
+</pre>
+
+<p>See the <a href="apidocs/index.html">Javadoc</a> for more details about the API.</p>
+
+<br>
+<h3 id="gradle">Performance</h3>
+<p>
+Binomial classifiers : the AbstractNaiveBayesClassifierMapImpl with in-memory ConcurrentHashMap can learn from billions of facts and classify new data very fast.
+Using off-the-heap persistent key-value stores can help scaling vertically to even larger volumes. For example, the MapDB implementation on SSDs is only ~3-5 times slower and it can scale on large volumes. 
+</p>
+<p>
+Multinomial classifiers : with many class categories and many features, you may need to use the in-memory ConcurrentHashMap implementation and allocate more memory to the java heap. This implementation is known to run smoothly on servers with 192Gb RAM. 
+Further optimization will be needed to effectively use MemDB, LevelDB or RocksDB when the classification needs to read a LOT of data. 
+</p>
+
+<br>
+<h3 id="explain">Explainability</h3>
+<p>Use NaiveBayesExplainerImpl to explain exactly how a classification was calculated by the engine (with or without Laplace smoothing). 
+When running the first example <a href="http://ai.fon.bg.ac.rs/wp-content/uploads/2015/04/ML-Classification-NaiveBayes-2014.pdf" target="top">Sport / No Sport</a>, we see that we are unlikely to play sport given the weather conditions Sunny, Cool, Rainy and Windy : P(No)=0.795417348608838 > P(Yes)=0.204582651391162.
+But how was that calculated exactly ? You can reproduce the calculations using a spreadsheet like <a href="naive_bayes_sample_excel.xls" target="top">this one</a>, or you can use the NaiveBayesExplainerImpl to trace the algorithm calculations as Formulae, Expressions and Values. 
+</p>
+<pre class="prettyprint lang-javascript">
+// JavaScript : 
+
+// observation table variables 
+var gL=14
+var gL_cA_No=5
+var gL_cA_No_fE_humidity=5
+var gL_cA_No_fE_humidity_is_High=4
+var gL_cA_No_fE_outlook=5
+var gL_cA_No_fE_outlook_is_Sunny=3
+var gL_cA_No_fE_temp=5
+var gL_cA_No_fE_temp_is_Cool=1
+var gL_cA_No_fE_wind=5
+var gL_cA_No_fE_wind_is_Strong=3
+var gL_cA_Yes=9
+var gL_cA_Yes_fE_humidity=9
+var gL_cA_Yes_fE_humidity_is_High=3
+var gL_cA_Yes_fE_outlook=9
+var gL_cA_Yes_fE_outlook_is_Sunny=2
+var gL_cA_Yes_fE_temp=9
+var gL_cA_Yes_fE_temp_is_Cool=3
+var gL_cA_Yes_fE_wind=9
+var gL_cA_Yes_fE_wind_is_Strong=3
+var gL_fE_humidity=14
+var gL_fE_outlook=14
+var gL_fE_temp=14
+var gL_fE_wind=14
+
+
+// likelyhoods by category 
+
+// likelyhoods for category No
+var likelyhoodOfNo=gL_cA_No / gL * (gL_cA_No_fE_temp_is_Cool / gL_cA_No_fE_temp * gL_cA_No_fE_humidity_is_High / gL_cA_No_fE_humidity * gL_cA_No_fE_outlook_is_Sunny / gL_cA_No_fE_outlook * gL_cA_No_fE_wind_is_Strong / gL_cA_No_fE_wind * 1 )
+var likelyhoodOfNoExpr=5 / 14 * (1 / 5 * 4 / 5 * 3 / 5 * 3 / 5 * 1 )
+var likelyhoodOfNoValue=0.020571428571428574
+
+// likelyhoods for category Yes
+var likelyhoodOfYes=gL_cA_Yes / gL * (gL_cA_Yes_fE_temp_is_Cool / gL_cA_Yes_fE_temp * gL_cA_Yes_fE_humidity_is_High / gL_cA_Yes_fE_humidity * gL_cA_Yes_fE_outlook_is_Sunny / gL_cA_Yes_fE_outlook * gL_cA_Yes_fE_wind_is_Strong / gL_cA_Yes_fE_wind * 1 )
+var likelyhoodOfYesExpr=9 / 14 * (3 / 9 * 3 / 9 * 2 / 9 * 3 / 9 * 1 )
+var likelyhoodOfYesValue=0.005291005291005291
+
+
+// probability estimates by category 
+
+// probability estimate for category No
+var probabilityOfNo=likelyhoodOfNo/(likelyhoodOfNo+likelyhoodOfYes+0)
+var probabilityOfNoValue=0.795417348608838
+
+// probability estimate for category Yes
+var probabilityOfYes=likelyhoodOfYes/(likelyhoodOfNo+likelyhoodOfYes+0)
+var probabilityOfYesValue=0.204582651391162
+
+
+// return the highest probability estimate for evaluation 
+probabilityOfNo
+</pre>
+<br>
+
+<h3>Credits</h3>
+
+<p>This page template from <a href="https://ebourg.github.io/jsign/">Jsign</a> project.<br></p>
+
+<h3>Contact</h3>
+
+<p>Elian Carsenat (<a href="mailto:elian.carsenat@namsor.com">elian.carsenat@namsor.com</a>, <a href="https://twitter.com/eliancarsenat">@eliancarsenat</a>)</p>
+
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Java Naive Bayes Classifier JNBC maintained by <a href="https://github.com/namsor">NamSor</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+  </body>
+</html>
