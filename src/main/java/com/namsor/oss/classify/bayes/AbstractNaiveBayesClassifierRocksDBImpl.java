@@ -20,8 +20,8 @@ public abstract class AbstractNaiveBayesClassifierRocksDBImpl extends AbstractNa
     private final String rootPathWritable;
     private final RocksDB db;
     private final int ROCKSDB_MaxBackgroundFlushes = 8;
-    public AbstractNaiveBayesClassifierRocksDBImpl(String classifierName, String[] categories, String rootPathWritable, int topN) throws IOException, PersistentClassifierException {
-        super(classifierName, categories, topN);
+    public AbstractNaiveBayesClassifierRocksDBImpl(String classifierName, String[] categories, String rootPathWritable) throws IOException, PersistentClassifierException {
+        super(classifierName, categories);
         this.rootPathWritable = rootPathWritable;
         Options options = new Options();
         options.setCreateIfMissing(true);
@@ -32,10 +32,6 @@ public abstract class AbstractNaiveBayesClassifierRocksDBImpl extends AbstractNa
             throw new PersistentClassifierException(ex);
         }
     }
-    public AbstractNaiveBayesClassifierRocksDBImpl(String classifierName, String[] categories, String rootPathWritable) throws IOException, PersistentClassifierException {
-        this(classifierName, categories, rootPathWritable, -1);
-    }
-
     
     public long dbSize() throws PersistentClassifierException {
         try {

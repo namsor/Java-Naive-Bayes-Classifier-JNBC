@@ -37,22 +37,13 @@ public abstract class AbstractNaiveBayesClassifierMapImpl extends AbstractNaiveB
      * @param categories
      * @param topN 
      */
-    public AbstractNaiveBayesClassifierMapImpl(String classifierName, String[] categories, int topN) {
-        super(classifierName, categories, topN);
+    public AbstractNaiveBayesClassifierMapImpl(String classifierName, String[] categories) {
+        super(classifierName, categories);
         this.rootPathWritable = null;
         this.dbPersistent = null;
         this.db = new ConcurrentHashMap();
     }
 
-    /**
-     * Create in-memory ConcurrentHashMap classifier
-     * @param classifierName
-     * @param categories 
-     */
-    public AbstractNaiveBayesClassifierMapImpl(String classifierName, String[] categories) {
-        this(classifierName, categories, -1);
-    }
-    
     /**
      * Create persistent org.mapdb.HTreeMap classifier
      * @param classifierName
@@ -60,8 +51,8 @@ public abstract class AbstractNaiveBayesClassifierMapImpl extends AbstractNaiveB
      * @param topN
      * @param rootPathWritable 
      */
-    public AbstractNaiveBayesClassifierMapImpl(String classifierName, String[] categories, int topN, String rootPathWritable) {
-        super(classifierName, categories, topN);
+    public AbstractNaiveBayesClassifierMapImpl(String classifierName, String[] categories, String rootPathWritable) {
+        super(classifierName, categories);
         this.rootPathWritable = rootPathWritable;
         File dataDir = new File(rootPathWritable);
         dataDir.mkdirs();
@@ -76,17 +67,6 @@ public abstract class AbstractNaiveBayesClassifierMapImpl extends AbstractNaiveB
         dbPersistent = map;
     }
     
-    /**
-     * Create persistent org.mapdb.HTreeMap classifier
-     * @param classifierName
-     * @param categories
-     * @param rootPathWritable 
-     */
-    public AbstractNaiveBayesClassifierMapImpl(String classifierName, String[] categories, String rootPathWritable) {
-        this(classifierName, categories, -1, rootPathWritable);
-    }    
-
-
     @Override
     public void dbClose() throws PersistentClassifierException {
         if (dbPersistent != null) {

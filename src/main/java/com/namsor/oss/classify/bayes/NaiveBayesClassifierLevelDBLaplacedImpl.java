@@ -24,26 +24,14 @@ public class NaiveBayesClassifierLevelDBLaplacedImpl extends AbstractNaiveBayesC
     private final boolean variant;
     private final double alpha;
 
-    public NaiveBayesClassifierLevelDBLaplacedImpl(String classifierName, String[] categories, String rootPathWritable, double alpha, boolean variant, int topN) throws IOException, PersistentClassifierException {
-        super(classifierName, categories, rootPathWritable, topN);
-        this.variant = variant;
-        this.alpha = alpha;
-    }
-
     public NaiveBayesClassifierLevelDBLaplacedImpl(String classifierName, String[] categories, String rootPathWritable, double alpha, boolean variant) throws IOException, PersistentClassifierException {
         super(classifierName, categories, rootPathWritable);
         this.variant = variant;
         this.alpha = alpha;
     }
 
-    public NaiveBayesClassifierLevelDBLaplacedImpl(String classifierName, String[] categories, String rootPathWritable, int topN) throws IOException, PersistentClassifierException {
-        this(classifierName, categories, rootPathWritable, ALPHA, VARIANT, topN);
-    }
-
     public NaiveBayesClassifierLevelDBLaplacedImpl(String classifierName, String[] categories, String rootPathWritable) throws IOException, PersistentClassifierException {
-        super(classifierName, categories, rootPathWritable);
-        this.alpha = ALPHA;
-        this.variant = VARIANT;
+        this(classifierName, categories, rootPathWritable, ALPHA, VARIANT);
     }
 
     @Override
@@ -98,9 +86,9 @@ public class NaiveBayesClassifierLevelDBLaplacedImpl extends AbstractNaiveBayesC
     }
 
     @Override
-    public IClassification classify(Map<String, String> features, final boolean explain) throws ClassifyException {
+    public IClassification classify(Map<String, String> features, final boolean explainData) throws ClassifyException {
         Map<String, Long> explanation = null;
-        if (explain) {
+        if (explainData) {
             explanation = new HashMap();
         }
         ReadOptions ro = new ReadOptions();
@@ -109,11 +97,11 @@ public class NaiveBayesClassifierLevelDBLaplacedImpl extends AbstractNaiveBayesC
             String pathGlobal = pathGlobal();
             String pathGlobalCountCategories = pathGlobalCountCategories();
             long globalCount = (getDb().get(bytes(pathGlobal), ro) == null ? 0 : Longs.fromByteArray(getDb().get(bytes(pathGlobal), ro)));
-            if (explain) {
+            if (explainData) {
                 explanation.put(pathGlobal, globalCount);
             }
             long globalCountCategories = (getDb().get(bytes(pathGlobalCountCategories), ro) == null ? 0 : Longs.fromByteArray(getDb().get(bytes(pathGlobalCountCategories), ro)));
-            if (explain) {
+            if (explainData) {
                 explanation.put(pathGlobalCountCategories, globalCountCategories);
             }
             double[] likelyhood = new double[getCategories().length];
@@ -127,23 +115,23 @@ public class NaiveBayesClassifierLevelDBLaplacedImpl extends AbstractNaiveBayesC
                     String pathFeatureKey = pathFeatureKey(feature.getKey());
                     //double featureCount = (getDb().get(ro, bytes(pathFeatureKey)) == null ? 0 : Longs.fromByteArray(getDb().get(ro, bytes(pathFeatureKey))));
                     long featureCount = (getDb().get(bytes(pathFeatureKey), ro) == null ? 0 : Longs.fromByteArray(getDb().get(bytes(pathFeatureKey), ro)));
-                    if (explain) {
+                    if (explainData) {
                         explanation.put(pathFeatureKey, featureCount);
                     }
                     if (featureCount > 0) {
                         String pathCategoryFeatureKey = pathCategoryFeatureKey(category, feature.getKey());
                         long categoryFeatureCount = (getDb().get(bytes(pathCategoryFeatureKey), ro) == null ? 0 : Longs.fromByteArray(getDb().get(bytes(pathCategoryFeatureKey), ro)));
-                        if (explain) {
+                        if (explainData) {
                             explanation.put(pathCategoryFeatureKey, categoryFeatureCount);
                         }
                         String pathFeatureKeyCountValueTypes = pathFeatureKeyCountValueTypes(feature.getKey());
                         long featureCountValueTypes = (getDb().get(bytes(pathFeatureKeyCountValueTypes), ro) == null ? 0 : Longs.fromByteArray(getDb().get(bytes(pathFeatureKeyCountValueTypes), ro)));
-                        if (explain) {
+                        if (explainData) {
                             explanation.put(pathFeatureKeyCountValueTypes, featureCountValueTypes);
                         }
                         String pathCategoryFeatureKeyValue = pathCategoryFeatureKeyValue(category, feature.getKey(), feature.getValue());
                         long categoryFeatureValueCount = (getDb().get(bytes(pathCategoryFeatureKeyValue), ro) == null ? 0 : Longs.fromByteArray(getDb().get(bytes(pathCategoryFeatureKeyValue), ro)));
-                        if (explain) {
+                        if (explainData) {
                             explanation.put(pathCategoryFeatureKeyValue, categoryFeatureValueCount);
                         }
                         double basicProbability = (categoryFeatureCount == 0 ? 0 : 1d * (categoryFeatureValueCount + alpha) / (categoryFeatureCount + featureCountValueTypes * alpha));
@@ -157,7 +145,7 @@ public class NaiveBayesClassifierLevelDBLaplacedImpl extends AbstractNaiveBayesC
                 }
                 likelyhoodTot += likelyhood[i];
             }
-            return new ClassificationImpl(likelihoodsToProbas(likelyhood, likelyhoodTot), explanation);
+            return new ClassificationImpl(features, likelihoodsToProbas(likelyhood, likelyhoodTot), explanation, true, variant, alpha);
         } finally {
             try {
                 // Make sure you close the snapshot to avoid resource leaks.

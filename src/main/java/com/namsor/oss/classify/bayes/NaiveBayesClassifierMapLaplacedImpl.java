@@ -20,10 +20,6 @@ public class NaiveBayesClassifierMapLaplacedImpl extends AbstractNaiveBayesClass
     private final boolean variant;
     private final double alpha;
 
-    public NaiveBayesClassifierMapLaplacedImpl(String classifierName, String[] categories, int topN) {
-        this(classifierName, categories, ALPHA, VARIANT, topN);
-    }
-
     public NaiveBayesClassifierMapLaplacedImpl(String classifierName, String[] categories) {
         this(classifierName, categories, ALPHA, VARIANT);
     }
@@ -43,29 +39,6 @@ public class NaiveBayesClassifierMapLaplacedImpl extends AbstractNaiveBayesClass
         this.variant = variant;
     }
 
-    /**
-     * Create a classifier, that will only return topN classifs, with in-memory
-     * Map
-     *
-     * @param classifierName
-     * @param categories
-     * @param alpha Typically 1
-     * @param variant
-     * @throws IOException
-     */
-    public NaiveBayesClassifierMapLaplacedImpl(String classifierName, String[] categories, double alpha, boolean variant, int topN) {
-        super(classifierName, categories, topN);
-        this.alpha = alpha;
-        this.variant = variant;
-    }
-
-    public NaiveBayesClassifierMapLaplacedImpl(String classifierName, String[] categories, int topN, String rootPathWritable) {
-        this(classifierName, categories, ALPHA, VARIANT, topN, rootPathWritable);
-    }
-
-    public NaiveBayesClassifierMapLaplacedImpl(String classifierName, String[] categories, String rootPathWritable) {
-        this(classifierName, categories, ALPHA, VARIANT, rootPathWritable);
-    }
 
     /**
      * Create a classifier, that will only return topN classifs, with persistent
@@ -75,22 +48,6 @@ public class NaiveBayesClassifierMapLaplacedImpl extends AbstractNaiveBayesClass
      * @param categories
      * @param alpha Typically 1
      * @param variant
-     * @param topN
-     * @param rootPathWritable
-     */
-    public NaiveBayesClassifierMapLaplacedImpl(String classifierName, String[] categories, double alpha, boolean variant, int topN, String rootPathWritable) {
-        super(classifierName, categories, topN, rootPathWritable);
-        this.alpha = alpha;
-        this.variant = variant;
-    }
-
-    /**
-     * Create a classifier with persistent map
-     *
-     * @param classifierName
-     * @param categories
-     * @param alpha
-     * @param variant
      * @param rootPathWritable
      */
     public NaiveBayesClassifierMapLaplacedImpl(String classifierName, String[] categories, double alpha, boolean variant, String rootPathWritable) {
@@ -99,6 +56,11 @@ public class NaiveBayesClassifierMapLaplacedImpl extends AbstractNaiveBayesClass
         this.variant = variant;
     }
 
+    public NaiveBayesClassifierMapLaplacedImpl(String classifierName, String[] categories, String rootPathWritable) {
+        this(classifierName, categories, ALPHA, VARIANT, rootPathWritable);
+    }
+    
+    
     @Override
     public synchronized void learn(String category, Map<String, String> features, long weight) throws ClassifyException {
         String pathGlobal = pathGlobal();
@@ -132,19 +94,19 @@ public class NaiveBayesClassifierMapLaplacedImpl extends AbstractNaiveBayesClass
     }
 
     @Override
-    public IClassification classify(Map<String, String> features, final boolean explain) throws ClassifyException {
+    public IClassification classify(Map<String, String> features, final boolean explainData) throws ClassifyException {
         Map<String, Long> explanation = null;
-        if (explain) {
+        if (explainData) {
             explanation = new HashMap();
         }
         String pathGlobal = pathGlobal();
         String pathGlobalCountCategories = pathGlobalCountCategories();
         long globalCount = (getDb().containsKey(pathGlobal) ? getDb().get(pathGlobal) : 0);
-        if (explain) {
+        if (explainData) {
             explanation.put(pathGlobal, globalCount);
         }
         long globalCountCategories = (getDb().containsKey(pathGlobalCountCategories) ? getDb().get(pathGlobalCountCategories) : 0);
-        if (explain) {
+        if (explainData) {
             explanation.put(pathGlobalCountCategories, globalCountCategories);
         }
         double[] likelyhood = new double[getCategories().length];
@@ -153,30 +115,30 @@ public class NaiveBayesClassifierMapLaplacedImpl extends AbstractNaiveBayesClass
             String category = getCategories()[i];
             String pathCategory = pathCategory(category);
             long categoryCount = (getDb().containsKey(pathCategory) ? getDb().get(pathCategory) : 0);
-            if (explain) {
+            if (explainData) {
                 explanation.put(pathCategory, categoryCount);
             }
             double product = 1.0d;
             for (Entry<String, String> feature : features.entrySet()) {
                 String pathFeatureKey = pathFeatureKey(feature.getKey());
                 long featureCount = (getDb().containsKey(pathFeatureKey) ? getDb().get(pathFeatureKey) : 0);
-                if (explain) {
+                if (explainData) {
                     explanation.put(pathFeatureKey, featureCount);
                 }
                 if (featureCount > 0) {
                     String pathCategoryFeatureKey = pathCategoryFeatureKey(category, feature.getKey());
                     long categoryFeatureCount = (getDb().containsKey(pathCategoryFeatureKey) ? getDb().get(pathCategoryFeatureKey) : 0);
-                    if (explain) {
+                    if (explainData) {
                         explanation.put(pathCategoryFeatureKey, categoryFeatureCount);
                     }
                     String pathFeatureKeyCountValueTypes = pathFeatureKeyCountValueTypes(feature.getKey());
                     long featureCountValueTypes = (getDb().containsKey(pathFeatureKeyCountValueTypes) ? getDb().get(pathFeatureKeyCountValueTypes) : 0);
-                    if (explain) {
+                    if (explainData) {
                         explanation.put(pathFeatureKeyCountValueTypes, featureCountValueTypes);
                     }
                     String pathCategoryFeatureKeyValue = pathCategoryFeatureKeyValue(category, feature.getKey(), feature.getValue());
                     long categoryFeatureValueCount = (getDb().containsKey(pathCategoryFeatureKeyValue) ? getDb().get(pathCategoryFeatureKeyValue) : 0);
-                    if (explain) {
+                    if (explainData) {
                         explanation.put(pathCategoryFeatureKeyValue, categoryFeatureValueCount);
                     }
                     double basicProbability = (categoryFeatureCount == 0 ? 0 : 1d * (categoryFeatureValueCount + alpha) / (categoryFeatureCount + featureCountValueTypes * alpha));
@@ -190,7 +152,7 @@ public class NaiveBayesClassifierMapLaplacedImpl extends AbstractNaiveBayesClass
             }
             likelyhoodTot += likelyhood[i];
         }
-        return new ClassificationImpl(likelihoodsToProbas(likelyhood, likelyhoodTot), explanation);
+        return new ClassificationImpl(features, likelihoodsToProbas(likelyhood, likelyhoodTot), explanation, true, variant, alpha);
     }
 
 }

@@ -26,8 +26,8 @@ public abstract class AbstractNaiveBayesClassifierLevelDBImpl extends AbstractNa
     private final String rootPathWritable;
     private final DB db;
 
-    public AbstractNaiveBayesClassifierLevelDBImpl(String classifierName, String[] categories, int cacheSizeMb, String rootPathWritable, int topN) throws PersistentClassifierException {
-        super(classifierName, categories, topN);
+    public AbstractNaiveBayesClassifierLevelDBImpl(String classifierName, String[] categories, int cacheSizeMb, String rootPathWritable) throws PersistentClassifierException {
+        super(classifierName, categories);
         this.rootPathWritable = rootPathWritable;
         Options options = new Options();
         options.createIfMissing(true);
@@ -40,19 +40,12 @@ public abstract class AbstractNaiveBayesClassifierLevelDBImpl extends AbstractNa
             throw new PersistentClassifierException(ex);
         }
     }
-
-    public AbstractNaiveBayesClassifierLevelDBImpl(String classifierName, String[] categories, String rootPathWritable, int topN) throws PersistentClassifierException {
-        this(classifierName, categories, CACHE_SIZE_DEFAULT, rootPathWritable, topN);
-    }
-
-    public AbstractNaiveBayesClassifierLevelDBImpl(String classifierName, String[] categories, int cacheSizeMb, String rootPathWritable) throws PersistentClassifierException {
-        this(classifierName, categories, cacheSizeMb, rootPathWritable, -1);
-    }
-
+    
     public AbstractNaiveBayesClassifierLevelDBImpl(String classifierName, String[] categories, String rootPathWritable) throws PersistentClassifierException {
-        this(classifierName, categories, CACHE_SIZE_DEFAULT, rootPathWritable, -1);
+        this(classifierName, categories, CACHE_SIZE_DEFAULT, rootPathWritable);
     }
 
+    
     @Override
     public long dbSize() throws PersistentClassifierException {
         long dbSize = 0;

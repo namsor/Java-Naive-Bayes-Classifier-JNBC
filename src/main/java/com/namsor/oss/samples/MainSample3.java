@@ -10,6 +10,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.namsor.oss.classify.bayes.IClassProbability;
 import com.namsor.oss.classify.bayes.IClassification;
+import com.namsor.oss.classify.bayes.IClassificationExplained;
+import com.namsor.oss.classify.bayes.NaiveBayesExplainerImpl;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 
 /**
  * Simple test inspired by
@@ -76,16 +80,19 @@ public class MainSample3 {
             features.put("Yellow", "Yes");
             features.put("Dummy", "Yes");
             IClassification predict = bayes.classify(features,true);
-            StringWriter sw = new StringWriter();
-            bayes.dumpDb(sw);
-            System.out.println(sw);
             for (int i = 0; i < predict.getClassProbabilities().length; i++) {
                 System.out.println("P(" + predict.getClassProbabilities()[i].getCategory() + ")=" + predict.getClassProbabilities()[i].getProbability());
             }
-            if( predict.getExplanation()!=null) {
-                for (Map.Entry<String, Long> entry : predict.getExplanation().entrySet()) {
-                   System.out.println(entry.getKey()+"="+entry.getValue());                    
-                }
+            if( predict.getExplanationData()!=null) {
+                NaiveBayesExplainerImpl explainer = new NaiveBayesExplainerImpl();
+                IClassificationExplained explained = explainer.explain(predict);
+                System.out.println(explained.toString());       
+                ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
+                ScriptEngine scriptEngine = scriptEngineManager.getEngineByName("JavaScript");
+                // JavaScript code from String
+                Object ob = scriptEngine.eval(explained.toString());
+                System.out.println("Result of evaluating mathematical expressions in String = " + ob);
+                
             }
         } catch (PersistentClassifierException ex) {
             Logger.getLogger(MainSample1Laplaced.class.getName()).log(Level.SEVERE, null, ex);

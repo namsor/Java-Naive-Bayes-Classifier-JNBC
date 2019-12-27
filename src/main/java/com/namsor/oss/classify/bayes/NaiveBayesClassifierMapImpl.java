@@ -23,17 +23,6 @@ public class NaiveBayesClassifierMapImpl extends AbstractNaiveBayesClassifierMap
     }
 
     /**
-     * Create in-memory classifier
-     *
-     * @param classifierName
-     * @param categories
-     * @param topN
-     */
-    public NaiveBayesClassifierMapImpl(String classifierName, String[] categories, int topN) {
-        super(classifierName, categories, topN);
-    }
-
-    /**
      * Create persistent classifier
      *
      * @param classifierName
@@ -42,18 +31,6 @@ public class NaiveBayesClassifierMapImpl extends AbstractNaiveBayesClassifierMap
      */
     public NaiveBayesClassifierMapImpl(String classifierName, String[] categories, String rootPathWritable) {
         super(classifierName, categories, rootPathWritable);
-    }
-
-    /**
-     * Create persistent classifier
-     *
-     * @param classifierName
-     * @param categories
-     * @param topN
-     * @param rootPathWritable
-     */
-    public NaiveBayesClassifierMapImpl(String classifierName, String[] categories, int topN, String rootPathWritable) {
-        super(classifierName, categories, topN, rootPathWritable);
     }
 
     @Override
@@ -73,14 +50,14 @@ public class NaiveBayesClassifierMapImpl extends AbstractNaiveBayesClassifierMap
     }
 
     @Override
-    public IClassification classify(Map<String, String> features, final boolean explain) throws ClassifyException {
+    public IClassification classify(Map<String, String> features, final boolean explainData) throws ClassifyException {
         Map<String, Long> explanation = null;
-        if (explain) {
+        if (explainData) {
             explanation = new HashMap();
         }
         String pathGlobal = pathGlobal();
         long globalCount = (getDb().containsKey(pathGlobal) ? getDb().get(pathGlobal) : 0);
-        if (explain) {
+        if (explainData) {
             explanation.put(pathGlobal, globalCount);
         }
         double[] likelyhood = new double[getCategories().length];
@@ -89,25 +66,25 @@ public class NaiveBayesClassifierMapImpl extends AbstractNaiveBayesClassifierMap
             String category = getCategories()[i];
             String pathCategory = pathCategory(category);
             long categoryCount = (getDb().containsKey(pathCategory) ? getDb().get(pathCategory) : 0);
-            if (explain) {
+            if (explainData) {
                 explanation.put(pathCategory, categoryCount);
             }
             double product = 1.0d;
             for (Entry<String, String> feature : features.entrySet()) {
                 String pathFeatureKey = pathFeatureKey(feature.getKey());
                 long featureCount = (getDb().containsKey(pathFeatureKey) ? getDb().get(pathFeatureKey) : 0);
-                if (explain) {
+                if (explainData) {
                     explanation.put(pathFeatureKey, featureCount);
                 }
                 if (featureCount > 0) {
                     String pathCategoryFeatureKey = pathCategoryFeatureKey(category, feature.getKey());
                     long categoryFeatureCount = (getDb().containsKey(pathCategoryFeatureKey) ? getDb().get(pathCategoryFeatureKey) : 0);
-                    if (explain) {
+                    if (explainData) {
                         explanation.put(pathCategoryFeatureKey, categoryFeatureCount);
                     }
                     String pathCategoryFeatureKeyValue = pathCategoryFeatureKeyValue(category, feature.getKey(), feature.getValue());
                     long categoryFeatureValueCount = (getDb().containsKey(pathCategoryFeatureKeyValue) ? getDb().get(pathCategoryFeatureKeyValue) : 0);
-                    if (explain) {
+                    if (explainData) {
                         explanation.put(pathCategoryFeatureKeyValue, categoryFeatureValueCount);
                     }
                     double basicProbability = (categoryFeatureCount == 0 ? 0 : 1d * categoryFeatureValueCount / categoryFeatureCount);
@@ -117,11 +94,7 @@ public class NaiveBayesClassifierMapImpl extends AbstractNaiveBayesClassifierMap
             likelyhood[i] = 1d * categoryCount / globalCount * product;
             likelyhoodTot += likelyhood[i];
         }
-        return new ClassificationImpl(likelihoodsToProbas(likelyhood, likelyhoodTot), explanation);
-    }
-
-    public IClassification classify(Map<String, String> features) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return new ClassificationImpl(features, likelihoodsToProbas(likelyhood, likelyhoodTot), explanation);
     }
 
 }

@@ -19,10 +19,6 @@ import org.iq80.leveldb.WriteBatch;
  */
 public class NaiveBayesClassifierLevelDBImpl extends AbstractNaiveBayesClassifierLevelDBImpl implements INaiveBayesClassifier {
 
-    public NaiveBayesClassifierLevelDBImpl(String classifierName, String[] categories, String rootPathWritable, int topN) throws IOException, PersistentClassifierException {
-        super(classifierName, categories, rootPathWritable, topN);
-    }
-
     public NaiveBayesClassifierLevelDBImpl(String classifierName, String[] categories, String rootPathWritable) throws IOException, PersistentClassifierException {
         super(classifierName, categories, rootPathWritable);
     }
@@ -63,9 +59,9 @@ public class NaiveBayesClassifierLevelDBImpl extends AbstractNaiveBayesClassifie
     }
 
     @Override
-    public IClassification classify(Map<String, String> features, final boolean explain) throws ClassifyException {
+    public IClassification classify(Map<String, String> features, final boolean explainData) throws ClassifyException {
         Map<String, Long> explanation = null;
-        if (explain) {
+        if (explainData) {
             explanation = new HashMap();
         }
         ReadOptions ro = new ReadOptions();
@@ -73,7 +69,7 @@ public class NaiveBayesClassifierLevelDBImpl extends AbstractNaiveBayesClassifie
         try {
             String pathGlobal = pathGlobal();
             long globalCount = (getDb().get(bytes(pathGlobal), ro) == null ? 0 : Longs.fromByteArray(getDb().get(bytes(pathGlobal), ro)));
-            if (explain) {
+            if (explainData) {
                 explanation.put(pathGlobal, globalCount);
             }
             double[] likelyhood = new double[getCategories().length];
@@ -82,7 +78,7 @@ public class NaiveBayesClassifierLevelDBImpl extends AbstractNaiveBayesClassifie
                 String category = getCategories()[i];
                 String pathCategory = pathCategory(category);
                 long categoryCount = (getDb().get(bytes(pathCategory), ro) == null ? 0 : Longs.fromByteArray(getDb().get(bytes(pathCategory), ro)));
-                if (explain) {
+                if (explainData) {
                     explanation.put(pathCategory, categoryCount);
                 }
                 double product = 1.0d;
@@ -90,18 +86,18 @@ public class NaiveBayesClassifierLevelDBImpl extends AbstractNaiveBayesClassifie
                     String pathFeatureKey = pathFeatureKey(feature.getKey());
                     //double featureCount = (getDb().get(ro, bytes(pathFeatureKey)) == null ? 0 : Longs.fromByteArray(getDb().get(ro, bytes(pathFeatureKey))));
                     long featureCount = (getDb().get(bytes(pathFeatureKey), ro) == null ? 0 : Longs.fromByteArray(getDb().get(bytes(pathFeatureKey), ro)));
-                    if (explain) {
+                    if (explainData) {
                         explanation.put(pathFeatureKey, featureCount);
                     }
                     if (featureCount > 0) {
                         String pathCategoryFeatureKey = pathCategoryFeatureKey(category, feature.getKey());
                         long categoryFeatureCount = (getDb().get(bytes(pathCategoryFeatureKey), ro) == null ? 0 : Longs.fromByteArray(getDb().get(bytes(pathCategoryFeatureKey), ro)));
-                        if (explain) {
+                        if (explainData) {
                             explanation.put(pathCategoryFeatureKey, categoryFeatureCount);
                         }
                         String pathCategoryFeatureKeyValue = pathCategoryFeatureKeyValue(category, feature.getKey(), feature.getValue());
                         long categoryFeatureValueCount = (getDb().get(bytes(pathCategoryFeatureKeyValue), ro) == null ? 0 : Longs.fromByteArray(getDb().get(bytes(pathCategoryFeatureKeyValue), ro)));
-                        if (explain) {
+                        if (explainData) {
                             explanation.put(pathCategoryFeatureKeyValue, categoryFeatureValueCount);
                         }
                         double basicProbability = (categoryFeatureCount == 0 ? 0 : 1d * categoryFeatureValueCount / categoryFeatureCount);
@@ -111,7 +107,7 @@ public class NaiveBayesClassifierLevelDBImpl extends AbstractNaiveBayesClassifie
                 likelyhood[i] = 1d * categoryCount / globalCount * product;
                 likelyhoodTot += likelyhood[i];
             }
-            return new ClassificationImpl(likelihoodsToProbas(likelyhood, likelyhoodTot), explanation);
+            return new ClassificationImpl(features, likelihoodsToProbas(likelyhood, likelyhoodTot), explanation);
         } finally {
             try {
                 // Make sure you close the snapshot to avoid resource leaks.

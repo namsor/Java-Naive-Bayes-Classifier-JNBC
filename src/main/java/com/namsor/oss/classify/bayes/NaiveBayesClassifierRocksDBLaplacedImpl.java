@@ -26,24 +26,14 @@ public class NaiveBayesClassifierRocksDBLaplacedImpl extends AbstractNaiveBayesC
     private final boolean variant;
     private final double alpha;
 
-    public NaiveBayesClassifierRocksDBLaplacedImpl(String classifierName, String[] categories, String rootPathWritable, int topN) throws IOException, PersistentClassifierException {
-        this(classifierName, categories, rootPathWritable, ALPHA, VARIANT, topN);
-    }
-
-    public NaiveBayesClassifierRocksDBLaplacedImpl(String classifierName, String[] categories, String rootPathWritable) throws IOException, PersistentClassifierException {
-        this(classifierName, categories, rootPathWritable, ALPHA, VARIANT);
-    }
-
     public NaiveBayesClassifierRocksDBLaplacedImpl(String classifierName, String[] categories, String rootPathWritable, double alpha, boolean variant) throws IOException, PersistentClassifierException {
         super(classifierName, categories, rootPathWritable);
         this.variant = variant;
         this.alpha = alpha;
     }
 
-    public NaiveBayesClassifierRocksDBLaplacedImpl(String classifierName, String[] categories, String rootPathWritable, double alpha, boolean variant, int topN) throws IOException, PersistentClassifierException {
-        super(classifierName, categories, rootPathWritable, topN);
-        this.variant = variant;
-        this.alpha = alpha;
+    public NaiveBayesClassifierRocksDBLaplacedImpl(String classifierName, String[] categories, String rootPathWritable) throws IOException, PersistentClassifierException {
+        this(classifierName, categories, rootPathWritable, ALPHA, VARIANT);
     }
 
     @Override
@@ -92,9 +82,9 @@ public class NaiveBayesClassifierRocksDBLaplacedImpl extends AbstractNaiveBayesC
     }
 
     @Override
-    public IClassification classify(Map<String, String> features, final boolean explain) throws ClassifyException {
+    public IClassification classify(Map<String, String> features, final boolean explainData) throws ClassifyException {
         Map<String, Long> explanation = null;
-        if (explain) {
+        if (explainData) {
             explanation = new HashMap();
         }
         ReadOptions ro = new ReadOptions();
@@ -103,11 +93,11 @@ public class NaiveBayesClassifierRocksDBLaplacedImpl extends AbstractNaiveBayesC
             String pathGlobal = pathGlobal();
             String pathGlobalCountCategories = pathGlobalCountCategories();
             long globalCount = (getDb().get(ro, bytes(pathGlobal)) == null ? 0 : Longs.fromByteArray(getDb().get(ro, bytes(pathGlobal))));
-            if (explain) {
+            if (explainData) {
                 explanation.put(pathGlobal, globalCount);
             }
             long globalCountCategories = (getDb().get(ro, bytes(pathGlobalCountCategories)) == null ? 0 : Longs.fromByteArray(getDb().get(ro, bytes(pathGlobalCountCategories))));
-            if (explain) {
+            if (explainData) {
                 explanation.put(pathGlobalCountCategories, globalCountCategories);
             }
             double[] likelyhood = new double[getCategories().length];
@@ -116,30 +106,30 @@ public class NaiveBayesClassifierRocksDBLaplacedImpl extends AbstractNaiveBayesC
                 String category = getCategories()[i];
                 String pathCategory = pathCategory(category);
                 long categoryCount = (getDb().get(ro, bytes(pathCategory)) == null ? 0 : Longs.fromByteArray(getDb().get(ro, bytes(pathCategory))));
-                if (explain) {
+                if (explainData) {
                     explanation.put(pathCategory, categoryCount);
                 }
                 double product = 1.0d;
                 for (Map.Entry<String, String> feature : features.entrySet()) {
                     String pathFeatureKey = pathFeatureKey(feature.getKey());
                     long featureCount = (getDb().get(ro, bytes(pathFeatureKey)) == null ? 0 : Longs.fromByteArray(getDb().get(ro, bytes(pathFeatureKey))));
-                    if (explain) {
+                    if (explainData) {
                         explanation.put(pathFeatureKey, featureCount);
                     }
                     if (featureCount > 0) {
                         String pathCategoryFeatureKey = pathCategoryFeatureKey(category, feature.getKey());
                         long categoryFeatureCount = (getDb().get(ro, bytes(pathCategoryFeatureKey)) == null ? 0 : Longs.fromByteArray(getDb().get(ro, bytes(pathCategoryFeatureKey))));
-                        if (explain) {
+                        if (explainData) {
                             explanation.put(pathCategoryFeatureKey, categoryFeatureCount);
                         }
                         String pathFeatureKeyCountValueTypes = pathFeatureKeyCountValueTypes(feature.getKey());
                         long featureCountValueTypes = (getDb().get(ro, bytes(pathFeatureKeyCountValueTypes)) == null ? 0 : Longs.fromByteArray(getDb().get(ro, bytes(pathFeatureKeyCountValueTypes))));
-                        if (explain) {
+                        if (explainData) {
                             explanation.put(pathFeatureKeyCountValueTypes, featureCountValueTypes);
                         }
                         String pathCategoryFeatureKeyValue = pathCategoryFeatureKeyValue(category, feature.getKey(), feature.getValue());
                         long categoryFeatureValueCount = (getDb().get(ro, bytes(pathCategoryFeatureKeyValue)) == null ? 0 : Longs.fromByteArray(getDb().get(ro, bytes(pathCategoryFeatureKeyValue))));
-                        if (explain) {
+                        if (explainData) {
                             explanation.put(pathCategoryFeatureKeyValue, categoryFeatureValueCount);
                         }
                         double basicProbability = (categoryFeatureCount == 0 ? 0 : 1d * (categoryFeatureValueCount + alpha) / (categoryFeatureCount + featureCountValueTypes * alpha));
@@ -153,7 +143,7 @@ public class NaiveBayesClassifierRocksDBLaplacedImpl extends AbstractNaiveBayesC
                 }
                 likelyhoodTot += likelyhood[i];
             }
-            return new ClassificationImpl(likelihoodsToProbas(likelyhood, likelyhoodTot), explanation);
+            return new ClassificationImpl(features, likelihoodsToProbas(likelyhood, likelyhoodTot), explanation, true, variant, alpha);
         } catch (RocksDBException ex) {
             throw new PersistentClassifierException(ex);
         } finally {
