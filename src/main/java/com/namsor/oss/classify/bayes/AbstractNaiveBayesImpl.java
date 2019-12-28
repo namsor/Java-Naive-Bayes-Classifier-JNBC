@@ -2,10 +2,11 @@ package com.namsor.oss.classify.bayes;
 
 /**
  * Functions common to the Naive Bayes Classifier and the Explainer
+ *
  * @author elian
  */
 public class AbstractNaiveBayesImpl {
-    
+
     private static final String KEY_GLOBAL = "gL";
     private static final String KEY_CATEGORY = "cA";
     private static final String KEY_COUNT = "_count";
@@ -44,7 +45,7 @@ public class AbstractNaiveBayesImpl {
     /**
      * Path to the number of observations in a category, with feature featureKey
      *
-     * @param category The category
+     * @param category   The category
      * @param featureKey The feature key
      * @return Path to the number of observations in a category, with feature
      * featureKey
@@ -57,7 +58,7 @@ public class AbstractNaiveBayesImpl {
      * Path to the number of observations with feature featureKey and feature
      * value featureValue
      *
-     * @param featureKey The feature key
+     * @param featureKey   The feature key
      * @param featureValue The feature value
      * @return Path to the number of observations with feature featureKey and
      * feature value featureValue
@@ -90,14 +91,14 @@ public class AbstractNaiveBayesImpl {
      * Path to the number of observations in a category, with feature featureKey
      * and value featureValue
      *
-     * @param category the Category
-     * @param featureKey the featureKey
+     * @param category     the Category
+     * @param featureKey   the featureKey
      * @param featureValue the featureValue
      * @return Path the he number of observations in a category, with feature featureKey and value featureValue
      */
     protected static String pathCategoryFeatureKeyValue(String category, String featureKey, String featureValue) {
         return KEY_GLOBAL + KEY_SEPARATOR + KEY_CATEGORY + KEY_SEPARATOR + category + KEY_SEPARATOR + KEY_FEATURE + KEY_SEPARATOR + featureKey + KEY_FEATURE_EQUAL + featureValue;
     }
-    
+
 
 }

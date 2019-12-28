@@ -1,10 +1,10 @@
 package com.namsor.oss.classify.bayes;
 
-import java.io.StringWriter;
 import java.util.Map;
 
 /**
  * An immutable classification object
+ *
  * @author elian
  */
 public class ClassificationImpl implements IClassification {
@@ -74,6 +74,6 @@ public class ClassificationImpl implements IClassification {
     public double getLaplaceSmoothingAlpha() {
         return laplaceSmoothingAlpha;
     }
-    
+
 
 }

@@ -2,6 +2,7 @@ package com.namsor.oss.classify.bayes;
 
 /**
  * Classification output and probability estimate.
+ *
  * @author elian carsenat, NamSor SAS
  */
 public class ClassProbabilityImpl implements IClassProbability {
@@ -11,7 +12,8 @@ public class ClassProbabilityImpl implements IClassProbability {
 
     /**
      * Create an immutable classification output
-     * @param category The classification category
+     *
+     * @param category    The classification category
      * @param probability The probability (likelyHood/sum(likelyhoods))
      */
     public ClassProbabilityImpl(String category, double probability) {

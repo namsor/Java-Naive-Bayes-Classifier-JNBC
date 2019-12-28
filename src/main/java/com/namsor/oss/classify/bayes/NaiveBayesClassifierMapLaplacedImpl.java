@@ -1,8 +1,6 @@
 package com.namsor.oss.classify.bayes;
 
-import java.io.*;
 import java.util.HashMap;
-
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -22,8 +20,9 @@ public class NaiveBayesClassifierMapLaplacedImpl extends AbstractNaiveBayesClass
 
     /**
      * Create in-memory classifier using ConcurrentHashMap and defaults for Laplace smoothing (ALPHA=1 and VARIANT=false)
+     *
      * @param classifierName The classifier name
-     * @param categories The classification categories
+     * @param categories     The classification categories
      */
     public NaiveBayesClassifierMapLaplacedImpl(String classifierName, String[] categories) {
         this(classifierName, categories, ALPHA, VARIANT);
@@ -33,9 +32,9 @@ public class NaiveBayesClassifierMapLaplacedImpl extends AbstractNaiveBayesClass
      * Create a classifier with in-memory ConcurrentHashMap and Laplace parameters
      *
      * @param classifierName The classifier name
-     * @param categories The classification categories
-     * @param alpha The Laplace alpha, typically 1.0
-     * @param variant The Laplace variant 
+     * @param categories     The classification categories
+     * @param alpha          The Laplace alpha, typically 1.0
+     * @param variant        The Laplace variant
      */
     public NaiveBayesClassifierMapLaplacedImpl(String classifierName, String[] categories, double alpha, boolean variant) {
         super(classifierName, categories);
@@ -46,10 +45,11 @@ public class NaiveBayesClassifierMapLaplacedImpl extends AbstractNaiveBayesClass
 
     /**
      * Create persistent classifier using org.mapdb.HTreeMap and Laplace parameters
-     * @param classifierName The classifier name
-     * @param categories The classification categories
-     * @param alpha The Laplace alpha, typically 1.0
-     * @param variant The Laplace variant 
+     *
+     * @param classifierName   The classifier name
+     * @param categories       The classification categories
+     * @param alpha            The Laplace alpha, typically 1.0
+     * @param variant          The Laplace variant
      * @param rootPathWritable A writable directory for org.mapdb.HTreeMap storage
      */
     public NaiveBayesClassifierMapLaplacedImpl(String classifierName, String[] categories, double alpha, boolean variant, String rootPathWritable) {
@@ -60,15 +60,16 @@ public class NaiveBayesClassifierMapLaplacedImpl extends AbstractNaiveBayesClass
 
     /**
      * Create persistent classifier using org.mapdb.HTreeMap and defaults for Laplace smoothing (ALPHA=1 and VARIANT=false)
-     * @param classifierName The classifier name
-     * @param categories The classification categories
+     *
+     * @param classifierName   The classifier name
+     * @param categories       The classification categories
      * @param rootPathWritable A writable directory for org.mapdb.HTreeMap storage
      */
     public NaiveBayesClassifierMapLaplacedImpl(String classifierName, String[] categories, String rootPathWritable) {
         this(classifierName, categories, ALPHA, VARIANT, rootPathWritable);
     }
-    
-    
+
+
     @Override
     public synchronized void learn(String category, Map<String, String> features, long weight) throws ClassifyException {
         String pathGlobal = pathGlobal();
@@ -162,5 +163,4 @@ public class NaiveBayesClassifierMapLaplacedImpl extends AbstractNaiveBayesClass
         }
         return new ClassificationImpl(features, likelihoodsToProbas(likelyhood, likelyhoodTot), explanation, true, variant, alpha);
     }
-
 }

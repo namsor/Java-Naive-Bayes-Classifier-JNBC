@@ -59,7 +59,7 @@ public abstract class AbstractNaiveBayesClassifierMapImpl extends AbstractNaiveB
     }
     
     @Override
-    public void dbClose() throws PersistentClassifierException {
+    public void dbClose() throws PersistentClassifierException { //todo PersistentClassifierException is never thrown
         if (dbPersistent != null) {
             dbPersistent.close();
         }
@@ -78,7 +78,7 @@ public abstract class AbstractNaiveBayesClassifierMapImpl extends AbstractNaiveB
     }
 
     @Override
-    public long dbSize() throws PersistentClassifierException {
+    public long dbSize() throws PersistentClassifierException { // todo PersistentClassifierException is never thrown
         return getDb().size();
     }
 

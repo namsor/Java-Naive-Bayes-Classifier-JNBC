@@ -1,15 +1,12 @@
 package com.namsor.oss.classify.bayes;
 
 import com.google.common.primitives.Longs;
-import static com.namsor.oss.classify.bayes.AbstractNaiveBayesClassifierImpl.pathCategory;
-import static com.namsor.oss.classify.bayes.AbstractNaiveBayesClassifierImpl.pathGlobal;
-
-import java.io.*;
-import java.util.HashMap;
-
-import java.util.Map;
 import org.iq80.leveldb.ReadOptions;
 import org.iq80.leveldb.WriteBatch;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Naive Bayes Classifier implementation with LevelDB as key/value store.
@@ -21,8 +18,9 @@ public class NaiveBayesClassifierLevelDBImpl extends AbstractNaiveBayesClassifie
 
     /**
      * Create a persistent Naive Bayes Classifier using LevelDB, with default cache size
-     * @param classifierName The classifier name
-     * @param categories The immutable classification categories
+     *
+     * @param classifierName   The classifier name
+     * @param categories       The immutable classification categories
      * @param rootPathWritable The writable directory for LevelDB storage
      * @throws PersistentClassifierException The persistence error and cause
      */
@@ -37,7 +35,7 @@ public class NaiveBayesClassifierLevelDBImpl extends AbstractNaiveBayesClassifie
         WriteBatch batch = getDb().createWriteBatch();
         try {
             String pathGlobal = pathGlobal();
-            batch.put(bytes(pathGlobal), Longs.toByteArray((getDb().get(bytes(pathGlobal), ro) == null ? weight : Longs.fromByteArray(getDb().get(bytes(pathGlobal), ro)) + weight)));
+            batch.put(bytes(pathGlobal), Longs.toByteArray((getDb().get(bytes(pathGlobal), ro) == null ? weight : Longs.fromByteArray(getDb().get(bytes(pathGlobal), ro)) + weight))); //todo duplicated code. Could be extracted to a private method
             String pathCategory = pathCategory(category);
             batch.put(bytes(pathCategory), Longs.toByteArray((getDb().get(bytes(pathCategory), ro) == null ? weight : Longs.fromByteArray(getDb().get(bytes(pathCategory), ro)) + weight)));
             for (Map.Entry<String, String> feature : features.entrySet()) {
