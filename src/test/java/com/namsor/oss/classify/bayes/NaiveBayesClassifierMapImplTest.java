@@ -1,40 +1,28 @@
 package com.namsor.oss.classify.bayes;
 
-import com.namsor.oss.samples.MainSample3;
 import com.namsor.oss.samples.MainSample1;
-import static com.namsor.oss.samples.MainSample1.NO;
-import static com.namsor.oss.samples.MainSample1.YES;
-import static com.namsor.oss.samples.MainSample1.colName;
-import static com.namsor.oss.samples.MainSample1.data;
-import static com.namsor.oss.samples.MainSample2.ONE;
-import static com.namsor.oss.samples.MainSample2.X1;
-import static com.namsor.oss.samples.MainSample2.X2;
-import static com.namsor.oss.samples.MainSample2.Y;
-import static com.namsor.oss.samples.MainSample2.ZERO;
-import static com.namsor.oss.samples.MainSample3.BANANA;
-import static com.namsor.oss.samples.MainSample3.ORANGE;
-import static com.namsor.oss.samples.MainSample3.OTHER;
-import static com.namsor.oss.samples.MainSample3.colName;
-import static com.namsor.oss.samples.MainSample3.data;
+import com.namsor.oss.samples.MainSample3;
+import org.junit.*;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import static org.junit.Assert.*;
 
-/**
- *
+import static com.namsor.oss.samples.MainSample1.NO;
+import static com.namsor.oss.samples.MainSample1.YES;
+import static com.namsor.oss.samples.MainSample2.*;
+import static com.namsor.oss.samples.MainSample3.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+/** todo remove
  * @author elian
  */
 public class NaiveBayesClassifierMapImplTest {
 
     private static final String MAPDB_DIR = "/tmp/mapdb";
 
-    public NaiveBayesClassifierMapImplTest() {
+    public NaiveBayesClassifierMapImplTest() { //todo remove
     }
 
     @BeforeClass
@@ -48,6 +36,7 @@ public class NaiveBayesClassifierMapImplTest {
 
     }
 
+    // todo methods that don't do anything
     @AfterClass
     public static void tearDownClass() {
     }
@@ -80,7 +69,7 @@ public class NaiveBayesClassifierMapImplTest {
         features.put("temp", "Cool");
         features.put("humidity", "High");
         features.put("wind", "Strong");
-        IClassification predict = bayes.classify(features,true);
+        IClassification predict = bayes.classify(features, true);
         assertNotNull(predict);
         assertEquals(predict.getClassProbabilities().length, 2);
         assertEquals(predict.getClassProbabilities()[0].getCategory(), "No");
@@ -96,7 +85,7 @@ public class NaiveBayesClassifierMapImplTest {
     @Test
     public void testLearnClassifySampleMapDB1() throws Exception {
         String[] cats = {YES, NO};
-        NaiveBayesClassifierMapImpl bayes = new NaiveBayesClassifierMapImpl("tennis", cats, MAPDB_DIR+System.currentTimeMillis());
+        NaiveBayesClassifierMapImpl bayes = new NaiveBayesClassifierMapImpl("tennis", cats, MAPDB_DIR + System.currentTimeMillis());
         for (int i = 0; i < MainSample1.data.length; i++) {
             Map<String, String> features = new HashMap();
             for (int j = 0; j < MainSample1.colName.length - 1; j++) {
@@ -109,7 +98,7 @@ public class NaiveBayesClassifierMapImplTest {
         features.put("temp", "Cool");
         features.put("humidity", "High");
         features.put("wind", "Strong");
-        IClassification predict = bayes.classify(features,true);
+        IClassification predict = bayes.classify(features, true);
         assertNotNull(predict);
         assertEquals(predict.getClassProbabilities().length, 2);
         assertEquals(predict.getClassProbabilities()[0].getCategory(), "No");
@@ -143,7 +132,7 @@ public class NaiveBayesClassifierMapImplTest {
         Map<String, String> features = new HashMap();
         features.put("X1", "B");
         features.put("X2", "S");
-        IClassification predict = bayes.classify(features,true);
+        IClassification predict = bayes.classify(features, true);
         assertNotNull(predict);
         assertEquals(predict.getClassProbabilities().length, 2);
         assertEquals(predict.getClassProbabilities()[0].getCategory(), "0");
@@ -161,7 +150,7 @@ public class NaiveBayesClassifierMapImplTest {
         String[] cats = {ZERO, ONE};
         // Create a new bayes classifier with string categories and string features.
         // INaiveBayesClassifier bayes1 = new NaiveBayesClassifierLevelDBImpl("sentiment", cats, ".", 100);
-        NaiveBayesClassifierMapImpl bayes = new NaiveBayesClassifierMapImpl("sentiment", cats, MAPDB_DIR+System.currentTimeMillis());
+        NaiveBayesClassifierMapImpl bayes = new NaiveBayesClassifierMapImpl("sentiment", cats, MAPDB_DIR + System.currentTimeMillis());
         //NaiveBayesClassifierRocksDBImpl bayes = new NaiveBayesClassifierRocksDBImpl("intro", cats, ".", 100);
 
 // Examples to learn from.
@@ -176,14 +165,14 @@ public class NaiveBayesClassifierMapImplTest {
         Map<String, String> features = new HashMap();
         features.put("X1", "B");
         features.put("X2", "S");
-        IClassification predict = bayes.classify(features,true);
+        IClassification predict = bayes.classify(features, true);
         assertNotNull(predict);
         assertEquals(predict.getClassProbabilities().length, 2);
         assertEquals(predict.getClassProbabilities()[0].getCategory(), "0");
         assertEquals(predict.getClassProbabilities()[1].getCategory(), "1");
         assertEquals(predict.getClassProbabilities()[0].getProbability(), 0.75, .0001);
         assertEquals(predict.getClassProbabilities()[1].getProbability(), 0.25, .0001);
-        bayes.dbCloseAndDestroy();        
+        bayes.dbCloseAndDestroy();
     }
 
     /**
@@ -216,7 +205,7 @@ public class NaiveBayesClassifierMapImplTest {
         features.put("Sweet", "Yes");
         features.put("Yellow", "Yes");
         features.put("Dummy", "Yes");
-        IClassification predict = bayes.classify(features,true);
+        IClassification predict = bayes.classify(features, true);
         assertNotNull(predict);
         assertEquals(predict.getClassProbabilities().length, 3);
         assertEquals(predict.getClassProbabilities()[0].getCategory(), BANANA);
@@ -235,7 +224,7 @@ public class NaiveBayesClassifierMapImplTest {
     public void testLearnClassifyMapDBSample3() throws Exception {
         String[] cats = {BANANA, ORANGE, OTHER};
         // Create a new bayes classifier with string categories and string features.
-        NaiveBayesClassifierMapImpl bayes = new NaiveBayesClassifierMapImpl("fruit", cats, MAPDB_DIR+System.currentTimeMillis());
+        NaiveBayesClassifierMapImpl bayes = new NaiveBayesClassifierMapImpl("fruit", cats, MAPDB_DIR + System.currentTimeMillis());
         //NaiveBayesClassifierTransientLaplacedImpl bayes = new NaiveBayesClassifierTransientLaplacedImpl("fruit", cats);
         //NaiveBayesClassifierRocksDBImpl bayes = new NaiveBayesClassifierRocksDBImpl("intro", cats, ".", 100);
 
@@ -257,7 +246,7 @@ public class NaiveBayesClassifierMapImplTest {
         features.put("Sweet", "Yes");
         features.put("Yellow", "Yes");
         features.put("Dummy", "Yes");
-        IClassification predict = bayes.classify(features,true);
+        IClassification predict = bayes.classify(features, true);
         assertNotNull(predict);
         assertEquals(predict.getClassProbabilities().length, 3);
         assertEquals(predict.getClassProbabilities()[0].getCategory(), BANANA);
@@ -266,7 +255,7 @@ public class NaiveBayesClassifierMapImplTest {
         assertEquals(predict.getClassProbabilities()[0].getProbability(), 0.9307479224376731, .0001);
         assertEquals(predict.getClassProbabilities()[1].getProbability(), 0.06925207756232689, .0001);
         assertEquals(predict.getClassProbabilities()[2].getProbability(), 0, .0001);
-        bayes.dbCloseAndDestroy();                
+        bayes.dbCloseAndDestroy();
     }
 
 }

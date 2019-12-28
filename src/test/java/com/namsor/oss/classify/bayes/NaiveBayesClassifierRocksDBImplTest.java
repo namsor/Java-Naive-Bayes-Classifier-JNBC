@@ -1,37 +1,32 @@
 package com.namsor.oss.classify.bayes;
 
 import com.namsor.oss.samples.MainSample3;
-import static com.namsor.oss.samples.MainSample1.NO;
-import static com.namsor.oss.samples.MainSample1.YES;
-import static com.namsor.oss.samples.MainSample1.colName;
-import static com.namsor.oss.samples.MainSample1.data;
-import static com.namsor.oss.samples.MainSample2.ONE;
-import static com.namsor.oss.samples.MainSample2.X1;
-import static com.namsor.oss.samples.MainSample2.X2;
-import static com.namsor.oss.samples.MainSample2.Y;
-import static com.namsor.oss.samples.MainSample2.ZERO;
-import static com.namsor.oss.samples.MainSample3.BANANA;
-import static com.namsor.oss.samples.MainSample3.ORANGE;
-import static com.namsor.oss.samples.MainSample3.OTHER;
+import org.junit.*;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import static org.junit.Assert.*;
+
+import static com.namsor.oss.samples.MainSample1.colName;
+import static com.namsor.oss.samples.MainSample1.data;
+import static com.namsor.oss.samples.MainSample1.*;
+import static com.namsor.oss.samples.MainSample2.*;
+import static com.namsor.oss.samples.MainSample3.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
+ * todo comment remoe
  *
  * @author elian
  */
 public class NaiveBayesClassifierRocksDBImplTest {
     private static final String ROCKSDB_DIR = "/tmp/rocksdb";
+
     public NaiveBayesClassifierRocksDBImplTest() {
     }
 
+    //todo methods don't do anything
     @BeforeClass
     public static void setUpClass() {
     }
@@ -43,7 +38,7 @@ public class NaiveBayesClassifierRocksDBImplTest {
     @Before
     public void setUp() {
         File rocksdb = new File(ROCKSDB_DIR);
-        if( rocksdb.exists() && rocksdb.isDirectory() ) {
+        if (rocksdb.exists() && rocksdb.isDirectory()) {
             // ok
         } else {
             rocksdb.mkdirs();
@@ -74,7 +69,7 @@ public class NaiveBayesClassifierRocksDBImplTest {
         features.put("temp", "Cool");
         features.put("humidity", "High");
         features.put("wind", "Strong");
-        IClassification predict = bayes.classify(features,true);
+        IClassification predict = bayes.classify(features, true);
         assertNotNull(predict);
         assertEquals(predict.getClassProbabilities().length, 2);
         assertEquals(predict.getClassProbabilities()[0].getCategory(), "No");
@@ -108,7 +103,7 @@ public class NaiveBayesClassifierRocksDBImplTest {
         Map<String, String> features = new HashMap();
         features.put("X1", "B");
         features.put("X2", "S");
-        IClassification predict = bayes.classify(features,true);
+        IClassification predict = bayes.classify(features, true);
         assertNotNull(predict);
         assertEquals(predict.getClassProbabilities().length, 2);
         assertEquals(predict.getClassProbabilities()[0].getCategory(), "0");
@@ -116,10 +111,9 @@ public class NaiveBayesClassifierRocksDBImplTest {
         assertEquals(predict.getClassProbabilities()[0].getProbability(), 0.75, .0001);
         assertEquals(predict.getClassProbabilities()[1].getProbability(), 0.25, .0001);
         bayes.dbCloseAndDestroy();
-        
+
     }
 
-    
 
     /**
      * Test based on
@@ -151,7 +145,7 @@ public class NaiveBayesClassifierRocksDBImplTest {
         features.put("Sweet", "Yes");
         features.put("Yellow", "Yes");
         features.put("Dummy", "Yes");
-        IClassification predict = bayes.classify(features,true);
+        IClassification predict = bayes.classify(features, true);
         assertNotNull(predict);
         assertEquals(predict.getClassProbabilities().length, 3);
         assertEquals(predict.getClassProbabilities()[0].getCategory(), BANANA);
@@ -161,5 +155,5 @@ public class NaiveBayesClassifierRocksDBImplTest {
         assertEquals(predict.getClassProbabilities()[1].getProbability(), 0.06925207756232689, .0001);
         assertEquals(predict.getClassProbabilities()[2].getProbability(), 0, .0001);
     }
-    
+
 }

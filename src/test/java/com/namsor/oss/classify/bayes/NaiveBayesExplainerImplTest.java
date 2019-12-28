@@ -1,30 +1,23 @@
 package com.namsor.oss.classify.bayes;
 
-import com.namsor.oss.samples.MainSample3;
 import com.namsor.oss.samples.MainSample1;
-import static com.namsor.oss.samples.MainSample1.NO;
-import static com.namsor.oss.samples.MainSample1.YES;
-import static com.namsor.oss.samples.MainSample2.ONE;
-import static com.namsor.oss.samples.MainSample2.X1;
-import static com.namsor.oss.samples.MainSample2.X2;
-import static com.namsor.oss.samples.MainSample2.Y;
-import static com.namsor.oss.samples.MainSample2.ZERO;
-import static com.namsor.oss.samples.MainSample3.BANANA;
-import static com.namsor.oss.samples.MainSample3.ORANGE;
-import static com.namsor.oss.samples.MainSample3.OTHER;
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
+import com.namsor.oss.samples.MainSample3;
+import org.junit.*;
+
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.namsor.oss.samples.MainSample1.NO;
+import static com.namsor.oss.samples.MainSample1.YES;
+import static com.namsor.oss.samples.MainSample2.*;
+import static com.namsor.oss.samples.MainSample3.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
+ * todo remove cooment
  *
  * @author elian
  */
@@ -33,6 +26,7 @@ public class NaiveBayesExplainerImplTest {
     public NaiveBayesExplainerImplTest() {
     }
 
+    //todo methods don't do anything
     @BeforeClass
     public static void setUpClass() {
     }
@@ -69,7 +63,7 @@ public class NaiveBayesExplainerImplTest {
         features.put("temp", "Cool");
         features.put("humidity", "High");
         features.put("wind", "Strong");
-        IClassification predict = bayes.classify(features,true);
+        IClassification predict = bayes.classify(features, true);
         assertNotNull(predict);
         assertEquals(predict.getClassProbabilities().length, 2);
         assertEquals(predict.getClassProbabilities()[0].getCategory(), "No");
@@ -112,7 +106,7 @@ public class NaiveBayesExplainerImplTest {
         Map<String, String> features = new HashMap();
         features.put("X1", "B");
         features.put("X2", "S");
-        IClassification predict = bayes.classify(features,true);
+        IClassification predict = bayes.classify(features, true);
         assertNotNull(predict);
         assertEquals(predict.getClassProbabilities().length, 2);
         assertEquals(predict.getClassProbabilities()[0].getCategory(), "0");
@@ -150,17 +144,15 @@ public class NaiveBayesExplainerImplTest {
             features.put(MainSample3.colName[3], MainSample3.data[i][3]);
             bayes.learn(MainSample3.data[i][0], features, Long.parseLong(MainSample3.data[i][4]));
         }
-        /**
-         * Calculate the likelihood that: Long, Sweet, Yellow is a Banana
-         */
 
+        // Calculate the likelihood that: Long, Sweet, Yellow is a Banana
         // Here are is X(B,S) to classify.
         Map<String, String> features = new HashMap();
         features.put("Long", "Yes");
         features.put("Sweet", "Yes");
         features.put("Yellow", "Yes");
         features.put("Dummy", "Yes");
-        IClassification predict = bayes.classify(features,true);
+        IClassification predict = bayes.classify(features, true);
         assertNotNull(predict);
         assertEquals(predict.getClassProbabilities().length, 3);
         assertEquals(predict.getClassProbabilities()[0].getCategory(), BANANA);
@@ -178,7 +170,7 @@ public class NaiveBayesExplainerImplTest {
         // JavaScript code from String
         Double ob = (Double) scriptEngine.eval(explained.toString());
         assertEquals(ob, 0.9307479224376731, .0001);
-        
+
     }
 
 }

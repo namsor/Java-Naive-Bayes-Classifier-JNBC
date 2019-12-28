@@ -1,34 +1,28 @@
 package com.namsor.oss.classify.bayes;
 
 import com.namsor.oss.samples.MainSample3;
-import static com.namsor.oss.samples.MainSample1.NO;
-import static com.namsor.oss.samples.MainSample1.YES;
-import static com.namsor.oss.samples.MainSample1.colName;
-import static com.namsor.oss.samples.MainSample1.data;
-import static com.namsor.oss.samples.MainSample2.ONE;
-import static com.namsor.oss.samples.MainSample2.X1;
-import static com.namsor.oss.samples.MainSample2.X2;
-import static com.namsor.oss.samples.MainSample2.Y;
-import static com.namsor.oss.samples.MainSample2.ZERO;
-import static com.namsor.oss.samples.MainSample3.BANANA;
-import static com.namsor.oss.samples.MainSample3.ORANGE;
-import static com.namsor.oss.samples.MainSample3.OTHER;
+import org.junit.*;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import static org.junit.Assert.*;
+
+import static com.namsor.oss.samples.MainSample1.colName;
+import static com.namsor.oss.samples.MainSample1.data;
+import static com.namsor.oss.samples.MainSample1.*;
+import static com.namsor.oss.samples.MainSample2.*;
+import static com.namsor.oss.samples.MainSample3.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+//todo remove comment
 
 /**
- *
  * @author elian
  */
 public class NaiveBayesClassifierLevelDBImplTest {
     private static final String LEVELDB_DIR = "/tmp/leveldb";
+
     public NaiveBayesClassifierLevelDBImplTest() {
     }
 
@@ -43,7 +37,11 @@ public class NaiveBayesClassifierLevelDBImplTest {
     @Before
     public void setUp() {
         File leveldb = new File(LEVELDB_DIR);
-        if( leveldb.exists() && leveldb.isDirectory() ) {
+        /**
+         * todo simplify
+         *         if( !leveldb.exists() || !leveldb.isDirectory() ) { leveldb.mkdirs(); }
+         */
+        if (leveldb.exists() && leveldb.isDirectory()) {
             // ok
         } else {
             leveldb.mkdirs();
@@ -74,7 +72,7 @@ public class NaiveBayesClassifierLevelDBImplTest {
         features.put("temp", "Cool");
         features.put("humidity", "High");
         features.put("wind", "Strong");
-        IClassification predict = bayes.classify(features,true);
+        IClassification predict = bayes.classify(features, true);
         assertNotNull(predict);
         assertEquals(predict.getClassProbabilities().length, 2);
         assertEquals(predict.getClassProbabilities()[0].getCategory(), "No");
@@ -108,7 +106,7 @@ public class NaiveBayesClassifierLevelDBImplTest {
         Map<String, String> features = new HashMap();
         features.put("X1", "B");
         features.put("X2", "S");
-        IClassification predict = bayes.classify(features,true);
+        IClassification predict = bayes.classify(features, true);
         assertNotNull(predict);
         assertEquals(predict.getClassProbabilities().length, 2);
         assertEquals(predict.getClassProbabilities()[0].getCategory(), "0");
@@ -116,10 +114,8 @@ public class NaiveBayesClassifierLevelDBImplTest {
         assertEquals(predict.getClassProbabilities()[0].getProbability(), 0.75, .0001);
         assertEquals(predict.getClassProbabilities()[1].getProbability(), 0.25, .0001);
         bayes.dbCloseAndDestroy();
-        
     }
 
-    
 
     /**
      * Test based on
@@ -130,7 +126,7 @@ public class NaiveBayesClassifierLevelDBImplTest {
         String[] cats = {BANANA, ORANGE, OTHER};
         // Create a new bayes classifier with string categories and string features.
         NaiveBayesClassifierLevelDBImpl bayes = new NaiveBayesClassifierLevelDBImpl("fruit", cats, LEVELDB_DIR);
-        //NaiveBayesClassifierTransientLaplacedImpl bayes = new NaiveBayesClassifierTransientLaplacedImpl("fruit", cats);
+        //NaiveBayesClassifierTransientLaplacedImpl bayes = new NaiveBayesClassifierTransientLaplacedImpl("fruit", cats); //todo remove this or write comment why they are commented out
         //NaiveBayesClassifierLevelDBImpl bayes = new NaiveBayesClassifierLevelDBImpl("intro", cats, ".", 100);
 
         // Examples to learn from.
@@ -151,7 +147,7 @@ public class NaiveBayesClassifierLevelDBImplTest {
         features.put("Sweet", "Yes");
         features.put("Yellow", "Yes");
         features.put("Dummy", "Yes");
-        IClassification predict = bayes.classify(features,true);
+        IClassification predict = bayes.classify(features, true);
         assertNotNull(predict);
         assertEquals(predict.getClassProbabilities().length, 3);
         assertEquals(predict.getClassProbabilities()[0].getCategory(), BANANA);
@@ -161,5 +157,5 @@ public class NaiveBayesClassifierLevelDBImplTest {
         assertEquals(predict.getClassProbabilities()[1].getProbability(), 0.06925207756232689, .0001);
         assertEquals(predict.getClassProbabilities()[2].getProbability(), 0, .0001);
     }
-    
+
 }
