@@ -1,15 +1,12 @@
 package com.namsor.oss.classify.bayes;
 
 import com.google.common.primitives.Longs;
-import static com.namsor.oss.classify.bayes.AbstractNaiveBayesClassifierImpl.pathCategory;
-import static com.namsor.oss.classify.bayes.AbstractNaiveBayesClassifierImpl.pathGlobal;
-
-import java.io.*;
-import java.util.HashMap;
-
-import java.util.Map;
 import org.iq80.leveldb.ReadOptions;
 import org.iq80.leveldb.WriteBatch;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Naive Bayes Classifier implementation with Laplace smoothing and LevelDB as
@@ -26,11 +23,12 @@ public class NaiveBayesClassifierLevelDBLaplacedImpl extends AbstractNaiveBayesC
 
     /**
      * Create a Naive Bayes Classifier implementation with Laplace smoothing and LevelDB as key/value store.
-     * @param classifierName The classifier name
-     * @param categories The classification categories
+     *
+     * @param classifierName   The classifier name
+     * @param categories       The classification categories
      * @param rootPathWritable A writable path for LevelDB storage
-     * @param alpha The laplace Alpha, usually 1.0
-     * @param variant True for variant likelyhood[i] = 1d * ((categoryCount + alpha) / (globalCount + globalCountCategories * alpha)) * product;
+     * @param alpha            The laplace Alpha, usually 1.0
+     * @param variant          True for variant likelyhood[i] = 1d * ((categoryCount + alpha) / (globalCount + globalCountCategories * alpha)) * product;
      * @throws PersistentClassifierException The persistence error and cause
      */
     public NaiveBayesClassifierLevelDBLaplacedImpl(String classifierName, String[] categories, String rootPathWritable, double alpha, boolean variant) throws PersistentClassifierException {
@@ -41,8 +39,9 @@ public class NaiveBayesClassifierLevelDBLaplacedImpl extends AbstractNaiveBayesC
 
     /**
      * Create a Naive Bayes Classifier implementation with Laplace smoothing and LevelDB as key/value store, with defaults ALPHA=1 and VARIANT=false
-     * @param classifierName The classifier name
-     * @param categories The classification categories
+     *
+     * @param classifierName   The classifier name
+     * @param categories       The classification categories
      * @param rootPathWritable A writable path for LevelDB storage
      * @throws PersistentClassifierException The persistence error and cause
      */

@@ -21,7 +21,7 @@ import javax.script.ScriptEngineManager;
  */
 public class MainSample1 {
 
-    public static final String YES = "Yes";
+    public static final String YES = "Yes"; // todo Remove these constants to a separate class so the data can be shared among other classes and to reduce duplication. This applies to all files in the samples package
     public static final String NO = "No";
     /**
      * Header table as per https://taylanbil.github.io/boostedNB or

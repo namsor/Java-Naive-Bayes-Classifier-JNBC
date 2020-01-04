@@ -17,7 +17,7 @@ public interface IClassProbability {
     /**
      * Probability
      *
-     * @return  he probability (likelyHood/sum(likelyhoods))
+     * @return he probability (likelyHood/sum(likelyhoods))
      */
     double getProbability();
 

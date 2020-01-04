@@ -2,6 +2,7 @@ package com.namsor.oss.classify.bayes;
 
 /**
  * Classification exception (except persistence related).
+ *
  * @author elian carsenat, NamSor SAS
  */
 public class ClassifyException extends Exception {
@@ -17,5 +18,5 @@ public class ClassifyException extends Exception {
     public ClassifyException(Throwable cause) {
         super(cause);
     }
-    
+
 }

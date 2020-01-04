@@ -1,30 +1,24 @@
 package com.namsor.oss.classify.bayes;
 
-import static com.namsor.oss.samples.MainSample1.NO;
-import static com.namsor.oss.samples.MainSample1.YES;
-import static com.namsor.oss.samples.MainSample1.colName;
-import static com.namsor.oss.samples.MainSample1.data;
-import static com.namsor.oss.samples.MainSample2.ONE;
-import static com.namsor.oss.samples.MainSample2.X1;
-import static com.namsor.oss.samples.MainSample2.X2;
-import static com.namsor.oss.samples.MainSample2.Y;
-import static com.namsor.oss.samples.MainSample2.ZERO;
+import org.junit.*;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import static org.junit.Assert.*;
+
+import static com.namsor.oss.samples.MainSample1.*;
+import static com.namsor.oss.samples.MainSample2.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
+ * todo remove comment
  *
  * @author elian
  */
 public class NaiveBayesClassifierLevelDBLaplacedImplTest {
     private static final String LEVELDB_DIR = "/tmp/leveldb";
+
     public NaiveBayesClassifierLevelDBLaplacedImplTest() {
     }
 
@@ -39,7 +33,7 @@ public class NaiveBayesClassifierLevelDBLaplacedImplTest {
     @Before
     public void setUp() {
         File leveldb = new File(LEVELDB_DIR);
-        if( leveldb.exists() && leveldb.isDirectory() ) {
+        if (leveldb.exists() && leveldb.isDirectory()) { //todo simplify using negation
             // ok
         } else {
             leveldb.mkdirs();
@@ -47,7 +41,7 @@ public class NaiveBayesClassifierLevelDBLaplacedImplTest {
     }
 
     @After
-    public void tearDown() {
+    public void tearDown() { //todo remove
     }
 
     /**
@@ -70,7 +64,7 @@ public class NaiveBayesClassifierLevelDBLaplacedImplTest {
         features.put("temp", "Cool");
         features.put("humidity", "High");
         features.put("wind", "Strong");
-        IClassification predict = bayes.classify(features,true);
+        IClassification predict = bayes.classify(features, true);
         assertNotNull(predict);
         assertEquals(predict.getClassProbabilities().length, 2);
         assertEquals(predict.getClassProbabilities()[0].getCategory(), "Yes");
@@ -78,7 +72,7 @@ public class NaiveBayesClassifierLevelDBLaplacedImplTest {
         assertEquals(predict.getClassProbabilities()[0].getProbability(), 0.7215830648872527, .0001);
         assertEquals(predict.getClassProbabilities()[1].getProbability(), 0.2784169351127473, .0001);
         bayes.dbCloseAndDestroy();
-        
+
     }
 
     /**
@@ -105,7 +99,7 @@ public class NaiveBayesClassifierLevelDBLaplacedImplTest {
         Map<String, String> features = new HashMap();
         features.put("X1", "B");
         features.put("X2", "S");
-        IClassification predict = bayes.classify(features,true);
+        IClassification predict = bayes.classify(features, true);
         assertNotNull(predict);
         assertEquals(predict.getClassProbabilities().length, 2);
         assertEquals(predict.getClassProbabilities()[0].getCategory(), "0");
@@ -113,7 +107,6 @@ public class NaiveBayesClassifierLevelDBLaplacedImplTest {
         assertEquals(predict.getClassProbabilities()[0].getProbability(), 0.6511627906976744, .0001);
         assertEquals(predict.getClassProbabilities()[1].getProbability(), 0.3488372093023256, .0001);
         bayes.dbCloseAndDestroy();
-        
     }
 
 }

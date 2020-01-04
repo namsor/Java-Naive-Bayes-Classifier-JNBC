@@ -37,6 +37,7 @@
     </developers>	
     <dependencies>	
         <dependency>
+            <!-- todo Migrate to jUnit 5 -->
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.12</version>

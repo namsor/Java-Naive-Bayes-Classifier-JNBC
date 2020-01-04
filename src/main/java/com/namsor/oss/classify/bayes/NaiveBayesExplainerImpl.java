@@ -6,10 +6,11 @@ import java.util.Map;
 
 /**
  * Explain the details of the Naive Bayes Classification, ie. formulae and algebraic
- * expression. This will re-run the algorithm but append additional information : 
+ * expression. This will re-run the algorithm but append additional information :
  * - likelyhood values
  * - likelyhood formulae
  * - likelyhood expressions
+ *
  * @author elian
  */
 public class NaiveBayesExplainerImpl extends AbstractNaiveBayesImpl implements INaiveBayesExplainer {
@@ -29,7 +30,9 @@ public class NaiveBayesExplainerImpl extends AbstractNaiveBayesImpl implements I
         long globalCount = (classification.getExplanationData().containsKey(pathGlobal) ? classification.getExplanationData().get(pathGlobal) : 0);
         long globalCountCategories = (classification.getExplanationData().containsKey(pathGlobalCountCategories) ? classification.getExplanationData().get(pathGlobalCountCategories) : 0);
         double[] likelyhood = new double[classification.getClassProbabilities().length];
-        double likelyhoodTot = 0;
+        double likelyhoodTot = 0; // todo separate variables and loops/statements with an empty row. This applies to all classes. Increases readability
+        // todo Also, try to have more short methods instad of one huge method
+
         for (int i = 0; i < classification.getClassProbabilities().length; i++) {
             StringWriter formula = new StringWriter();
             StringWriter algebraicExpression = new StringWriter();
@@ -37,9 +40,11 @@ public class NaiveBayesExplainerImpl extends AbstractNaiveBayesImpl implements I
             String pathCategory = pathCategory(category);
             long categoryCount = (classification.getExplanationData().containsKey(pathCategory) ? classification.getExplanationData().get(pathCategory) : 0);
             double product = 1.0d;
+
             for (Map.Entry<String, String> feature : classification.getFeatures().entrySet()) {
                 String pathFeatureKey = pathFeatureKey(feature.getKey());
                 long featureCount = (classification.getExplanationData().containsKey(pathFeatureKey) ? classification.getExplanationData().get(pathFeatureKey) : 0);
+
                 if (featureCount > 0) {
                     String pathCategoryFeatureKey = pathCategoryFeatureKey(category, feature.getKey());
                     long categoryFeatureCount = (classification.getExplanationData().containsKey(pathCategoryFeatureKey) ? classification.getExplanationData().get(pathCategoryFeatureKey) : 0);
@@ -47,8 +52,10 @@ public class NaiveBayesExplainerImpl extends AbstractNaiveBayesImpl implements I
                     long featureCountValueTypes = (classification.getExplanationData().containsKey(pathFeatureKeyCountValueTypes) ? classification.getExplanationData().get(pathFeatureKeyCountValueTypes) : 0);
                     String pathCategoryFeatureKeyValue = pathCategoryFeatureKeyValue(category, feature.getKey(), feature.getValue());
                     long categoryFeatureValueCount = (classification.getExplanationData().containsKey(pathCategoryFeatureKeyValue) ? classification.getExplanationData().get(pathCategoryFeatureKeyValue) : 0);
+
                     if (classification.isLaplaceSmoothed()) {
                         double basicProbability = (categoryFeatureCount == 0 ? 0 : 1d * (categoryFeatureValueCount + classification.getLaplaceSmoothingAlpha()) / (categoryFeatureCount + featureCountValueTypes * classification.getLaplaceSmoothingAlpha()));
+
                         if (categoryFeatureCount == 0) {
                             formula.append(pathCategoryFeatureKey);
                             algebraicExpression.append("0");
@@ -99,5 +106,6 @@ public class NaiveBayesExplainerImpl extends AbstractNaiveBayesImpl implements I
         }
         return new ClassificationExplainedImpl(classification, likelyhood, formulae, algebraicExpressions);
     }
+
     private static final double EPSILON = 0.00001;
 }

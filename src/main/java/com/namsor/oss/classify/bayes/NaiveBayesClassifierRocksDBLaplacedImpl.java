@@ -1,17 +1,13 @@
 package com.namsor.oss.classify.bayes;
 
 import com.google.common.primitives.Longs;
-import static com.namsor.oss.classify.bayes.AbstractNaiveBayesClassifierImpl.pathCategory;
-import static com.namsor.oss.classify.bayes.AbstractNaiveBayesClassifierImpl.pathGlobal;
-
-import java.io.*;
-import java.util.HashMap;
-
-import java.util.Map;
 import org.rocksdb.ReadOptions;
 import org.rocksdb.RocksDBException;
 import org.rocksdb.WriteBatch;
 import org.rocksdb.WriteOptions;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Naive Bayes Classifier with Laplace smoothing and implementation with RocksDB
@@ -28,11 +24,12 @@ public class NaiveBayesClassifierRocksDBLaplacedImpl extends AbstractNaiveBayesC
 
     /**
      * Create a Naive Bayes Classifier implementation with RocksDB as key/value store.
-     * @param classifierName The classifier name
-     * @param categories The classification categories
+     *
+     * @param classifierName   The classifier name
+     * @param categories       The classification categories
      * @param rootPathWritable A writable path for RocksDB
-     * @param alpha The Laplace alpha, typically 1.0
-     * @param variant The Laplace variant 
+     * @param alpha            The Laplace alpha, typically 1.0
+     * @param variant          The Laplace variant
      * @throws PersistentClassifierException The persistence error and cause
      */
 
@@ -44,8 +41,9 @@ public class NaiveBayesClassifierRocksDBLaplacedImpl extends AbstractNaiveBayesC
 
     /**
      * Create a Naive Bayes Classifier implementation with RocksDB as key/value store and defaults for Laplace smoothing (ALPHA=1 and VARIANT=false)
-     * @param classifierName The classifier name
-     * @param categories The classification categories
+     *
+     * @param classifierName   The classifier name
+     * @param categories       The classification categories
      * @param rootPathWritable A writable path for RocksDB
      * @throws PersistentClassifierException The persistence error and cause
      */

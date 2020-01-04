@@ -20,7 +20,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- *
+ * todo remove comment
  * @author elian
  */
 public class NaiveBayesClassifierRocksDBLaplacedImplTest {
@@ -28,6 +28,7 @@ public class NaiveBayesClassifierRocksDBLaplacedImplTest {
     public NaiveBayesClassifierRocksDBLaplacedImplTest() {
     }
 
+    // todo methods don't don anything
     @BeforeClass
     public static void setUpClass() {
     }

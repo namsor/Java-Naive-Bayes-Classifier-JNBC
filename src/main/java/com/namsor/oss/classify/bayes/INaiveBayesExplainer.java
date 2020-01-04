@@ -3,6 +3,7 @@ package com.namsor.oss.classify.bayes;
 /**
  * Explain the details of the classification, ie. formulae and algebraic
  * expression.
+ *
  * @author elian
  */
 public interface INaiveBayesExplainer {
@@ -12,7 +13,7 @@ public interface INaiveBayesExplainer {
      * expression.
      *
      * @param classification A classification, with the explainData needed for
-     * explanation
+     *                       explanation
      * @return An explanation of the classification, ie. formulae and algebraic
      * expression.
      * @throws ClassifyException The error and cause

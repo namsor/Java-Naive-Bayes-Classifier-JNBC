@@ -1,17 +1,13 @@
 package com.namsor.oss.classify.bayes;
 
 import com.google.common.primitives.Longs;
-import static com.namsor.oss.classify.bayes.AbstractNaiveBayesClassifierImpl.pathCategory;
-import static com.namsor.oss.classify.bayes.AbstractNaiveBayesClassifierImpl.pathGlobal;
-
-import java.io.*;
-import java.util.HashMap;
-
-import java.util.Map;
 import org.rocksdb.ReadOptions;
 import org.rocksdb.RocksDBException;
 import org.rocksdb.WriteBatch;
 import org.rocksdb.WriteOptions;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Naive Bayes Classifier implementation with RocksDB as key/value store.
@@ -23,8 +19,9 @@ public class NaiveBayesClassifierRocksDBImpl extends AbstractNaiveBayesClassifie
 
     /**
      * Create a Naive Bayes Classifier implementation with RocksDB as key/value store.
-     * @param classifierName The classifier name
-     * @param categories The classification categories
+     *
+     * @param classifierName   The classifier name
+     * @param categories       The classification categories
      * @param rootPathWritable A writable path for RocksDB
      * @throws PersistentClassifierException The persistence error and cause
      */
@@ -116,7 +113,5 @@ public class NaiveBayesClassifierRocksDBImpl extends AbstractNaiveBayesClassifie
             // Make sure you close the snapshot to avoid resource leaks.
             ro.snapshot().close();
         }
-
     }
-
 }

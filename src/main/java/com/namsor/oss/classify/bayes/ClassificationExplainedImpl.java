@@ -1,22 +1,19 @@
 package com.namsor.oss.classify.bayes;
 
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * The detailed explanation of a classification :
  * - likelyhood values
  * - likelyhood formulae (in a readable format)
  * - likelyhood expressions (in a readable format)
- * The toString() function generates a JavaScript that can interpreted 
+ * The toString() function generates a JavaScript that can interpreted
+ *
  * @author elian
  */
 public class ClassificationExplainedImpl implements IClassificationExplained {
-    private static Comparator KEY_ORDER = new Comparator() {
+    private static Comparator KEY_ORDER = new Comparator() { //todo can be replaced with lambda expression
         @Override
         public int compare(Object o1, Object o2) {
             Map.Entry<String, Long> e1 = (Map.Entry<String, Long>) o1;
@@ -32,9 +29,10 @@ public class ClassificationExplainedImpl implements IClassificationExplained {
 
     /**
      * Create an immutable detailed explanation of a classification :
-     * @param classification The classification output and explainData
-     * @param likelyhoods The likelyhood values
-     * @param likelyhoodFormulae The likelyhood formulae
+     *
+     * @param classification        The classification output and explainData
+     * @param likelyhoods           The likelyhood values
+     * @param likelyhoodFormulae    The likelyhood formulae
      * @param likelyhoodExpressions The likelyhood expressions
      */
     public ClassificationExplainedImpl(IClassification classification, double[] likelyhoods, String[] likelyhoodFormulae, String[] likelyhoodExpressions) {
@@ -101,13 +99,14 @@ public class ClassificationExplainedImpl implements IClassificationExplained {
     public double getLaplaceSmoothingAlpha() {
         return getClassification().getLaplaceSmoothingAlpha();
     }
-    
+
     /**
      * Print to String that can be interpreted as JavaScript and return the highest probability value
-     * @return The Javascript text 
+     *
+     * @return The Javascript text
      */
     @Override
-    public String toString() {
+    public String toString() { // todo Not sure this is the best name for the method. It can be misleading. Maybe better would be "toJavaScriptText" or something similar
         StringWriter sw = new StringWriter();
         sw.append("// JavaScript : " + "\n");
         if (isLaplaceSmoothed()) {
@@ -115,32 +114,32 @@ public class ClassificationExplainedImpl implements IClassificationExplained {
             sw.append("var alpha=" + getLaplaceSmoothingAlpha() + "\n");
             sw.append("\n// laplaced smoothing variant : " + isLaplaceSmoothedVariant() + "\n");
         }
-        sw.append("\n// observation table variables "+ "\n");
+        sw.append("\n// observation table variables " + "\n");
         List<Map.Entry<String, Long>> entries = new ArrayList(getExplanationData().entrySet());
         Collections.sort(entries, KEY_ORDER);
         for (Map.Entry<String, Long> entry : entries) {
-            sw.append("var "+entry.getKey() + "=" + entry.getValue() + "\n");
+            sw.append("var " + entry.getKey() + "=" + entry.getValue() + "\n");
         }
-        sw.append("\n\n// likelyhoods by category "+ "\n");
+        sw.append("\n\n// likelyhoods by category " + "\n");
         StringWriter swLikelyhoodTot = new StringWriter();
         for (int i = 0; i < getClassProbabilities().length; i++) {
-            sw.append("\n// likelyhoods for category "+getClassProbabilities()[i].getCategory()+ "\n");
-            sw.append("var likelyhoodOf"+getClassProbabilities()[i].getCategory()+ "="+getLikelyhoodFormulae()[i]+"\n");
-            sw.append("var likelyhoodOf"+getClassProbabilities()[i].getCategory()+ "Expr="+getLikelyhoodExpressions()[i]+"\n");
-            sw.append("var likelyhoodOf"+getClassProbabilities()[i].getCategory()+ "Value="+getLikelyhoods()[i]+"\n");
-            swLikelyhoodTot.append("likelyhoodOf"+getClassProbabilities()[i].getCategory()+ "+");
+            sw.append("\n// likelyhoods for category " + getClassProbabilities()[i].getCategory() + "\n");
+            sw.append("var likelyhoodOf" + getClassProbabilities()[i].getCategory() + "=" + getLikelyhoodFormulae()[i] + "\n");
+            sw.append("var likelyhoodOf" + getClassProbabilities()[i].getCategory() + "Expr=" + getLikelyhoodExpressions()[i] + "\n");
+            sw.append("var likelyhoodOf" + getClassProbabilities()[i].getCategory() + "Value=" + getLikelyhoods()[i] + "\n");
+            swLikelyhoodTot.append("likelyhoodOf" + getClassProbabilities()[i].getCategory() + "+");
         }
-        sw.append("\n\n// probability estimates by category "+ "\n");
-        StringWriter swProbabilityTot = new StringWriter();        
+        sw.append("\n\n// probability estimates by category " + "\n");
+        StringWriter swProbabilityTot = new StringWriter();
         for (int i = 0; i < getClassProbabilities().length; i++) {
-            sw.append("\n// probability estimate for category "+getClassProbabilities()[i].getCategory()+ "\n");
-            sw.append("var probabilityOf"+getClassProbabilities()[i].getCategory()+ "="+"likelyhoodOf"+getClassProbabilities()[i].getCategory()+"/("+swLikelyhoodTot.toString()+"0)"+"\n");
-            sw.append("var probabilityOf"+getClassProbabilities()[i].getCategory()+ "Value="+getClassProbabilities()[i].getProbability()+"\n");
-            swProbabilityTot.append("probabilityOf"+getClassProbabilities()[i].getCategory()+" + ");
+            sw.append("\n// probability estimate for category " + getClassProbabilities()[i].getCategory() + "\n");
+            sw.append("var probabilityOf" + getClassProbabilities()[i].getCategory() + "=" + "likelyhoodOf" + getClassProbabilities()[i].getCategory() + "/(" + swLikelyhoodTot.toString() + "0)" + "\n");
+            sw.append("var probabilityOf" + getClassProbabilities()[i].getCategory() + "Value=" + getClassProbabilities()[i].getProbability() + "\n");
+            swProbabilityTot.append("probabilityOf" + getClassProbabilities()[i].getCategory() + " + ");
         }
-        
-        sw.append("\n\n// return the highest probability estimate for evaluation "+ "\n");
-        sw.append("probabilityOf"+getClassProbabilities()[0].getCategory());
+
+        sw.append("\n\n// return the highest probability estimate for evaluation " + "\n");
+        sw.append("probabilityOf" + getClassProbabilities()[0].getCategory());
         return sw.toString();
     }
 
