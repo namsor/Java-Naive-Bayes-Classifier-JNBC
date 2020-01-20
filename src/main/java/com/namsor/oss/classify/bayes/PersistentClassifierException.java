@@ -1,5 +1,7 @@
 package com.namsor.oss.classify.bayes;
 
+import com.namsor.oss.classify.bayes.ClassifyException;
+
 /**
  * Exception raised by the KeyValue backend
  * @author elian

@@ -13,13 +13,11 @@ import java.util.*;
  * @author elian
  */
 public class ClassificationExplainedImpl implements IClassificationExplained {
-    private static Comparator KEY_ORDER = new Comparator() { //todo can be replaced with lambda expression
-        @Override
-        public int compare(Object o1, Object o2) {
-            Map.Entry<String, Long> e1 = (Map.Entry<String, Long>) o1;
-            Map.Entry<String, Long> e2 = (Map.Entry<String, Long>) o2;
-            return e1.getKey().compareTo(e2.getKey());
-        }
+    
+    private static final Comparator KEY_ORDER = (Comparator) (Object o1, Object o2) -> {
+        Map.Entry<String, Long> e1 = (Map.Entry<String, Long>) o1;
+        Map.Entry<String, Long> e2 = (Map.Entry<String, Long>) o2;
+        return e1.getKey().compareTo(e2.getKey());
     };
 
     private final IClassification classification;
@@ -52,6 +50,7 @@ public class ClassificationExplainedImpl implements IClassificationExplained {
     /**
      * @return the likelyhoods
      */
+    @Override
     public double[] getLikelyhoods() {
         return likelyhoods;
     }
@@ -59,6 +58,7 @@ public class ClassificationExplainedImpl implements IClassificationExplained {
     /**
      * @return the likelyhoodFormulae
      */
+    @Override
     public String[] getLikelyhoodFormulae() {
         return likelyhoodFormulae;
     }
@@ -66,6 +66,7 @@ public class ClassificationExplainedImpl implements IClassificationExplained {
     /**
      * @return the likelyhoodExpressions
      */
+    @Override
     public String[] getLikelyhoodExpressions() {
         return likelyhoodExpressions;
     }
@@ -100,13 +101,8 @@ public class ClassificationExplainedImpl implements IClassificationExplained {
         return getClassification().getLaplaceSmoothingAlpha();
     }
 
-    /**
-     * Print to String that can be interpreted as JavaScript and return the highest probability value
-     *
-     * @return The Javascript text
-     */
     @Override
-    public String toString() { // todo Not sure this is the best name for the method. It can be misleading. Maybe better would be "toJavaScriptText" or something similar
+    public String toJavaScriptText() {
         StringWriter sw = new StringWriter();
         sw.append("// JavaScript : " + "\n");
         if (isLaplaceSmoothed()) {
@@ -140,7 +136,13 @@ public class ClassificationExplainedImpl implements IClassificationExplained {
 
         sw.append("\n\n// return the highest probability estimate for evaluation " + "\n");
         sw.append("probabilityOf" + getClassProbabilities()[0].getCategory());
-        return sw.toString();
+        return sw.toString();        
+    }
+    
+
+    @Override
+    public String toString() { 
+        return toJavaScriptText();
     }
 
 }

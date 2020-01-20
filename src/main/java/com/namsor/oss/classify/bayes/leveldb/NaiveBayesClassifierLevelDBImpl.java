@@ -1,6 +1,11 @@
-package com.namsor.oss.classify.bayes;
+package com.namsor.oss.classify.bayes.leveldb;
 
 import com.google.common.primitives.Longs;
+import com.namsor.oss.classify.bayes.ClassificationImpl;
+import com.namsor.oss.classify.bayes.ClassifyException;
+import com.namsor.oss.classify.bayes.IClassification;
+import com.namsor.oss.classify.bayes.INaiveBayesClassifier;
+import com.namsor.oss.classify.bayes.PersistentClassifierException;
 import org.iq80.leveldb.ReadOptions;
 import org.iq80.leveldb.WriteBatch;
 
@@ -9,44 +14,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Naive Bayes Classifier implementation with Laplace smoothing and LevelDB as
- * key/value store. Learning is Synchronized but classification is not.
+ * Naive Bayes Classifier implementation with LevelDB as key/value store.
+ * Learning is Synchronized but classification is not.
  *
  * @author elian carsenat, NamSor SAS
  */
-public class NaiveBayesClassifierLevelDBLaplacedImpl extends AbstractNaiveBayesClassifierLevelDBImpl implements INaiveBayesClassifier {
-
-    private static final boolean VARIANT = false;
-    private static final double ALPHA = 1d;
-    private final boolean variant;
-    private final double alpha;
+public class NaiveBayesClassifierLevelDBImpl extends AbstractNaiveBayesClassifierLevelDBImpl implements INaiveBayesClassifier {
 
     /**
-     * Create a Naive Bayes Classifier implementation with Laplace smoothing and LevelDB as key/value store.
+     * Create a persistent Naive Bayes Classifier using LevelDB, with default cache size
      *
      * @param classifierName   The classifier name
-     * @param categories       The classification categories
-     * @param rootPathWritable A writable path for LevelDB storage
-     * @param alpha            The laplace Alpha, usually 1.0
-     * @param variant          True for variant likelyhood[i] = 1d * ((categoryCount + alpha) / (globalCount + globalCountCategories * alpha)) * product;
+     * @param categories       The immutable classification categories
+     * @param rootPathWritable The writable directory for LevelDB storage
      * @throws PersistentClassifierException The persistence error and cause
      */
-    public NaiveBayesClassifierLevelDBLaplacedImpl(String classifierName, String[] categories, String rootPathWritable, double alpha, boolean variant) throws PersistentClassifierException {
+    public NaiveBayesClassifierLevelDBImpl(String classifierName, String[] categories, String rootPathWritable) throws PersistentClassifierException {
         super(classifierName, categories, rootPathWritable);
-        this.variant = variant;
-        this.alpha = alpha;
-    }
-
-    /**
-     * Create a Naive Bayes Classifier implementation with Laplace smoothing and LevelDB as key/value store, with defaults ALPHA=1 and VARIANT=false
-     *
-     * @param classifierName   The classifier name
-     * @param categories       The classification categories
-     * @param rootPathWritable A writable path for LevelDB storage
-     * @throws PersistentClassifierException The persistence error and cause
-     */
-    public NaiveBayesClassifierLevelDBLaplacedImpl(String classifierName, String[] categories, String rootPathWritable) throws PersistentClassifierException {
-        this(classifierName, categories, rootPathWritable, ALPHA, VARIANT);
     }
 
     @Override
@@ -56,31 +40,15 @@ public class NaiveBayesClassifierLevelDBLaplacedImpl extends AbstractNaiveBayesC
         WriteBatch batch = getDb().createWriteBatch();
         try {
             String pathGlobal = pathGlobal();
-            batch.put(bytes(pathGlobal), Longs.toByteArray((getDb().get(bytes(pathGlobal), ro) == null ? weight : Longs.fromByteArray(getDb().get(bytes(pathGlobal), ro)) + weight)));
+            batch.put(bytes(pathGlobal), Longs.toByteArray((getDb().get(bytes(pathGlobal), ro) == null ? weight : Longs.fromByteArray(getDb().get(bytes(pathGlobal), ro)) + weight))); 
             String pathCategory = pathCategory(category);
-            String pathGlobalCountCategories = pathGlobalCountCategories();
-            if (getDb().get(bytes(pathCategory), ro) == null) {
-                batch.put(bytes(pathCategory), Longs.toByteArray(weight));
-                // increment the count
-                batch.put(bytes(pathGlobalCountCategories), Longs.toByteArray((getDb().get(bytes(pathGlobalCountCategories), ro) == null ? 1 : Longs.fromByteArray(getDb().get(bytes(pathGlobalCountCategories), ro)) + 1)));
-            } else {
-                batch.put(bytes(pathCategory), Longs.toByteArray(Longs.fromByteArray(getDb().get(bytes(pathCategory), ro)) + weight));
-            }
+            batch.put(bytes(pathCategory), Longs.toByteArray((getDb().get(bytes(pathCategory), ro) == null ? weight : Longs.fromByteArray(getDb().get(bytes(pathCategory), ro)) + weight)));
             for (Map.Entry<String, String> feature : features.entrySet()) {
                 String pathFeatureKey = pathFeatureKey(feature.getKey());
                 batch.put(bytes(pathFeatureKey), Longs.toByteArray((getDb().get(bytes(pathFeatureKey), ro) == null ? weight : Longs.fromByteArray(getDb().get(bytes(pathFeatureKey), ro)) + weight)));
                 String pathCategoryFeatureKey = pathCategoryFeatureKey(category, feature.getKey());
                 batch.put(bytes(pathCategoryFeatureKey), Longs.toByteArray((getDb().get(bytes(pathCategoryFeatureKey), ro) == null ? weight : Longs.fromByteArray(getDb().get(bytes(pathCategoryFeatureKey), ro)) + weight)));
                 String pathCategoryFeatureKeyValue = pathCategoryFeatureKeyValue(category, feature.getKey(), feature.getValue());
-                String pathFeatureKeyValue = pathFeatureKeyValue(feature.getKey(), feature.getValue());
-                if (getDb().get(bytes(pathFeatureKeyValue), ro) == null) {
-                    batch.put(bytes(pathFeatureKeyValue), Longs.toByteArray(weight));
-                    // increment the count
-                    String pathFeatureKeyCountValueTypes = pathFeatureKeyCountValueTypes(feature.getKey());
-                    batch.put(bytes(pathFeatureKeyCountValueTypes), Longs.toByteArray((getDb().get(bytes(pathFeatureKeyCountValueTypes), ro) == null ? 1 : Longs.fromByteArray(getDb().get(bytes(pathFeatureKeyCountValueTypes), ro)) + 1)));
-                } else {
-                    batch.put(bytes(pathFeatureKeyValue), Longs.toByteArray(Longs.fromByteArray(getDb().get(bytes(pathFeatureKeyValue), ro)) + weight));
-                }
                 batch.put(bytes(pathCategoryFeatureKeyValue), Longs.toByteArray((getDb().get(bytes(pathCategoryFeatureKeyValue), ro) == null ? weight : Longs.fromByteArray(getDb().get(bytes(pathCategoryFeatureKeyValue), ro)) + weight)));
             }
             getDb().write(batch);
@@ -110,14 +78,9 @@ public class NaiveBayesClassifierLevelDBLaplacedImpl extends AbstractNaiveBayesC
         ro.snapshot(getDb().getSnapshot());
         try {
             String pathGlobal = pathGlobal();
-            String pathGlobalCountCategories = pathGlobalCountCategories();
             long globalCount = (getDb().get(bytes(pathGlobal), ro) == null ? 0 : Longs.fromByteArray(getDb().get(bytes(pathGlobal), ro)));
             if (explainData) {
                 explanation.put(pathGlobal, globalCount);
-            }
-            long globalCountCategories = (getDb().get(bytes(pathGlobalCountCategories), ro) == null ? 0 : Longs.fromByteArray(getDb().get(bytes(pathGlobalCountCategories), ro)));
-            if (explainData) {
-                explanation.put(pathGlobalCountCategories, globalCountCategories);
             }
             double[] likelyhood = new double[getCategories().length];
             double likelyhoodTot = 0;
@@ -125,6 +88,9 @@ public class NaiveBayesClassifierLevelDBLaplacedImpl extends AbstractNaiveBayesC
                 String category = getCategories()[i];
                 String pathCategory = pathCategory(category);
                 long categoryCount = (getDb().get(bytes(pathCategory), ro) == null ? 0 : Longs.fromByteArray(getDb().get(bytes(pathCategory), ro)));
+                if (explainData) {
+                    explanation.put(pathCategory, categoryCount);
+                }
                 double product = 1.0d;
                 for (Map.Entry<String, String> feature : features.entrySet()) {
                     String pathFeatureKey = pathFeatureKey(feature.getKey());
@@ -139,28 +105,19 @@ public class NaiveBayesClassifierLevelDBLaplacedImpl extends AbstractNaiveBayesC
                         if (explainData) {
                             explanation.put(pathCategoryFeatureKey, categoryFeatureCount);
                         }
-                        String pathFeatureKeyCountValueTypes = pathFeatureKeyCountValueTypes(feature.getKey());
-                        long featureCountValueTypes = (getDb().get(bytes(pathFeatureKeyCountValueTypes), ro) == null ? 0 : Longs.fromByteArray(getDb().get(bytes(pathFeatureKeyCountValueTypes), ro)));
-                        if (explainData) {
-                            explanation.put(pathFeatureKeyCountValueTypes, featureCountValueTypes);
-                        }
                         String pathCategoryFeatureKeyValue = pathCategoryFeatureKeyValue(category, feature.getKey(), feature.getValue());
                         long categoryFeatureValueCount = (getDb().get(bytes(pathCategoryFeatureKeyValue), ro) == null ? 0 : Longs.fromByteArray(getDb().get(bytes(pathCategoryFeatureKeyValue), ro)));
                         if (explainData) {
                             explanation.put(pathCategoryFeatureKeyValue, categoryFeatureValueCount);
                         }
-                        double basicProbability = (categoryFeatureCount == 0 ? 0 : 1d * (categoryFeatureValueCount + alpha) / (categoryFeatureCount + featureCountValueTypes * alpha));
+                        double basicProbability = (categoryFeatureCount == 0 ? 0 : 1d * categoryFeatureValueCount / categoryFeatureCount);
                         product *= basicProbability;
                     }
                 }
-                if (variant) {
-                    likelyhood[i] = 1d * ((categoryCount + alpha) / (globalCount + globalCountCategories * alpha)) * product;
-                } else {
-                    likelyhood[i] = 1d * categoryCount / globalCount * product;
-                }
+                likelyhood[i] = 1d * categoryCount / globalCount * product;
                 likelyhoodTot += likelyhood[i];
             }
-            return new ClassificationImpl(features, likelihoodsToProbas(likelyhood, likelyhoodTot), explanation, true, variant, alpha);
+            return new ClassificationImpl(features, likelihoodsToProbas(likelyhood, likelyhoodTot), explanation);
         } finally {
             try {
                 // Make sure you close the snapshot to avoid resource leaks.

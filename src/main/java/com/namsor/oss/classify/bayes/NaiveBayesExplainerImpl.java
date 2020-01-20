@@ -30,9 +30,7 @@ public class NaiveBayesExplainerImpl extends AbstractNaiveBayesImpl implements I
         long globalCount = (classification.getExplanationData().containsKey(pathGlobal) ? classification.getExplanationData().get(pathGlobal) : 0);
         long globalCountCategories = (classification.getExplanationData().containsKey(pathGlobalCountCategories) ? classification.getExplanationData().get(pathGlobalCountCategories) : 0);
         double[] likelyhood = new double[classification.getClassProbabilities().length];
-        double likelyhoodTot = 0; // todo separate variables and loops/statements with an empty row. This applies to all classes. Increases readability
-        // todo Also, try to have more short methods instad of one huge method
-
+        double likelyhoodTot = 0; 
         for (int i = 0; i < classification.getClassProbabilities().length; i++) {
             StringWriter formula = new StringWriter();
             StringWriter algebraicExpression = new StringWriter();

@@ -1,6 +1,6 @@
 package com.namsor.oss.classify.bayes;
 
-import org.junit.*;
+
 
 import java.io.File;
 import java.util.HashMap;
@@ -8,8 +8,10 @@ import java.util.Map;
 
 import static com.namsor.oss.samples.MainSample1.*;
 import static com.namsor.oss.samples.MainSample2.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.junit.jupiter.api.BeforeEach;
 
 /**
  * todo remove comment
@@ -22,28 +24,16 @@ public class NaiveBayesClassifierMapLaplacedImplTest {
     public NaiveBayesClassifierMapLaplacedImplTest() {
     }
 
-    @BeforeClass
-    public static void setUpClass() {
+    @BeforeEach
+    public void setUp() {
         File mapdb = new File(MAPDB_DIR);
-        if (mapdb.exists() && mapdb.isDirectory()) { //todo simplify using negation.
+        if (mapdb.exists() && mapdb.isDirectory()) { 
             // ok
         } else {
             mapdb.mkdirs();
         }
     }
 
-    //todo methods don't do anything
-    @AfterClass
-    public static void tearDownClass() {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
 
     /**
      * Test based on https://taylanbil.github.io/boostedNB or

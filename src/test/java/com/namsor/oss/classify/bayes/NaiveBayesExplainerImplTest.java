@@ -2,46 +2,25 @@ package com.namsor.oss.classify.bayes;
 
 import com.namsor.oss.samples.MainSample1;
 import com.namsor.oss.samples.MainSample3;
-import org.junit.*;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
-import java.util.HashMap;
-import java.util.Map;
 
 import static com.namsor.oss.samples.MainSample1.NO;
 import static com.namsor.oss.samples.MainSample1.YES;
 import static com.namsor.oss.samples.MainSample2.*;
 import static com.namsor.oss.samples.MainSample3.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import java.util.HashMap;
+import java.util.Map;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-/**
- * todo remove cooment
- *
- * @author elian
- */
 public class NaiveBayesExplainerImplTest {
 
     public NaiveBayesExplainerImplTest() {
     }
 
-    //todo methods don't do anything
-    @BeforeClass
-    public static void setUpClass() {
-    }
-
-    @AfterClass
-    public static void tearDownClass() {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
 
     /**
      * Test based on https://taylanbil.github.io/boostedNB or

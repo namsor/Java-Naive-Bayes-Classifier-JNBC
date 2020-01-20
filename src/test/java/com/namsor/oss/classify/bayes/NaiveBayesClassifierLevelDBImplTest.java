@@ -1,7 +1,7 @@
 package com.namsor.oss.classify.bayes;
 
+import com.namsor.oss.classify.bayes.leveldb.NaiveBayesClassifierLevelDBImpl;
 import com.namsor.oss.samples.MainSample3;
-import org.junit.*;
 
 import java.io.File;
 import java.util.HashMap;
@@ -12,35 +12,20 @@ import static com.namsor.oss.samples.MainSample1.data;
 import static com.namsor.oss.samples.MainSample1.*;
 import static com.namsor.oss.samples.MainSample2.*;
 import static com.namsor.oss.samples.MainSample3.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
-//todo remove comment
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.junit.jupiter.api.BeforeEach;
 
-/**
- * @author elian
- */
+
 public class NaiveBayesClassifierLevelDBImplTest {
     private static final String LEVELDB_DIR = "/tmp/leveldb";
 
-    public NaiveBayesClassifierLevelDBImplTest() {
-    }
 
-    @BeforeClass
-    public static void setUpClass() {
-    }
-
-    @AfterClass
-    public static void tearDownClass() {
-    }
-
-    @Before
+    @BeforeEach
     public void setUp() {
         File leveldb = new File(LEVELDB_DIR);
-        /**
-         * todo simplify
-         *         if( !leveldb.exists() || !leveldb.isDirectory() ) { leveldb.mkdirs(); }
-         */
         if (leveldb.exists() && leveldb.isDirectory()) {
             // ok
         } else {
@@ -48,9 +33,7 @@ public class NaiveBayesClassifierLevelDBImplTest {
         }
     }
 
-    @After
-    public void tearDown() {
-    }
+   
 
     /**
      * Test based on https://taylanbil.github.io/boostedNB or
@@ -126,8 +109,6 @@ public class NaiveBayesClassifierLevelDBImplTest {
         String[] cats = {BANANA, ORANGE, OTHER};
         // Create a new bayes classifier with string categories and string features.
         NaiveBayesClassifierLevelDBImpl bayes = new NaiveBayesClassifierLevelDBImpl("fruit", cats, LEVELDB_DIR);
-        //NaiveBayesClassifierTransientLaplacedImpl bayes = new NaiveBayesClassifierTransientLaplacedImpl("fruit", cats); //todo remove this or write comment why they are commented out
-        //NaiveBayesClassifierLevelDBImpl bayes = new NaiveBayesClassifierLevelDBImpl("intro", cats, ".", 100);
 
         // Examples to learn from.
         for (int i = 0; i < MainSample3.data.length; i++) {

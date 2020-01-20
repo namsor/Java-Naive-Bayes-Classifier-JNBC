@@ -2,7 +2,6 @@ package com.namsor.oss.classify.bayes;
 
 import com.namsor.oss.samples.MainSample1;
 import com.namsor.oss.samples.MainSample3;
-import org.junit.*;
 
 import java.io.File;
 import java.util.HashMap;
@@ -12,43 +11,30 @@ import static com.namsor.oss.samples.MainSample1.NO;
 import static com.namsor.oss.samples.MainSample1.YES;
 import static com.namsor.oss.samples.MainSample2.*;
 import static com.namsor.oss.samples.MainSample3.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.junit.jupiter.api.BeforeEach;
 
-/** todo remove
- * @author elian
- */
+
+
 public class NaiveBayesClassifierMapImplTest {
 
     private static final String MAPDB_DIR = "/tmp/mapdb";
 
-    public NaiveBayesClassifierMapImplTest() { //todo remove
-    }
 
-    @BeforeClass
-    public static void setUpClass() {
+    @BeforeEach
+    public void setUp() {
         File mapdb = new File(MAPDB_DIR);
         if (mapdb.exists() && mapdb.isDirectory()) {
             // ok
         } else {
             mapdb.mkdirs();
         }
-
+        
     }
 
-    // todo methods that don't do anything
-    @AfterClass
-    public static void tearDownClass() {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
-
+    
     /**
      * Test based on https://taylanbil.github.io/boostedNB or
      * http://ai.fon.bg.ac.rs/wp-content/uploads/2015/04/ML-Classification-NaiveBayes-2014.pdf

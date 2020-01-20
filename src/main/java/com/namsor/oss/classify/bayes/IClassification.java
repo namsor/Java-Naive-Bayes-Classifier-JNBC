@@ -2,8 +2,6 @@ package com.namsor.oss.classify.bayes;
 
 import java.util.Map;
 
-//todo Separate interfaces and implementations to different packages.
-
 /**
  * Classification output : class probabilities and (optionally) the features and counters for explanation / audit trail
  *

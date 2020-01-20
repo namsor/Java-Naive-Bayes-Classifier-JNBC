@@ -1,5 +1,7 @@
 package com.namsor.oss.classify.bayes;
 
+import com.namsor.oss.classify.bayes.IClassification;
+
 /**
  * Contains additional details on the classifications, such as the formulas or the algebraic calculation.
  * The toString() method returns the explanation in human-readable form, and interpretable using JavaScript
@@ -38,4 +40,11 @@ public interface IClassificationExplained extends IClassification {
      * @return The likelyhood algebraic expression
      */
     String[] getLikelyhoodExpressions();
+    
+    /**
+     * Print to String that can be interpreted as JavaScript and return the highest probability value. Also default toString() output.
+     *
+     * @return The Javascript text
+     */    
+    String toJavaScriptText();
 }

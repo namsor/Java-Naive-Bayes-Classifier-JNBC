@@ -1,6 +1,11 @@
-package com.namsor.oss.classify.bayes;
+package com.namsor.oss.classify.bayes.rocksdb;
 
 import com.google.common.primitives.Longs;
+import com.namsor.oss.classify.bayes.ClassificationImpl;
+import com.namsor.oss.classify.bayes.ClassifyException;
+import com.namsor.oss.classify.bayes.IClassification;
+import com.namsor.oss.classify.bayes.INaiveBayesClassifier;
+import com.namsor.oss.classify.bayes.PersistentClassifierException;
 import org.rocksdb.ReadOptions;
 import org.rocksdb.RocksDBException;
 import org.rocksdb.WriteBatch;

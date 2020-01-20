@@ -1,7 +1,7 @@
 package com.namsor.oss.classify.bayes;
 
+import com.namsor.oss.classify.bayes.rocksdb.NaiveBayesClassifierRocksDBImpl;
 import com.namsor.oss.samples.MainSample3;
-import org.junit.*;
 
 import java.io.File;
 import java.util.HashMap;
@@ -12,30 +12,20 @@ import static com.namsor.oss.samples.MainSample1.data;
 import static com.namsor.oss.samples.MainSample1.*;
 import static com.namsor.oss.samples.MainSample2.*;
 import static com.namsor.oss.samples.MainSample3.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.junit.jupiter.api.BeforeEach;
 
-/**
- * todo comment remoe
- *
- * @author elian
- */
+
 public class NaiveBayesClassifierRocksDBImplTest {
     private static final String ROCKSDB_DIR = "/tmp/rocksdb";
 
     public NaiveBayesClassifierRocksDBImplTest() {
     }
 
-    //todo methods don't do anything
-    @BeforeClass
-    public static void setUpClass() {
-    }
 
-    @AfterClass
-    public static void tearDownClass() {
-    }
-
-    @Before
+    @BeforeEach
     public void setUp() {
         File rocksdb = new File(ROCKSDB_DIR);
         if (rocksdb.exists() && rocksdb.isDirectory()) {
@@ -45,9 +35,6 @@ public class NaiveBayesClassifierRocksDBImplTest {
         }
     }
 
-    @After
-    public void tearDown() {
-    }
 
     /**
      * Test based on https://taylanbil.github.io/boostedNB or

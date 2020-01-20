@@ -1,6 +1,8 @@
-package com.namsor.oss.classify.bayes;
+package com.namsor.oss.classify.bayes.leveldb;
 
 import com.google.common.primitives.Longs;
+import com.namsor.oss.classify.bayes.AbstractNaiveBayesClassifierImpl;
+import com.namsor.oss.classify.bayes.PersistentClassifierException;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
@@ -24,6 +26,7 @@ import org.iq80.leveldb.ReadOptions;
 public abstract class AbstractNaiveBayesClassifierLevelDBImpl extends AbstractNaiveBayesClassifierImpl {
 
     private static final int CACHE_SIZE_DEFAULT = 100; //100mb
+    private static final int MB = 1048576;
     private final String rootPathWritable;
     private final DB db;
 
@@ -40,11 +43,11 @@ public abstract class AbstractNaiveBayesClassifierLevelDBImpl extends AbstractNa
         this.rootPathWritable = rootPathWritable;
         Options options = new Options();
         options.createIfMissing(true);
-        options.cacheSize(cacheSizeMb * 1048576); // 100MB cache todo - convert number to be a constant
+        options.cacheSize(cacheSizeMb * MB); 
         options.compressionType(CompressionType.NONE);
         
         try {
-            db = factory.open(new File(rootPathWritable + "/" + classifierName), options); //todo not sure this will work on Windows
+            db = factory.open(new File(rootPathWritable + "/" + classifierName), options); 
         } catch (IOException ex) {
             throw new PersistentClassifierException(ex);
         }
@@ -70,7 +73,7 @@ public abstract class AbstractNaiveBayesClassifierLevelDBImpl extends AbstractNa
         DBIterator iterator = getDb().iterator(ro);
         try {
             for (iterator.seekToFirst(); iterator.hasNext(); iterator.next()) {
-                Map.Entry<byte[],byte[]> nextEntry = iterator.peekNext(); //todo no need to create the nextEntry object since it's never used.
+                //Map.Entry<byte[],byte[]> nextEntry = iterator.peekNext(); // no need to create the nextEntry object since it's never used.
                 dbSize++;
             }
             return dbSize;
@@ -103,16 +106,6 @@ public abstract class AbstractNaiveBayesClassifierLevelDBImpl extends AbstractNa
             factory.destroy(new File(rootPathWritable + "/" + getClassifierName()), options);
         } catch (IOException ex) {
             throw new PersistentClassifierException(ex);
-        }
-    }
-
-    @Override
-    protected void finalize() throws Throwable {
-        super.finalize(); //todo finalize is deprecated
-        try {
-            dbClose();
-        } catch (Throwable t) {
-            // ignore
         }
     }
 

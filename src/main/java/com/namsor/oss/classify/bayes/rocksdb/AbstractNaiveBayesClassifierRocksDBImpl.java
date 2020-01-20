@@ -1,6 +1,9 @@
-package com.namsor.oss.classify.bayes;
+package com.namsor.oss.classify.bayes.rocksdb;
 
 import com.google.common.primitives.Longs;
+import com.namsor.oss.classify.bayes.AbstractNaiveBayesClassifierImpl;
+import com.namsor.oss.classify.bayes.PersistentClassifierException;
+import java.io.File;
 import org.rocksdb.*;
 
 import java.io.IOException;
@@ -20,8 +23,8 @@ public abstract class AbstractNaiveBayesClassifierRocksDBImpl extends AbstractNa
     /**
      * Create a persistent Naive Bayes Classifier using RocksDB
      *
-     * @param classifierName   The classifier name
-     * @param categories       The immutable classification categories
+     * @param classifierName The classifier name
+     * @param categories The immutable classification categories
      * @param rootPathWritable The writable directory for LevelDB storage
      * @throws PersistentClassifierException The persistence error and cause
      */
@@ -32,6 +35,12 @@ public abstract class AbstractNaiveBayesClassifierRocksDBImpl extends AbstractNa
         options.setCreateIfMissing(true);
         options.setMaxBackgroundFlushes(ROCKSDB_MaxBackgroundFlushes);
         try {
+            File rootPathWritableFile = new File(rootPathWritable);
+            if (rootPathWritableFile.exists() && rootPathWritableFile.isDirectory()) {
+                // ok
+            } else {
+                rootPathWritableFile.mkdirs();
+            }
             db = RocksDB.open(options, rootPathWritable + "/" + classifierName);
         } catch (RocksDBException ex) {
             throw new PersistentClassifierException(ex);
@@ -53,7 +62,7 @@ public abstract class AbstractNaiveBayesClassifierRocksDBImpl extends AbstractNa
     }
 
     @Override
-    public void dbClose() throws PersistentClassifierException { //todo PersistentClassifierException is never thrown
+    public void dbClose() throws PersistentClassifierException {
         getDb().close();
     }
 
@@ -68,16 +77,6 @@ public abstract class AbstractNaiveBayesClassifierRocksDBImpl extends AbstractNa
         }
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
-        try {
-            dbClose();
-        } catch (Throwable t) {
-            // ignore
-        }
-    }
-
     protected byte[] bytes(String key) {
         return key.getBytes();
     }
@@ -88,7 +87,6 @@ public abstract class AbstractNaiveBayesClassifierRocksDBImpl extends AbstractNa
     protected RocksDB getDb() {
         return db;
     }
-
 
     @Override
     public synchronized void dumpDb(Writer w) throws PersistentClassifierException {

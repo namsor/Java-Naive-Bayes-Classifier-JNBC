@@ -1,48 +1,35 @@
 package com.namsor.oss.classify.bayes;
 
-import org.junit.*;
 
+import com.namsor.oss.classify.bayes.leveldb.NaiveBayesClassifierLevelDBLaplacedImpl;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
 import static com.namsor.oss.samples.MainSample1.*;
 import static com.namsor.oss.samples.MainSample2.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.junit.jupiter.api.BeforeEach;
 
-/**
- * todo remove comment
- *
- * @author elian
- */
+
 public class NaiveBayesClassifierLevelDBLaplacedImplTest {
     private static final String LEVELDB_DIR = "/tmp/leveldb";
 
     public NaiveBayesClassifierLevelDBLaplacedImplTest() {
     }
 
-    @BeforeClass
-    public static void setUpClass() {
-    }
-
-    @AfterClass
-    public static void tearDownClass() {
-    }
-
-    @Before
+    @BeforeEach
     public void setUp() {
         File leveldb = new File(LEVELDB_DIR);
-        if (leveldb.exists() && leveldb.isDirectory()) { //todo simplify using negation
+        if (leveldb.exists() && leveldb.isDirectory()) { 
             // ok
         } else {
             leveldb.mkdirs();
         }
     }
 
-    @After
-    public void tearDown() { //todo remove
-    }
 
     /**
      * Test based on https://taylanbil.github.io/boostedNB or
