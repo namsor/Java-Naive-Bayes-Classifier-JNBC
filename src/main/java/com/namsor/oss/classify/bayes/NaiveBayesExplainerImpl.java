@@ -3,6 +3,7 @@ package com.namsor.oss.classify.bayes;
 
 import java.io.StringWriter;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * Explain the details of the Naive Bayes Classification, ie. formulae and algebraic
@@ -99,7 +100,7 @@ public class NaiveBayesExplainerImpl extends AbstractNaiveBayesImpl implements I
                 proba = 0d;
             }
             if (Math.abs(proba - classification.getClassProbabilities()[i].getProbability()) > EPSILON) {
-                throw new IllegalStateException("Class " + classification.getClassProbabilities()[i].getCategory() + " probability differs PExplained = " + proba + " <> P = " + classification.getClassProbabilities()[i].getProbability());
+                Logger.getLogger(getClass().getName()).warning("Class " + classification.getClassProbabilities()[i].getCategory() + " probability differs PExplained = " + proba + " <> P = " + classification.getClassProbabilities()[i].getProbability());
             }
         }
         return new ClassificationExplainedImpl(classification, likelyhood, formulae, algebraicExpressions);
