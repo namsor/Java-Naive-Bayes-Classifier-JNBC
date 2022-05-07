@@ -50,14 +50,20 @@ public abstract class AbstractNaiveBayesClassifierImpl extends AbstractNaiveBaye
     }
 
     protected IClassProbability[] likelihoodsToProbas(double[] likelyhood, double likelyhoodTot) {
-        IClassProbability[] result = new ClassProbabilityImpl[getCategories().length];
+        IClassProbability[] result = new ClassProbabilityImpl[getCategories().length]; // TODO : if likelyhoodTot=0 then
         for (int i = 0; i < getCategories().length; i++) {
-            double proba = likelyhood[i] / likelyhoodTot;
-            if (proba > 1d) {
-                // could equal 1.000000000002 due to double precision issue;
-                proba = 1d;
-            } else if (proba < 0) {
+            double proba;
+            if (likelyhoodTot <= 0) {
+                // this is an underflow/overflow error
                 proba = 0d;
+            } else {
+                proba = likelyhood[i] / likelyhoodTot;
+                if (proba > 1d) {
+                    // could equal 1.000000000002 due to double precision issue;
+                    proba = 1d;
+                } else if (proba < 0) {
+                    proba = 0d;
+                }
             }
             ClassProbabilityImpl classif = new ClassProbabilityImpl(getCategories()[i], proba);
             result[i] = classif;
@@ -65,5 +71,4 @@ public abstract class AbstractNaiveBayesClassifierImpl extends AbstractNaiveBaye
         Arrays.sort(result, orderByProba);
         return result;
     }
-
 }
