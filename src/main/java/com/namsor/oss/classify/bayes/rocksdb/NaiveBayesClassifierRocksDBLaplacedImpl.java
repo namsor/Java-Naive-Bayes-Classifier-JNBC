@@ -163,7 +163,7 @@ public class NaiveBayesClassifierRocksDBLaplacedImpl extends AbstractNaiveBayesC
                 }
                 likelyhoodTot += likelyhood[i];
             }
-            return new ClassificationImpl(features, likelihoodsToProbas(likelyhood, likelyhoodTot), explanation, true, variant, alpha);
+            return new ClassificationImpl(features, likelihoodsToProbas(likelyhood, likelyhoodTot), explanation, true, variant, alpha, likelyhoodTot);
         } catch (RocksDBException ex) {
             throw new PersistentClassifierException(ex);
         } finally {

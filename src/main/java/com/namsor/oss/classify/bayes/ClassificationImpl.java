@@ -15,18 +15,20 @@ public class ClassificationImpl implements IClassification {
     private final boolean laplaceSmoothed;
     private final boolean laplaceSmoothedVariant;
     private final double laplaceSmoothingAlpha;
+    private final double likelyhoodTot;
 
-    public ClassificationImpl(Map<String, String> features, IClassProbability[] classProbabilities, Map<String, Long> explanationData, boolean laplaceSmoothed, boolean laplaceSmoothedVariant, double laplaceSmoothingAlpha) {
+    public ClassificationImpl(Map<String, String> features, IClassProbability[] classProbabilities, Map<String, Long> explanationData, boolean laplaceSmoothed, boolean laplaceSmoothedVariant, double laplaceSmoothingAlpha, double likelyhoodTot) {
         this.features = features;
         this.classProbabilities = classProbabilities;
         this.explanationData = explanationData;
         this.laplaceSmoothed = laplaceSmoothed;
         this.laplaceSmoothedVariant = laplaceSmoothedVariant;
         this.laplaceSmoothingAlpha = laplaceSmoothingAlpha;
+        this.likelyhoodTot = likelyhoodTot; 
     }
 
-    public ClassificationImpl(Map<String, String> features, IClassProbability[] classProbabilities, Map<String, Long> explanationData) {
-        this(features, classProbabilities, explanationData, false, false, 0);
+    public ClassificationImpl(Map<String, String> features, IClassProbability[] classProbabilities, Map<String, Long> explanationData, double likelyhoodTot) {
+        this(features, classProbabilities, explanationData, false, false, 0, likelyhoodTot);
     }
 
     /**
@@ -64,6 +66,7 @@ public class ClassificationImpl implements IClassification {
     /**
      * @return the features
      */
+    @Override
     public Map<String, String> getFeatures() {
         return features;
     }
@@ -71,8 +74,14 @@ public class ClassificationImpl implements IClassification {
     /**
      * @return the laplaceSmoothingAlpha
      */
+    @Override
     public double getLaplaceSmoothingAlpha() {
         return laplaceSmoothingAlpha;
+    }
+
+    @Override
+    public boolean isUnderflow() {
+        return likelyhoodTot<=0;
     }
 
 

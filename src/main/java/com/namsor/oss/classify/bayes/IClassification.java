@@ -51,4 +51,10 @@ public interface IClassification {
      * @return The alpha value, usually 1.0
      */
     double getLaplaceSmoothingAlpha();
+    
+    /**
+     * If the calculation is underflow
+     * @return True if the calculation is underflow
+     */
+    boolean isUnderflow();
 }

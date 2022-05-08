@@ -94,7 +94,7 @@ public class NaiveBayesClassifierMapImpl extends AbstractNaiveBayesClassifierMap
             likelyhood[i] = 1d * categoryCount / globalCount * product;
             likelyhoodTot += likelyhood[i];
         }
-        return new ClassificationImpl(features, likelihoodsToProbas(likelyhood, likelyhoodTot), explanation);
+        return new ClassificationImpl(features, likelihoodsToProbas(likelyhood, likelyhoodTot), explanation, likelyhoodTot);
     }
 
 }

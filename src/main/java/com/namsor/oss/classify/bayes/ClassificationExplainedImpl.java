@@ -145,4 +145,9 @@ public class ClassificationExplainedImpl implements IClassificationExplained {
         return toJavaScriptText();
     }
 
+    @Override
+    public boolean isUnderflow() {
+        return getClassification().isUnderflow();
+    }
+
 }
