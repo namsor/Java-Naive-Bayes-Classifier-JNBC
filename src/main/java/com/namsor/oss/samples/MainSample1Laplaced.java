@@ -96,7 +96,7 @@ public class MainSample1Laplaced {
                 ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
                 ScriptEngine scriptEngine = scriptEngineManager.getEngineByName("JavaScript");
                 // JavaScript code from String
-                Object ob = scriptEngine.eval(explained.toString());
+                Object ob = scriptEngine.eval(explained.toJavaScriptText(features));
                 System.out.println("Result of evaluating mathematical expressions in String = " + ob);
             }
         } catch (PersistentClassifierException ex) {

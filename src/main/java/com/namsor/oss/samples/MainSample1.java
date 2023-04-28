@@ -87,7 +87,7 @@ public class MainSample1 {
                 ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
                 ScriptEngine scriptEngine = scriptEngineManager.getEngineByName("JavaScript");
                 // JavaScript code from String
-                Double proba = (Double) scriptEngine.eval(explained.toString());
+                Double proba = (Double) scriptEngine.eval(explained.toJavaScriptText(features));
                 System.out.println("Result of evaluating mathematical expressions in String = " + proba);
             }
         } catch (PersistentClassifierException ex) {

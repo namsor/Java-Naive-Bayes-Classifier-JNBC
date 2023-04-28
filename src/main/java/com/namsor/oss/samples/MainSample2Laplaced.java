@@ -32,7 +32,7 @@ public class MainSample2Laplaced {
             String[] cats = {ZERO, ONE};
             // Create a new bayes classifier with string categories and string features.
             // INaiveBayesClassifier bayes1 = new NaiveBayesClassifierLevelDBImpl("sentiment", cats, ".", 100);
-            NaiveBayesClassifierMapLaplacedImpl bayes = new NaiveBayesClassifierMapLaplacedImpl("sentiment", cats, 1, true);
+            NaiveBayesClassifierMapLaplacedImpl bayes = new NaiveBayesClassifierMapLaplacedImpl("sentiment", cats, 1, false);
             //NaiveBayesClassifierRocksDBImpl bayes = new NaiveBayesClassifierRocksDBImpl("intro", cats, ".", 100);
 
 // Examples to learn from.
@@ -54,12 +54,13 @@ public class MainSample2Laplaced {
             if (predict.getExplanationData() != null) {
                 NaiveBayesExplainerImpl explainer = new NaiveBayesExplainerImpl();
                 IClassificationExplained explained = explainer.explain(predict);
-                System.out.println(explained.toString());
+                System.out.println(explained.toJavaScriptText(features));
                 ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
                 ScriptEngine scriptEngine = scriptEngineManager.getEngineByName("JavaScript");
                 // JavaScript code from String
-                Object ob = scriptEngine.eval(explained.toString());
+                Object ob = scriptEngine.eval(explained.toJavaScriptText(features));
                 System.out.println("Result of evaluating mathematical expressions in String = " + ob);
+                System.out.println("\n\nPython script below " + explained.toPythonText(features));
                 
             }
         } catch (ClassifyException ex) {

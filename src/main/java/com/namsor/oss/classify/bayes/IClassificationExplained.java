@@ -1,6 +1,7 @@
 package com.namsor.oss.classify.bayes;
 
 import com.namsor.oss.classify.bayes.IClassification;
+import java.util.Map;
 
 /**
  * Contains additional details on the classifications, such as the formulas or the algebraic calculation.
@@ -42,9 +43,19 @@ public interface IClassificationExplained extends IClassification {
     String[] getLikelyhoodExpressions();
     
     /**
-     * Print to String that can be interpreted as JavaScript and return the highest probability value. Also default toString() output.
+     * Print to String that can be interpreted as JavaScript and return the highest probability value. 
      *
+     * @param features Optionally the list of features
      * @return The Javascript text
      */    
-    String toJavaScriptText();
+    String toJavaScriptText(Map<String, String> features);
+    
+    /**
+     * Print to String that can be interpreted as Python and return the highest probability value. Also default toString() output.
+     *
+     * @param features Optionally the list of features
+     * @return The Javascript text
+     */    
+    String toPythonText(Map<String, String> features);
+    
 }

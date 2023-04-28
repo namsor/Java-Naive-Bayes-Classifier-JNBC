@@ -63,7 +63,7 @@ public class MainSample2 {
                 ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
                 ScriptEngine scriptEngine = scriptEngineManager.getEngineByName("JavaScript");
                 // JavaScript code from String
-                Object ob = scriptEngine.eval(explained.toString());
+                Object ob = scriptEngine.eval(explained.toJavaScriptText(features));
                 System.out.println("Result of evaluating mathematical expressions in String = " + ob);
                 
             }
