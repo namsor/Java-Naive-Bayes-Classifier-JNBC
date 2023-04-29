@@ -8,15 +8,11 @@ import java.util.Map.Entry;
  * Naive Bayes Classifier with Laplace smoothing and implementation with
  * concurrent ConcurrentHashMap or persistent mapDB. The Laplace smoothing has two variants as per
  * Sample1 and Sample2.
- *
+ * Also, this implementation is using log(a*b)=log(a)+log(b) to reduce overflow risk
  * @author elian carsenat, NamSor SAS
  */
-public class NaiveBayesClassifierMapLaplacedImpl extends AbstractNaiveBayesClassifierMapImpl implements INaiveBayesClassifier {
+public class NaiveBayesClassifierMapLaplacedLogImpl extends NaiveBayesClassifierMapLaplacedImpl implements INaiveBayesClassifier {
 
-    protected static final boolean VARIANT = false;
-    protected static final double ALPHA = 1d;
-    private final boolean variant;
-    private final double alpha;
 
     /**
      * Create in-memory classifier using ConcurrentHashMap and defaults for Laplace smoothing (ALPHA=1 and VARIANT=false)
@@ -24,8 +20,8 @@ public class NaiveBayesClassifierMapLaplacedImpl extends AbstractNaiveBayesClass
      * @param classifierName The classifier name
      * @param categories     The classification categories
      */
-    public NaiveBayesClassifierMapLaplacedImpl(String classifierName, String[] categories) {
-        this(classifierName, categories, ALPHA, VARIANT);
+    public NaiveBayesClassifierMapLaplacedLogImpl(String classifierName, String[] categories) {
+        super(classifierName, categories, ALPHA, VARIANT);
     }
 
     /**
@@ -36,10 +32,8 @@ public class NaiveBayesClassifierMapLaplacedImpl extends AbstractNaiveBayesClass
      * @param alpha          The Laplace alpha, typically 1.0
      * @param variant        The Laplace variant
      */
-    public NaiveBayesClassifierMapLaplacedImpl(String classifierName, String[] categories, double alpha, boolean variant) {
-        super(classifierName, categories);
-        this.alpha = alpha;
-        this.variant = variant;
+    public NaiveBayesClassifierMapLaplacedLogImpl(String classifierName, String[] categories, double alpha, boolean variant) {
+        super(classifierName, categories, alpha, variant);
     }
 
 
@@ -52,10 +46,8 @@ public class NaiveBayesClassifierMapLaplacedImpl extends AbstractNaiveBayesClass
      * @param variant          The Laplace variant
      * @param rootPathWritable A writable directory for org.mapdb.HTreeMap storage
      */
-    public NaiveBayesClassifierMapLaplacedImpl(String classifierName, String[] categories, double alpha, boolean variant, String rootPathWritable) {
-        super(classifierName, categories, rootPathWritable);
-        this.alpha = alpha;
-        this.variant = variant;
+    public NaiveBayesClassifierMapLaplacedLogImpl(String classifierName, String[] categories, double alpha, boolean variant, String rootPathWritable) {
+        super(classifierName, categories, alpha, variant, rootPathWritable);
     }
 
     /**
@@ -65,42 +57,10 @@ public class NaiveBayesClassifierMapLaplacedImpl extends AbstractNaiveBayesClass
      * @param categories       The classification categories
      * @param rootPathWritable A writable directory for org.mapdb.HTreeMap storage
      */
-    public NaiveBayesClassifierMapLaplacedImpl(String classifierName, String[] categories, String rootPathWritable) {
-        this(classifierName, categories, ALPHA, VARIANT, rootPathWritable);
+    public NaiveBayesClassifierMapLaplacedLogImpl(String classifierName, String[] categories, String rootPathWritable) {
+        super(classifierName, categories, ALPHA, VARIANT, rootPathWritable);
     }
 
-
-    @Override
-    public synchronized void learn(String category, Map<String, String> features, long weight) throws ClassifyException {
-        String pathGlobal = pathGlobal();
-        String pathGlobalCountCategories = pathGlobalCountCategories();
-        getDb().put(pathGlobal, (getDb().containsKey(pathGlobal) ? getDb().get(pathGlobal) + weight : weight));
-        String pathCategory = pathCategory(category);
-        if (getDb().containsKey(pathCategory)) {
-            getDb().put(pathCategory, getDb().get(pathCategory) + weight);
-        } else {
-            getDb().put(pathCategory, weight);
-            // increment the count
-            getDb().put(pathGlobalCountCategories, (getDb().containsKey(pathGlobalCountCategories) ? getDb().get(pathGlobalCountCategories) + 1 : 1));
-        }
-        for (Entry<String, String> feature : features.entrySet()) {
-            String pathFeatureKey = pathFeatureKey(feature.getKey());
-            getDb().put(pathFeatureKey, (getDb().containsKey(pathFeatureKey) ? getDb().get(pathFeatureKey) + weight : weight));
-            String pathCategoryFeatureKey = pathCategoryFeatureKey(category, feature.getKey());
-            getDb().put(pathCategoryFeatureKey, (getDb().containsKey(pathCategoryFeatureKey) ? getDb().get(pathCategoryFeatureKey) + weight : weight));
-            String pathCategoryFeatureKeyValue = pathCategoryFeatureKeyValue(category, feature.getKey(), feature.getValue());
-            String pathFeatureKeyValue = pathFeatureKeyValue(feature.getKey(), feature.getValue());
-            if (getDb().containsKey(pathFeatureKeyValue)) {
-                getDb().put(pathFeatureKeyValue, getDb().get(pathFeatureKeyValue) + weight);
-            } else {
-                getDb().put(pathFeatureKeyValue, weight);
-                // increment the count
-                String pathFeatureKeyCountValueTypes = pathFeatureKeyCountValueTypes(feature.getKey());
-                getDb().put(pathFeatureKeyCountValueTypes, (getDb().containsKey(pathFeatureKeyCountValueTypes) ? getDb().get(pathFeatureKeyCountValueTypes) + 1 : 1));
-            }
-            getDb().put(pathCategoryFeatureKeyValue, (getDb().containsKey(pathCategoryFeatureKeyValue) ? getDb().get(pathCategoryFeatureKeyValue) + weight : weight));
-        }
-    }
 
     @Override
     public IClassification classify(Map<String, String> features, final boolean explainData) throws ClassifyException {
@@ -127,7 +87,7 @@ public class NaiveBayesClassifierMapLaplacedImpl extends AbstractNaiveBayesClass
             if (explainData) {
                 explanation.put(pathCategory, categoryCount);
             }
-            double product = 1.0d;
+            double logProduct = 0.0d;
             for (Entry<String, String> feature : features.entrySet()) {
                 String pathFeatureKey = pathFeatureKey(feature.getKey());
                 long featureCount = (getDb().containsKey(pathFeatureKey) ? getDb().get(pathFeatureKey) : 0);
@@ -150,31 +110,18 @@ public class NaiveBayesClassifierMapLaplacedImpl extends AbstractNaiveBayesClass
                     if (explainData) {
                         explanation.put(pathCategoryFeatureKeyValue, categoryFeatureValueCount);
                     }
-                    double basicProbability = (categoryFeatureCount == 0 ? 0 : 1d * (categoryFeatureValueCount + getAlpha()) / (categoryFeatureCount + featureCountValueTypes * getAlpha()));
-                    product *= basicProbability;
+                    double basicLogProbability = (categoryFeatureCount == 0 ? 0 : 0d + Math.log(categoryFeatureValueCount + getAlpha()) - Math.log(categoryFeatureCount + featureCountValueTypes * getAlpha()));
+                    logProduct += basicLogProbability;
                 }
             }
             if (isVariant()) {
-                likelyhood[i] = 1d * ((categoryCount + getAlpha()) / (globalCount + globalCountCategories * getAlpha())) * product;
+                likelyhood[i] = Math.exp( 0d + Math.log(categoryCount + getAlpha()) - Math.log((globalCount + globalCountCategories * getAlpha())) + logProduct );
             } else {
-                likelyhood[i] = 1d * categoryCount / globalCount * product;
+                likelyhood[i] = Math.exp( 0d + Math.log(categoryCount) - Math.log(globalCount) + logProduct);
             }
             likelyhoodTot += likelyhood[i];
         }
         return new ClassificationImpl(features, likelihoodsToProbas(likelyhood, likelyhoodTot), explanation, true, isVariant(), getAlpha(), likelyhoodTot);
     }
 
-    /**
-     * @return the variant
-     */
-    public boolean isVariant() {
-        return variant;
-    }
-
-    /**
-     * @return the alpha
-     */
-    public double getAlpha() {
-        return alpha;
-    }
 }

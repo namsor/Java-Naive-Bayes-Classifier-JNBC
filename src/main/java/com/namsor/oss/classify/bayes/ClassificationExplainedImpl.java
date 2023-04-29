@@ -34,6 +34,8 @@ public class ClassificationExplainedImpl implements IClassificationExplained {
      * @param likelyhoods           The likelyhood values
      * @param likelyhoodFormulae    The likelyhood formulae
      * @param likelyhoodExpressions The likelyhood expressions
+     * @param featureNameAndValues The feature names and values
+     * @param basicProbabilities The basic probabilities
      */
     public ClassificationExplainedImpl(IClassification classification, double[] likelyhoods, String[] likelyhoodFormulae, String[] likelyhoodExpressions, String[][] featureNameAndValues, double[][] basicProbabilities) {
         this.classification = classification;

@@ -18,10 +18,10 @@ import org.junit.jupiter.api.BeforeEach;
  *
  * @author elian
  */
-public class NaiveBayesClassifierMapLaplacedImplTest {
+public class NaiveBayesClassifierMapLaplacedLogImplTest1 {
     private static final String MAPDB_DIR = "/tmp/mapdb";
 
-    public NaiveBayesClassifierMapLaplacedImplTest() {
+    public NaiveBayesClassifierMapLaplacedLogImplTest1() {
     }
 
     @BeforeEach
@@ -42,7 +42,7 @@ public class NaiveBayesClassifierMapLaplacedImplTest {
     @Test
     public void testLearnClassifySample1() throws Exception {
         String[] cats = {YES, NO};
-        NaiveBayesClassifierMapLaplacedImpl bayes = new NaiveBayesClassifierMapLaplacedImpl("tennis", cats);
+        NaiveBayesClassifierMapLaplacedLogImpl bayes = new NaiveBayesClassifierMapLaplacedLogImpl("tennis", cats, 1, false);
         for (int i = 0; i < data.length; i++) {
             Map<String, String> features = new HashMap();
             for (int j = 0; j < colName.length - 1; j++) {
@@ -72,7 +72,7 @@ public class NaiveBayesClassifierMapLaplacedImplTest {
     @Test
     public void testLearnClassifyMapDBSample1() throws Exception {
         String[] cats = {YES, NO};
-        NaiveBayesClassifierMapLaplacedImpl bayes = new NaiveBayesClassifierMapLaplacedImpl("tennis", cats, 1, false, MAPDB_DIR + System.currentTimeMillis());
+        NaiveBayesClassifierMapLaplacedLogImpl bayes = new NaiveBayesClassifierMapLaplacedLogImpl("tennis", cats, 1, false, MAPDB_DIR + System.currentTimeMillis());
         for (int i = 0; i < data.length; i++) {
             Map<String, String> features = new HashMap();
             for (int j = 0; j < colName.length - 1; j++) {
@@ -104,7 +104,7 @@ public class NaiveBayesClassifierMapLaplacedImplTest {
         String[] cats = {ZERO, ONE};
         // Create a new bayes classifier with string categories and string features.
         // INaiveBayesClassifier bayes1 = new NaiveBayesClassifierLevelDBImpl("sentiment", cats, ".", 100);
-        NaiveBayesClassifierMapLaplacedImpl bayes = new NaiveBayesClassifierMapLaplacedImpl("sentiment", cats, 1, true);
+        NaiveBayesClassifierMapLaplacedLogImpl bayes = new NaiveBayesClassifierMapLaplacedLogImpl("sentiment", cats, 1, true);
         //NaiveBayesClassifierRocksDBImpl bayes = new NaiveBayesClassifierRocksDBImpl("intro", cats, ".", 100);
 
 // Examples to learn from.
@@ -138,7 +138,7 @@ public class NaiveBayesClassifierMapLaplacedImplTest {
         String[] cats = {ZERO, ONE};
         // Create a new bayes classifier with string categories and string features.
         // INaiveBayesClassifier bayes1 = new NaiveBayesClassifierLevelDBImpl("sentiment", cats, ".", 100);
-        NaiveBayesClassifierMapLaplacedImpl bayes = new NaiveBayesClassifierMapLaplacedImpl("sentiment", cats, 1, true, MAPDB_DIR + System.currentTimeMillis());
+        NaiveBayesClassifierMapLaplacedLogImpl bayes = new NaiveBayesClassifierMapLaplacedLogImpl("sentiment", cats, 1, true, MAPDB_DIR + System.currentTimeMillis());
         //NaiveBayesClassifierRocksDBImpl bayes = new NaiveBayesClassifierRocksDBImpl("intro", cats, ".", 100);
 
 // Examples to learn from.
