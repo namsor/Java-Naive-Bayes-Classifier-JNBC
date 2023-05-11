@@ -165,7 +165,7 @@ public class NaiveBayesClassifierLevelDBLaplacedImpl extends AbstractNaiveBayesC
                 }
                 likelyhoodTot += likelyhood[i];
             }
-            return new ClassificationImpl(features, likelihoodsToProbas(likelyhood, likelyhoodTot), explanation, true, variant, alpha, likelyhoodTot);
+            return new ClassificationImpl(features, likelihoodsToProbas(likelyhood, likelyhoodTot), explanation, true, variant, alpha, likelyhoodTot, false);
         } finally {
             try {
                 // Make sure you close the snapshot to avoid resource leaks.

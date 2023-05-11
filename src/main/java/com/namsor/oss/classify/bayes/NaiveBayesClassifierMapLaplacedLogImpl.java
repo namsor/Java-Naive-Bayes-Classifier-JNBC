@@ -121,7 +121,7 @@ public class NaiveBayesClassifierMapLaplacedLogImpl extends NaiveBayesClassifier
             }
             likelyhoodTot += likelyhood[i];
         }
-        return new ClassificationImpl(features, likelihoodsToProbas(likelyhood, likelyhoodTot), explanation, true, isVariant(), getAlpha(), likelyhoodTot);
+        return new ClassificationImpl(features, likelihoodsToProbas(likelyhood, likelyhoodTot), explanation, true, isVariant(), getAlpha(), likelyhoodTot, true);
     }
 
 }

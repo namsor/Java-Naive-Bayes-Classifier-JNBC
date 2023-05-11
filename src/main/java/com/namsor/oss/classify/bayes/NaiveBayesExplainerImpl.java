@@ -113,9 +113,9 @@ public class NaiveBayesExplainerImpl extends AbstractNaiveBayesImpl implements I
             } else if (proba < 0) {
                 proba = 0d;
             }
-            if (Math.abs(proba - classification.getClassProbabilities()[i].getProbability()) > EPSILON) {
+            if ( ! classification.isLogProductVariant() && Math.abs(proba - classification.getClassProbabilities()[i].getProbability()) > EPSILON) {
                 Logger.getLogger(getClass().getName()).warning("Class " + classification.getClassProbabilities()[i].getCategory() + " probability differs PExplained = " + proba + " <> P = " + classification.getClassProbabilities()[i].getProbability());
-            }
+            } 
         }
         return new ClassificationExplainedImpl(classification, likelyhood, formulae, algebraicExpressions, featureNameAndValues, basicProbabilities);
     }

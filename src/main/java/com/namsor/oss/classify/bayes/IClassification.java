@@ -37,6 +37,12 @@ public interface IClassification {
      * @return If Laplace smothing variant used
      */
     boolean isLaplaceSmoothedVariant();
+    
+    /** 
+     * If LogProduct variant is used to prevent underflows
+     * @return 
+     */
+    boolean isLogProductVariant();
 
     /**
      * The input features

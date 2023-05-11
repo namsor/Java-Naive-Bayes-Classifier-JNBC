@@ -233,4 +233,9 @@ public class ClassificationExplainedImpl implements IClassificationExplained {
         return featureNameAndValues;
     }
 
+    @Override
+    public boolean isLogProductVariant() {
+        return classification.isLogProductVariant();
+    }
+
 }
