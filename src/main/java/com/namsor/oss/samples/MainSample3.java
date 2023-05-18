@@ -80,7 +80,7 @@ public class MainSample3 {
             features.put("Yellow", "Yes");
             features.put("Dummy", "Yes");
             IClassification predict = bayes.classify(features,true);
-            for (int i = 0; i < predict.getClassProbabilities().length; i++) {
+            for (int i = 0; i < predict.getClassProbabilities().length; i++) {                
                 System.out.println("P(" + predict.getClassProbabilities()[i].getCategory() + ")=" + predict.getClassProbabilities()[i].getProbability());
             }
             if( predict.getExplanationData()!=null) {
@@ -90,7 +90,7 @@ public class MainSample3 {
                 ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
                 ScriptEngine scriptEngine = scriptEngineManager.getEngineByName("JavaScript");
                 // JavaScript code from String
-                Object ob = scriptEngine.eval(explained.toString());
+                Object ob = scriptEngine.eval(explained.toJavaScriptText(features));
                 System.out.println("Result of evaluating mathematical expressions in String = " + ob);
                 
             }

@@ -1,6 +1,7 @@
 package com.namsor.oss.classify.bayes;
 
 import java.io.StringWriter;
+import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -13,7 +14,7 @@ import java.util.*;
  * @author elian
  */
 public class ClassificationExplainedImpl implements IClassificationExplained {
-    
+    private DecimalFormat df = new DecimalFormat("#.###");
     private static final Comparator KEY_ORDER = (Comparator) (Object o1, Object o2) -> {
         Map.Entry<String, Long> e1 = (Map.Entry<String, Long>) o1;
         Map.Entry<String, Long> e2 = (Map.Entry<String, Long>) o2;
@@ -188,10 +189,17 @@ public class ClassificationExplainedImpl implements IClassificationExplained {
             sw.append("likelyhoodOf" + getClassProbabilities()[i].getCategory() + "=" + getLikelyhoodFormulae()[i] + "\n");
             sw.append("likelyhoodOf" + getClassProbabilities()[i].getCategory() + "Expr=" + getLikelyhoodExpressions()[i] + "\n");
             sw.append("likelyhoodOf" + getClassProbabilities()[i].getCategory() + "Value=" + getLikelyhoods()[i] + "\n");
+            if( i==0 && getClassProbabilities().length>=2) {
+                sw.append("# basicProbabilities (compared to best alternative) : \n");
+                for (int j = 0; j < getFeatureNameAndValues()[i].length; j++) {
+                    Double f = (getBasicProbabilities()[i+1][j]>0 ? getBasicProbabilities()[i][j] / getBasicProbabilities()[i+1][j]:Double.NaN);
+                    sw.append("# p "+getFeatureNameAndValues()[i][j]+" : "+df.format(getBasicProbabilities()[i][j])+" vs "+df.format(getBasicProbabilities()[i+1][j])+" factor="+df.format(f)+"\n");
+                }                
+            }
             sw.append("# basicProbabilities : \n");
             for (int j = 0; j < getFeatureNameAndValues()[i].length; j++) {
                 sw.append("# p "+getFeatureNameAndValues()[i][j]+" : "+getBasicProbabilities()[i][j]+"\n");
-            }            
+            }
             swLikelyhoodTot.append("likelyhoodOf" + getClassProbabilities()[i].getCategory() + "+");
         }
         sw.append("\n\n# probability estimates by category " + "\n");
